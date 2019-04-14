@@ -1,3 +1,8 @@
-include 'kebtest'
+include 'webtest'
 include 'ken'
+include 'kage'
+include 'kbase'
+include 'ksql'
+include 'yog'
+include 'yson'
 

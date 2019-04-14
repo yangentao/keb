@@ -1,0 +1,67 @@
+package dev.entao.kage
+
+import dev.entao.kage.widget.configUpload
+import dev.entao.ken.HttpPage
+import dev.entao.kbase.firstParamName
+import yet.web.api.FilesPage
+
+fun HttpPage.boot(block: HtmlDoc.() -> Unit) {
+	html {
+		head.apply {
+			metaCharset("UTF-8")
+
+			meta {
+				name = "viewport"
+				content = "width=device-width, initial-scale=1, shrink-to-fit=no"
+			}
+			linkStylesheet(R.CSS.boot)
+			linkStylesheet(httpContext.path.uriRes(R.myCSS))
+		}
+		body.apply {
+			scriptLink(resUri(R.jquery))
+			scriptLink(R.JS.popper)
+			scriptLink(R.JS.boot)
+			scriptLink(resUri(R.myJS))
+			if (FilesPage::class in httpContext.filter.allPages) {
+				val uploadUri = httpContext.path.action(FilesPage::uploadAction).uri
+				val viewUri = httpContext.path.action(FilesPage::imgAction).uri
+				val viewParam = FilesPage::imgAction.firstParamName ?: "id"
+				val missImg = httpContext.path.uriRes(R.fileImageDefault)
+				configUpload(uploadUri, viewUri, viewParam, 30, missImg)
+			}
+		}
+		this.block()
+	}
+}
+
+fun HttpPage.bootPage(block: Tag.() -> Unit) {
+	boot {
+		head.apply {
+			title(filter.webConfig.appName)
+		}
+		body.apply {
+			divContainerFluid {
+				this.block()
+			}
+		}
+	}
+}
+
+fun HttpPage.cardPage(block: Tag.() -> Unit) {
+	sidebarPage {
+		card {
+			this.block()
+		}
+	}
+}
+
+fun HttpPage.cardBodyPage(title: String, block: Tag.() -> Unit) {
+	sidebarPage {
+		card {
+			cardHeader(title)
+			cardBody {
+				this.block()
+			}
+		}
+	}
+}
