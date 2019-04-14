@@ -2,7 +2,6 @@
 
 package dev.entao.ken
 
-import dev.entao.ken.ex.contentTypeXml
 import org.w3c.dom.Element
 import dev.entao.kbase.toXml
 

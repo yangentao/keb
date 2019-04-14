@@ -1,8 +1,7 @@
+@file:Suppress("unused")
+
 package dev.entao.ken
 
-import dev.entao.ken.ex.contentTypeHtml
-import dev.entao.kage.HtmlDoc
-import dev.entao.kage.Tag
 import java.io.PrintWriter
 
 /**
@@ -25,16 +24,8 @@ open class HtmlSender(val context: HttpContext) {
 		writer.println(s)
 	}
 
-	fun tag(t: Tag) {
-		writer.print(t.toString())
-	}
-
 	fun text(s: String) {
-		print(s)
-	}
-
-	fun print(html: HtmlDoc) {
-		print(html.toString())
+		this.print(s)
 	}
 
 }

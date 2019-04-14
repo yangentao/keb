@@ -1,6 +1,5 @@
 package dev.entao.ken.anno
 
-import net.yet.web.role.Access
 
 /**
  * Created by entaoyang@163.com on 2017/6/10.
@@ -29,6 +28,3 @@ annotation class LengthRange(val minValue: Int, val maxValue: Int, val msg: Stri
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ColumnWidth(val value: String)
 
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class AccessLevel(val level: Access)

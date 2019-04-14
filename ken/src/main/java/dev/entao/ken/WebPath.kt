@@ -1,12 +1,11 @@
+@file:Suppress("MemberVisibilityCanBePrivate", "unused")
+
 package dev.entao.ken
 
 import dev.entao.kbase.Prop1
-import dev.entao.kbase.userName
-import dev.entao.kage.P
-import dev.entao.kbase.ownerClass
 import dev.entao.kbase.getValue
-import yet.servlet.actionName
-import yet.servlet.pageName
+import dev.entao.kbase.ownerClass
+import dev.entao.kbase.userName
 import java.net.URLEncoder
 import javax.servlet.http.HttpServletRequest
 import kotlin.math.min
@@ -36,13 +35,7 @@ class WebPath(val filter: HttpFilter) {
 		return this
 	}
 
-	fun success(msg: String): WebPath {
-		return arg(P.SUCCESS, msg)
-	}
 
-	fun error(msg: String): WebPath {
-		return arg(P.ERROR, msg)
-	}
 
 	//参数名是action函数的参数的名字,
 	fun param(v: Any?): WebPath {
@@ -72,14 +65,14 @@ class WebPath(val filter: HttpFilter) {
 
 	fun arg(p: Prop1, value: Any?): WebPath {
 		if (value != null) {
-			params.put(p.userName, value.toString())
+			params[p.userName] = value.toString()
 		}
 		return this
 	}
 
 	fun arg(key: String, value: Any?): WebPath {
 		if (value != null) {
-			params.put(key, value.toString())
+			params[key] = value.toString()
 		}
 		return this
 	}
@@ -89,13 +82,7 @@ class WebPath(val filter: HttpFilter) {
 		return this
 	}
 
-	fun ok(msg: String): WebPath {
-		return arg(P.SUCCESS, msg)
-	}
 
-	fun err(msg: String): WebPath {
-		return arg(P.ERROR, msg)
-	}
 
 	// /app_path
 	val uriApp: String
@@ -150,4 +137,20 @@ class WebPath(val filter: HttpFilter) {
 		}
 	}
 
+}
+
+fun WebPath.ok(msg: String): WebPath {
+	return arg(ParamConst.SUCCESS, msg)
+}
+
+fun WebPath.err(msg: String): WebPath {
+	return arg(ParamConst.ERROR, msg)
+}
+
+fun WebPath.success(msg: String): WebPath {
+	return arg(ParamConst.SUCCESS, msg)
+}
+
+fun WebPath.error(msg: String): WebPath {
+	return arg(ParamConst.ERROR, msg)
 }

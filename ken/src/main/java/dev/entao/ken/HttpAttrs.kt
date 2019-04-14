@@ -2,7 +2,6 @@ package dev.entao.ken
 
 import dev.entao.kbase.userName
 import dev.entao.kbase.MyDate
-import dev.entao.ken.ex.attr
 import java.sql.Date
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty

@@ -1,7 +1,6 @@
 package dev.entao.ken
 
 import dev.entao.kbase.Mimes
-import dev.entao.ken.ex.header
 import dev.entao.kbase.substringBetween
 import java.io.File
 import java.io.FileInputStream

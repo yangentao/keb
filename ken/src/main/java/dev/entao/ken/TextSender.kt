@@ -1,6 +1,5 @@
 package dev.entao.ken
 
-import dev.entao.ken.ex.contentTypePlain
 import java.io.PrintWriter
 
 /**

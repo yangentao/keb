@@ -1,12 +1,11 @@
 package dev.entao.ken
 
-import dev.entao.ken.ex.contentTypeJson
 import dev.entao.yog.logd
 import dev.entao.yson.YsonArray
 import dev.entao.yson.YsonObject
 import dev.entao.yson.YsonObjectBuilder
 import dev.entao.yson.ysonArray
-import yet.servlet.Result
+import dev.entao.ken.ex.Result
 
 /**
  * Created by entaoyang@163.com on 2018/3/18.

@@ -1,22 +1,13 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "FunctionName")
 
 package dev.entao.ken
 
-import dev.entao.kage.DialogBuild
-import dev.entao.kage.HtmlDoc
-import dev.entao.kage.Tag
-import dev.entao.kage.p
-import dev.entao.kage.widget.button
 import dev.entao.kbase.Prop1
-import dev.entao.ken.anno.NavItem
-import dev.entao.sql.sqlFullName
-import dev.entao.kage.P
 import dev.entao.kbase.isTypeInt
 import dev.entao.kbase.isTypeLong
 import dev.entao.kbase.isTypeString
-import dev.entao.ken.ex.fromRequest
+import dev.entao.ken.anno.NavItem
 import dev.entao.sql.*
-import yet.servlet.actionListWithNavItem
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import kotlin.reflect.KFunction
@@ -32,9 +23,9 @@ open class HttpPage(val context: HttpContext) {
 	val response: HttpServletResponse get() = context.response
 	val filter: HttpFilter get() = context.filter
 
+	val htmlSender: HtmlSender get() = context.htmlSender
 	val jsonSender: JsonSender get() = context.jsonSender
 	val xmlSender: XmlSender get() = context.xmlSender
-	val htmlSender: HtmlSender get() = context.htmlSender
 	val resultSender: ResultSender get() = context.resultSender
 	val fileSender: FileSender get() = context.fileSender
 
@@ -85,74 +76,9 @@ open class HttpPage(val context: HttpContext) {
 		return path.action(action)
 	}
 
-	fun formDialog(title: String, block: (Tag) -> Unit) {
-		val d = DialogBuild(context)
-		d.modal.outputScript = true
-		d.title(title)
-		d.bodyBlock = {
-			block(it)
-		}
-		d.closeText = "取消"
-		d.buttonsBlock = {
-			it.button {
-				+"提交"
-				classList += "m-1"
-				btnPrimary()
-				onclick = "yet.submitDialogPanel(this);"
-			}
-		}
-		d.build()
-		htmlSender.text(d.modal.toString())
-	}
 
-	fun formDialogDisplay(title: String, block: (Tag) -> Unit) {
-		val d = DialogBuild(context)
-		d.modal.outputScript = true
-		d.title(title)
-		d.bodyBlock = {
-			block(it)
-		}
-		d.closeText = "确定"
-		d.build()
-		val s = d.modal.toString()
-		htmlSender.text(s)
-	}
 
-	fun formError(title: String, msg: String) {
-		val d = DialogBuild(context)
-		d.modal.outputScript = true
-		d.title(title)
-		d.bodyBlock = {
-			it.p {
-				textEscaped(msg)
-			}
-		}
-		d.closeText = "确定"
-		d.build()
-		val s = d.modal.toString()
-		htmlSender.text(s)
-	}
 
-	fun html(block: HtmlDoc.() -> Unit) {
-		val h = HtmlDoc(context)
-		h.block()
-		h.body.filterDeep { it.tagName == "a" || it.tagName == "button" }.forEach {
-			val s = if (it.href.isNotEmpty()) {
-				it.href
-			} else if (it.dataUrl.isNotEmpty()) {
-				it.dataUrl
-			} else {
-				""
-			}
-			if (s.isNotEmpty()) {
-				if (!context.allow(s)) {
-					it.addClass("d-none")
-				}
-			}
-		}
-
-		htmlSender.print(h)
-	}
 
 	private fun paramValue(p: Prop1): Any? {
 		if (p.isTypeInt) {
@@ -228,8 +154,5 @@ open class HttpPage(val context: HttpContext) {
 		return p LT v
 	}
 
-	fun SQLQuery.limitPage() {
-		val n = context.httpParams.int(P.pageN) ?: 0
-		this.limit(P.pageSize, n * P.pageSize)
-	}
+
 }
