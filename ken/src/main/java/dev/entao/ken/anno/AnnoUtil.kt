@@ -1,7 +1,7 @@
 package dev.entao.ken.anno
 
 import dev.entao.kava.base.userName
-import dev.entao.sql.*
+import dev.entao.kava.sql.*
 import dev.entao.kava.log.loge
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
@@ -54,8 +54,8 @@ private fun keyValueMapByTable(tableName: String, keyCol: String, labelCol: Stri
 
 fun KProperty<*>.selectOptionsTable(w: Where? = null): Map<String, String> {
 	val map = HashMap<String, String>()
-	val fk = this.findAnnotation<ForeignKey>()
-	val fcol = this.findAnnotation<ForeignLabel>()
+	val fk = this.findAnnotation<dev.entao.kava.sql.ForeignKey>()
+	val fcol = this.findAnnotation<dev.entao.kava.sql.ForeignLabel>()
 
 	if (fk != null && fcol != null) {
 		if (fk.cls.modelPrimaryKeys.size != 1) {
@@ -76,8 +76,8 @@ fun KProperty<*>.singleSelectDisplay(v: Any): String? {
 	if (a != null) {
 		return a
 	}
-	val fk = this.findAnnotation<ForeignKey>()
-	val fcol = this.findAnnotation<ForeignLabel>()
+	val fk = this.findAnnotation<dev.entao.kava.sql.ForeignKey>()
+	val fcol = this.findAnnotation<dev.entao.kava.sql.ForeignLabel>()
 	if (fk != null && fcol != null) {
 		if (fk.cls.modelPrimaryKeys.size != 1) {
 			loge("主键必须只有一列")

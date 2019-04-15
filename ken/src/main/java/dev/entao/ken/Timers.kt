@@ -1,11 +1,9 @@
 package dev.entao.ken
 
 import dev.entao.kava.base.*
-import dev.entao.sql.AutoInc
-import dev.entao.ken.anno.MaxRows
-import dev.entao.sql.PrimaryKey
 import dev.entao.kava.log.loge
-import dev.entao.sql.*
+import dev.entao.kava.sql.*
+import dev.entao.ken.anno.MaxRows
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
@@ -40,7 +38,7 @@ class TableLimitTimer(private val cls: KClass<out Model>, limitValue: Int = 0) :
 			return null
 		}
 		val pk = ks.first()
-		if (!(pk.hasAnnotation<PrimaryKey>() && pk.hasAnnotation<AutoInc>())
+		if (!(pk.hasAnnotation<dev.entao.kava.sql.PrimaryKey>() && pk.hasAnnotation<dev.entao.kava.sql.AutoInc>())
 				|| !(pk.isTypeLong || pk.isTypeInt)) {
 			loge("必须是整形自增主键")
 			return null

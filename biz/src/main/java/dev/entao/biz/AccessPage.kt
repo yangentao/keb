@@ -7,8 +7,8 @@ import dev.entao.kava.log.logd
 import dev.entao.ken.HttpAction
 import dev.entao.ken.HttpPage
 import dev.entao.biz.model.Access
-import dev.entao.sql.AND
-import dev.entao.sql.EQ
+import dev.entao.kava.sql.AND
+import dev.entao.kava.sql.EQ
 import dev.entao.biz.model.ResAccess
 import dev.entao.biz.model.ResItem
 

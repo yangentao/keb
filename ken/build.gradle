@@ -20,10 +20,10 @@ dependencies {
 //    implementation 'dev.entao:ksql:1.0.1'
 
 
-    implementation project(":log")
-    implementation project(":base")
-    implementation project(":json")
-    implementation project(":ksql")
+    implementation 'dev.entao.kava:log:1.0.0'
+    implementation 'dev.entao.kava:base:1.0.0'
+    implementation 'dev.entao.kava:json:1.0.0'
+    implementation 'dev.entao.kava:sql:1.0.0'
 }
 
 

@@ -12,10 +12,10 @@ import dev.entao.kage.cardBodyPage
 import dev.entao.kage.cardPage
 import dev.entao.kage.widget.*
 import dev.entao.ken.intList
-import dev.entao.sql.AND
-import dev.entao.sql.EQ
-import dev.entao.sql.IN
-import dev.entao.sql.Where
+import dev.entao.kava.sql.AND
+import dev.entao.kava.sql.EQ
+import dev.entao.kava.sql.IN
+import dev.entao.kava.sql.Where
 import dev.entao.biz.model.Account
 import dev.entao.ken.ok
 

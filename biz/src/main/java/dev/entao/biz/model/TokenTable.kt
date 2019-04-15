@@ -1,12 +1,10 @@
 package dev.entao.biz.model
 
-import dev.entao.sql.Index
-import dev.entao.sql.PrimaryKey
-import dev.entao.sql.AND
-import dev.entao.sql.EQ
-import dev.entao.sql.Model
-import dev.entao.sql.ModelClass
 import dev.entao.kava.base.Hex
+import dev.entao.kava.sql.AND
+import dev.entao.kava.sql.EQ
+import dev.entao.kava.sql.Model
+import dev.entao.kava.sql.ModelClass
 
 /**
  * Created by entaoyang@163.com on 2018/4/2.
@@ -15,18 +13,18 @@ import dev.entao.kava.base.Hex
 //仅app用户
 class TokenTable : Model() {
 
-	@PrimaryKey
+	@dev.entao.kava.sql.PrimaryKey
 	var userId: String by model
 
 	//os
-	@PrimaryKey
+	@dev.entao.kava.sql.PrimaryKey
 	var type: String by model
 
-	@Index
+	@dev.entao.kava.sql.Index
 	var token: String by model
 
 	//0, -1永不过期
-	@Index
+	@dev.entao.kava.sql.Index
 	var expire: Long by model
 
 	val isExpired: Boolean

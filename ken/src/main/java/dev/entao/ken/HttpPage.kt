@@ -7,7 +7,7 @@ import dev.entao.kava.base.isTypeInt
 import dev.entao.kava.base.isTypeLong
 import dev.entao.kava.base.isTypeString
 import dev.entao.ken.anno.NavItem
-import dev.entao.sql.*
+import dev.entao.kava.sql.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import kotlin.reflect.KFunction

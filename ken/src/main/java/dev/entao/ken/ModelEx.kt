@@ -1,8 +1,8 @@
 package dev.entao.ken
 
 import dev.entao.kava.base.*
-import dev.entao.sql.Model
-import dev.entao.sql.modelProperties
+import dev.entao.kava.sql.Model
+import dev.entao.kava.sql.modelProperties
 import javax.servlet.http.HttpServletRequest
 
 fun Model.fromRequest(req: HttpServletRequest) {

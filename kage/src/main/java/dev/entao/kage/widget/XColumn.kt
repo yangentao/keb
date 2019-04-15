@@ -9,7 +9,7 @@ import dev.entao.ken.HttpContext
 import dev.entao.ken.WebPath
 import dev.entao.kage.B
 import dev.entao.kage.P
-import dev.entao.sql.ModelMap
+import dev.entao.kava.sql.ModelMap
 import dev.entao.kage.displayOf
 import dev.entao.ken.HttpAction
 import dev.entao.ken.valOf

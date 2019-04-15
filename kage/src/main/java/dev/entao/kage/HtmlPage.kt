@@ -5,7 +5,7 @@ package dev.entao.kage
 import dev.entao.kage.widget.button
 import dev.entao.ken.HttpContext
 import dev.entao.ken.HttpPage
-import dev.entao.sql.SQLQuery
+import dev.entao.kava.sql.SQLQuery
 
 open class HtmlPage(context: HttpContext) : HttpPage(context) {
 

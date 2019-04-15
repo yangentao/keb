@@ -1,20 +1,19 @@
 package dev.entao.biz.model
 
 import dev.entao.kava.base.Label
-import dev.entao.sql.PrimaryKey
-import dev.entao.sql.Model
-import dev.entao.sql.ModelClass
+import dev.entao.kava.sql.Model
+import dev.entao.kava.sql.ModelClass
 
 @Label("组角色")
 class DeptRole : Model() {
 
 
 	@Label("组ID")
-	@PrimaryKey
+	@dev.entao.kava.sql.PrimaryKey
 	var deptId: Int by model
 
 	@Label("角色ID")
-	@PrimaryKey
+	@dev.entao.kava.sql.PrimaryKey
 	var roleId: Int by model
 
 	companion object : ModelClass<DeptRole>() {

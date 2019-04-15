@@ -1,8 +1,7 @@
 package dev.entao.biz
 
-import dev.entao.sql.PrimaryKey
-import dev.entao.sql.Model
-import dev.entao.sql.ModelClass
+import dev.entao.kava.sql.Model
+import dev.entao.kava.sql.ModelClass
 
 /**
  * Created by entaoyang@163.com on 2018/7/31.
@@ -10,7 +9,7 @@ import dev.entao.sql.ModelClass
 
 class Province : Model() {
 
-	@PrimaryKey
+	@dev.entao.kava.sql.PrimaryKey
 	var id: String by model
 
 

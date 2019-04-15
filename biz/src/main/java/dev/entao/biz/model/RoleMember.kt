@@ -1,28 +1,26 @@
 package dev.entao.biz.model
 
 import dev.entao.kava.base.Label
-import dev.entao.sql.Exclude
-import dev.entao.sql.PrimaryKey
-import dev.entao.sql.Model
-import dev.entao.sql.ModelClass
+import dev.entao.kava.sql.Model
+import dev.entao.kava.sql.ModelClass
 
 @Label("用户角色")
 class RoleMember : Model() {
 
 	@Label("角色ID")
-	@PrimaryKey
+	@dev.entao.kava.sql.PrimaryKey
 	var roleId: Int by model
 
 	@Label("用户ID")
-	@PrimaryKey
+	@dev.entao.kava.sql.PrimaryKey
 	var accountId: Int by model
 
-	@Exclude
+	@dev.entao.kava.sql.Exclude
 	val roleName: String
 		get() {
 			return Role.findByKey(roleId)?.name ?: ""
 		}
-	@Exclude
+	@dev.entao.kava.sql.Exclude
 	val account: Account?
 		get() {
 			return Account.findByKey(accountId)

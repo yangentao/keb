@@ -2,11 +2,11 @@ package dev.entao.kage.ex
 
 import dev.entao.kava.base.DefaultValue
 import dev.entao.kava.base.Name
-import dev.entao.sql.AutoInc
-import dev.entao.sql.PrimaryKey
+import dev.entao.kava.sql.AutoInc
+import dev.entao.kava.sql.PrimaryKey
 import dev.entao.ken.HttpContext
-import dev.entao.sql.Model
-import dev.entao.sql.ModelClass
+import dev.entao.kava.sql.Model
+import dev.entao.kava.sql.ModelClass
 import java.io.File
 import java.util.*
 import javax.servlet.http.Part
@@ -18,8 +18,8 @@ import javax.servlet.http.Part
 @Name("upload")
 class Upload : Model() {
 
-	@PrimaryKey
-	@AutoInc
+	@dev.entao.kava.sql.PrimaryKey
+	@dev.entao.kava.sql.AutoInc
 	var id: Int by model
 	var localFileName: String by model
 	var extName: String by model

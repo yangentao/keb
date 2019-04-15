@@ -4,16 +4,8 @@ import dev.entao.kava.base.DefaultValue
 import dev.entao.kava.base.FormDate
 import dev.entao.kava.base.HideClient
 import dev.entao.kava.base.Label
+import dev.entao.kava.sql.*
 import dev.entao.ken.anno.*
-import dev.entao.sql.AutoInc
-import dev.entao.sql.EQ
-import dev.entao.sql.ForeignKey
-import dev.entao.sql.ForeignLabel
-import dev.entao.sql.Index
-import dev.entao.sql.Model
-import dev.entao.sql.ModelClass
-import dev.entao.sql.PrimaryKey
-import dev.entao.sql.Unique
 
 //账号是指web管理端的账号
 
@@ -21,12 +13,12 @@ import dev.entao.sql.Unique
 class Account : Model() {
 
 	@Label("ID")
-	@AutoInc
-	@PrimaryKey
+	@dev.entao.kava.sql.AutoInc
+	@dev.entao.kava.sql.PrimaryKey
 	var id: Int by model
 
-	@Index
-	@Unique
+	@dev.entao.kava.sql.Index
+	@dev.entao.kava.sql.Unique
 	@Label("手机号")
 	@FormRequired
 	var phone: String by model
@@ -42,7 +34,7 @@ class Account : Model() {
 
 	@FormOptions("0:正常", "1:禁用")
 	@Label("状态")
-	@Index
+	@dev.entao.kava.sql.Index
 	var status: Int by model
 
 	@FormDate("MM-dd HH:mm")
@@ -54,8 +46,8 @@ class Account : Model() {
 
 	@Label("部门")
 	@DefaultValue("0")
-	@ForeignKey(Dept::class)
-	@ForeignLabel("name")
+	@dev.entao.kava.sql.ForeignKey(Dept::class)
+	@dev.entao.kava.sql.ForeignLabel("name")
 	var deptId: Int by model
 
 	companion object : ModelClass<Account>() {

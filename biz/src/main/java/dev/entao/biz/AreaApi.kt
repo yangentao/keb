@@ -2,7 +2,7 @@ package dev.entao.biz
 
 import dev.entao.ken.HttpContext
 import dev.entao.ken.HttpPage
-import dev.entao.sql.EQ
+import dev.entao.kava.sql.EQ
 import dev.entao.kava.json.ysonObject
 
 class AreaApi(context: HttpContext) : HttpPage(context) {

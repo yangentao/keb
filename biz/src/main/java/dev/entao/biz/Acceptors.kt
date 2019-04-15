@@ -5,8 +5,8 @@ import dev.entao.biz.model.ResAccess
 import dev.entao.kava.base.base64Encoded
 import dev.entao.ken.*
 import dev.entao.biz.model.TokenTable
-import dev.entao.sql.AND
-import dev.entao.sql.EQ
+import dev.entao.kava.sql.AND
+import dev.entao.kava.sql.EQ
 
 class DefaultPermAcceptor : PermAcceptor {
 	private val accessMap = HashMap<String, Int>()

@@ -1,28 +1,25 @@
 package dev.entao.biz.model
 
 import dev.entao.kava.base.Label
-import dev.entao.ken.anno.*
-import dev.entao.sql.AutoInc
-import dev.entao.sql.Index
-import dev.entao.sql.Model
-import dev.entao.sql.ModelClass
-import dev.entao.sql.PrimaryKey
+import dev.entao.kava.sql.Model
+import dev.entao.kava.sql.ModelClass
+import dev.entao.ken.anno.FormOptions
 
 @Label("角色")
 class Role : Model() {
 
 	@Label("角色ID")
-	@PrimaryKey
-	@AutoInc
+	@dev.entao.kava.sql.PrimaryKey
+	@dev.entao.kava.sql.AutoInc
 	var id: Int by model
 
 	@Label("角色名")
-	@Index
+	@dev.entao.kava.sql.Index
 	var name: String by model
 
 	@FormOptions("0:正常","1:禁用")
 	@Label("状态")
-	@Index
+	@dev.entao.kava.sql.Index
 	var status: Int by model
 
 	companion object : ModelClass<Role>() {

@@ -8,7 +8,7 @@ import dev.entao.ken.HttpAction
 import dev.entao.kava.base.Prop
 import dev.entao.kava.base.Prop0
 import dev.entao.kage.S
-import dev.entao.sql.Where
+import dev.entao.kava.sql.Where
 import dev.entao.kava.base.firstParamName
 import dev.entao.kava.base.getValue
 import dev.entao.kage.TagCallback

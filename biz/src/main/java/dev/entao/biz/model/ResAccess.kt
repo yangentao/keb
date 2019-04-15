@@ -1,25 +1,24 @@
 package dev.entao.biz.model
 
 import dev.entao.kava.base.Label
+import dev.entao.kava.sql.Model
+import dev.entao.kava.sql.ModelClass
 import dev.entao.ken.anno.FormOptions
-import dev.entao.sql.PrimaryKey
-import dev.entao.sql.Model
-import dev.entao.sql.ModelClass
 
 @Label("访问资源")
 class ResAccess : Model() {
 
 
 	@Label("URI")
-	@PrimaryKey
+	@dev.entao.kava.sql.PrimaryKey
 	var uri: String by model
 
-	@PrimaryKey
+	@dev.entao.kava.sql.PrimaryKey
 	@Label("对象")
 	var objId: Int by model
 
 	@FormOptions("0:账号", "1:部门", "2:角色")
-	@PrimaryKey
+	@dev.entao.kava.sql.PrimaryKey
 	@Label("对象类型")
 	var objType: Int by model
 

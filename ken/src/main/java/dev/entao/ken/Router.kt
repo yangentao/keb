@@ -2,7 +2,7 @@ package dev.entao.ken
 
 import dev.entao.kava.base.*
 import dev.entao.ken.anno.*
-import dev.entao.sql.Length
+import dev.entao.kava.sql.Length
 import dev.entao.kava.json.YsonArray
 import dev.entao.kava.json.YsonObject
 import java.lang.reflect.InvocationTargetException
@@ -120,7 +120,7 @@ class Router(val uri: String, val function: KFunction<*>, obj: Any? = null) {
 				is NotBlank -> if (value.trim().isEmpty()) {
 					err(p, "参数不能为空或不可见字符")
 				}
-				is Length -> if (value.length > an.value) {
+				is dev.entao.kava.sql.Length -> if (value.length > an.value) {
 					err(p, "参数长度须小于${an.value}")
 				}
 				is LengthRange -> if (value.length > an.maxValue) {

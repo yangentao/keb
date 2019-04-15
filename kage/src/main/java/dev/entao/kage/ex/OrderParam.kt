@@ -5,7 +5,7 @@ import dev.entao.kava.base.Prop1
 import dev.entao.kava.base.userName
 import dev.entao.ken.HttpContext
 import dev.entao.ken.HttpPage
-import dev.entao.sql.SQLQuery
+import dev.entao.kava.sql.SQLQuery
 
 /**
  * Created by entaoyang@163.com on 2018/7/9.

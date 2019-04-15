@@ -1,10 +1,9 @@
 package dev.entao.biz.model
 
 import dev.entao.kava.base.DefaultValue
+import dev.entao.kava.sql.Model
+import dev.entao.kava.sql.ModelClass
 import dev.entao.ken.anno.FormOptions
-import dev.entao.sql.PrimaryKey
-import dev.entao.sql.Model
-import dev.entao.sql.ModelClass
 
 /**
  * Created by entaoyang@163.com on 2018/7/11.
@@ -12,7 +11,7 @@ import dev.entao.sql.ModelClass
 
 class UserClient : Model() {
 
-	@PrimaryKey
+	@dev.entao.kava.sql.PrimaryKey
 	var userId: Int by model
 
 

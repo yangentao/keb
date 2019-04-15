@@ -1,18 +1,16 @@
 package dev.entao.biz.model
 
+import dev.entao.biz.Parent
 import dev.entao.kava.base.*
+import dev.entao.kava.sql.Model
+import dev.entao.kava.sql.ModelClass
 import dev.entao.ken.HttpContext
 import dev.entao.ken.WebPath
 import dev.entao.ken.actionList
-import dev.entao.ken.anno.*
+import dev.entao.ken.anno.NavItem
 import dev.entao.ken.pageName
-import dev.entao.sql.Model
-import dev.entao.sql.ModelClass
-import dev.entao.sql.PrimaryKey
-import dev.entao.biz.Parent
 import java.util.*
 import kotlin.reflect.full.findAnnotation
-
 
 enum class Access(val value: Int) {
 	Page(-1), None(0), View(1), Edit(2), Create(3), Delete(4)
@@ -25,7 +23,7 @@ annotation class AccessLevel(val level: Access)
 @Label("组")
 class ResItem : Model() {
 
-	@PrimaryKey
+	@dev.entao.kava.sql.PrimaryKey
 	@Label("资源")
 	var uri: String by model
 

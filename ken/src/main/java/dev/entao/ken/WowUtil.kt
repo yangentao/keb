@@ -2,7 +2,7 @@ package dev.entao.ken
 
 import dev.entao.kava.base.*
 import dev.entao.ken.anno.*
-import dev.entao.sql.Exclude
+import dev.entao.kava.sql.Exclude
 import java.net.URLEncoder
 import kotlin.reflect.*
 import kotlin.reflect.full.findAnnotation
@@ -47,7 +47,7 @@ val KFunction<*>.isHttpAction: Boolean
 		if (!this.name.endsWith(HttpFilter.ACTION)) {
 			return false
 		}
-		if (this.hasAnnotation<Exclude>()) {
+		if (this.hasAnnotation<dev.entao.kava.sql.Exclude>()) {
 			return false
 		}
 		if (this.visibility != KVisibility.PUBLIC) {

@@ -5,7 +5,7 @@ package dev.entao.ken
 import dev.entao.kava.base.userLabel
 import dev.entao.ken.anno.NavItem
 import dev.entao.kava.log.*
-import dev.entao.sql.ConnLook
+import dev.entao.kava.sql.ConnLook
 import dev.entao.kava.base.MyDate
 import java.io.File
 import java.util.*

@@ -1,28 +1,25 @@
 package dev.entao.biz.model
 
-import dev.entao.kava.base.*
+import dev.entao.kava.base.Label
+import dev.entao.kava.base.substr
+import dev.entao.kava.log.loge
+import dev.entao.kava.sql.Model
+import dev.entao.kava.sql.ModelClass
 import dev.entao.ken.HttpContext
-import dev.entao.ken.anno.*
+import dev.entao.ken.anno.MaxRows
 import dev.entao.ken.clientIp
 import dev.entao.ken.headerUserAgent
 import dev.entao.ken.paramMap
-import dev.entao.sql.AutoInc
-import dev.entao.sql.Index
-import dev.entao.sql.Length
-import dev.entao.sql.Model
-import dev.entao.sql.ModelClass
-import dev.entao.sql.PrimaryKey
-import dev.entao.kava.log.loge
 
 @MaxRows(300_000)
 class Ip : Model() {
 
-	@AutoInc
-	@PrimaryKey
+	@dev.entao.kava.sql.AutoInc
+	@dev.entao.kava.sql.PrimaryKey
 	@Label("ID")
 	var id: Int by model
 
-	@Index
+	@dev.entao.kava.sql.Index
 	@Label("IP")
 	var ip: String by model
 
@@ -32,30 +29,30 @@ class Ip : Model() {
 	@Label("端口号")
 	var port: Int by model
 
-	@Index
+	@dev.entao.kava.sql.Index
 	@Label("URI")
 	var uri: String by model
 
 	@Label("请求参数")
-	@Length(3072)
+	@dev.entao.kava.sql.Length(3072)
 	var query: String by model
 
 	@Label("请求Agent")
-	@Length(1024)
+	@dev.entao.kava.sql.Length(1024)
 	var agent: String by model
 
-	@Index
+	@dev.entao.kava.sql.Index
 	@Label("APP用户ID")
 	var appUserId: String by model
 
-	@Index
+	@dev.entao.kava.sql.Index
 	@Label("WEB用户ID")
 	var accountId: String by model
 
-	@Index
+	@dev.entao.kava.sql.Index
 	var reqDate: java.sql.Date by model
 
-	@Index
+	@dev.entao.kava.sql.Index
 	var reqTime: java.sql.Time by model
 
 	companion object : ModelClass<Ip>() {

@@ -3,8 +3,8 @@ package dev.entao.biz
 import dev.entao.ken.HttpContext
 import dev.entao.biz.model.User
 import dev.entao.biz.model.TokenTable
-import dev.entao.sql.AND
-import dev.entao.sql.EQ
+import dev.entao.kava.sql.AND
+import dev.entao.kava.sql.EQ
 
 fun HttpContext.loginApp(phone: String, pwd: String): User? {
 	val u = User.findOne(User::phone EQ phone AND (User::pwd EQ pwd))

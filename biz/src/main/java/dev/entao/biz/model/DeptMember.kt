@@ -1,25 +1,23 @@
 package dev.entao.biz.model
 
 import dev.entao.kava.base.Label
-import dev.entao.sql.Index
-import dev.entao.sql.PrimaryKey
-import dev.entao.sql.Model
-import dev.entao.sql.ModelClass
+import dev.entao.kava.sql.Model
+import dev.entao.kava.sql.ModelClass
 
 @Label("部门成员")
 class DeptMember : Model() {
 
 	@Label("部门")
-	@PrimaryKey
+	@dev.entao.kava.sql.PrimaryKey
 	var deptId: Int by model
 
 	@Label("账号")
-	@PrimaryKey
+	@dev.entao.kava.sql.PrimaryKey
 	var accountId: Int by model
 
 
 
-	@Index
+	@dev.entao.kava.sql.Index
 	@Label("状态")
 	var status: Int by model
 

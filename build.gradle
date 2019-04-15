@@ -18,7 +18,7 @@ subprojects { proj ->
     }
 
     repositories {
-        maven { url 'http://app800.cn/maven/repository/jee/' }
+        maven { url 'http://app800.cn/maven/repository/releases/' }
         mavenCentral()
         google()
     }

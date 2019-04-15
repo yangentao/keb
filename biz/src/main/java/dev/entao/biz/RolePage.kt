@@ -5,10 +5,10 @@ package dev.entao.biz
 import dev.entao.kage.*
 import dev.entao.kava.base.Label
 import dev.entao.ken.anno.*
-import dev.entao.sql.AND
-import dev.entao.sql.EQ
-import dev.entao.sql.IN
-import dev.entao.sql.Where
+import dev.entao.kava.sql.AND
+import dev.entao.kava.sql.EQ
+import dev.entao.kava.sql.IN
+import dev.entao.kava.sql.Where
 import dev.entao.kage.widget.*
 import dev.entao.ken.HttpContext
 import dev.entao.ken.ex.OrderBy

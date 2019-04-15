@@ -11,7 +11,7 @@ import dev.entao.ken.HttpPage
 import dev.entao.ken.anno.HttpMethod
 import dev.entao.ken.anno.LoginWeb
 import dev.entao.ken.filePart
-import dev.entao.sql.EQ
+import dev.entao.kava.sql.EQ
 import dev.entao.kage.ex.Upload
 import dev.entao.kava.apk.ApkInfo
 import javax.servlet.http.Part

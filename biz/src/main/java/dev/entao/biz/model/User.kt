@@ -4,14 +4,12 @@ import dev.entao.kava.base.DefaultValue
 import dev.entao.kava.base.HideClient
 import dev.entao.kava.base.Label
 import dev.entao.kava.base.Name
-import dev.entao.ken.anno.*
-import dev.entao.sql.AutoInc
-import dev.entao.sql.EQ
-import dev.entao.sql.Index
-import dev.entao.sql.Model
-import dev.entao.sql.ModelClass
-import dev.entao.sql.PrimaryKey
-import dev.entao.sql.Unique
+import dev.entao.kava.sql.EQ
+import dev.entao.kava.sql.Model
+import dev.entao.kava.sql.ModelClass
+import dev.entao.ken.anno.ColumnWidth
+import dev.entao.ken.anno.FormOptions
+import dev.entao.ken.anno.FormRequired
 
 /**
  * Created by entaoyang@163.com on 2018/4/2.
@@ -22,13 +20,13 @@ import dev.entao.sql.Unique
 class User : Model() {
 
 	@Label("ID")
-	@AutoInc
-	@PrimaryKey
+	@dev.entao.kava.sql.AutoInc
+	@dev.entao.kava.sql.PrimaryKey
 	var id: Int by model
 
 	@ColumnWidth("8em")
-	@Index
-	@Unique
+	@dev.entao.kava.sql.Index
+	@dev.entao.kava.sql.Unique
 	@Label("手机号")
 	@FormRequired
 	var phone: String by model
@@ -44,13 +42,13 @@ class User : Model() {
 
 	@FormOptions("0:正常", "1:禁用")
 	@Label("状态")
-	@Index
+	@dev.entao.kava.sql.Index
 	var status: Int by model
 
 	@DefaultValue("0")
 	@FormOptions("0:普通", "1:内部")
 	@Label("类型")
-	@Index
+	@dev.entao.kava.sql.Index
 	var userType: Int by model
 
 	var lastLogin: Long by model
