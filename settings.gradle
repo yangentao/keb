@@ -1,7 +1,5 @@
 include ':webtest'
 include ':biz'
-include ':ken'
-include ':kage'
-include ':qr'
-include ':apk'
+include ':core'
+include ':page'
 
