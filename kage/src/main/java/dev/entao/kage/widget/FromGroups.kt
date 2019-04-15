@@ -1,12 +1,12 @@
 package dev.entao.kage.widget
 
 import dev.entao.kage.*
-import dev.entao.kbase.userLabel
-import dev.entao.kbase.userName
+import dev.entao.kava.base.userLabel
+import dev.entao.kava.base.userName
 import dev.entao.ken.anno.FormHelpBlock
-import dev.entao.kbase.Prop
-import dev.entao.kbase.getValue
-import dev.entao.kbase.strToV
+import dev.entao.kava.base.Prop
+import dev.entao.kava.base.getValue
+import dev.entao.kava.base.strToV
 import kotlin.reflect.KProperty0
 import kotlin.reflect.full.findAnnotation
 

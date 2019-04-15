@@ -1,9 +1,9 @@
 package dev.entao.sql
 
-import dev.entao.kbase.defaultValue
-import dev.entao.kbase.userName
-import dev.entao.kbase.defaultValueOfProperty
-import dev.entao.kbase.strToV
+import dev.entao.kava.base.defaultValue
+import dev.entao.kava.base.userName
+import dev.entao.kava.base.defaultValueOfProperty
+import dev.entao.kava.base.strToV
 import java.sql.Connection
 import kotlin.reflect.KProperty
 

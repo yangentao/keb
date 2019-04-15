@@ -2,10 +2,10 @@
 
 package dev.entao.ken
 
-import dev.entao.kbase.Prop1
-import dev.entao.kbase.getValue
-import dev.entao.kbase.ownerClass
-import dev.entao.kbase.userName
+import dev.entao.kava.base.Prop1
+import dev.entao.kava.base.getValue
+import dev.entao.kava.base.ownerClass
+import dev.entao.kava.base.userName
 import java.net.URLEncoder
 import javax.servlet.http.HttpServletRequest
 import kotlin.math.min

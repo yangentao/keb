@@ -5,7 +5,7 @@ package dev.entao.kage
 import dev.entao.kage.widget.a
 import dev.entao.kage.widget.button
 import dev.entao.kage.widget.radio
-import dev.entao.kbase.userLabel
+import dev.entao.kava.base.userLabel
 import kotlin.reflect.KFunction
 
 fun Tag.flex(block: Tag.() -> Unit): Tag {

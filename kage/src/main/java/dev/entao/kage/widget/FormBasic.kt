@@ -3,12 +3,12 @@
 package dev.entao.kage.widget
 
 import dev.entao.kage.Tag
-import dev.entao.kbase.userName
-import dev.entao.kbase.Prop
-import dev.entao.kbase.Prop0
-import dev.entao.kbase.Prop1
+import dev.entao.kava.base.userName
+import dev.entao.kava.base.Prop
+import dev.entao.kava.base.Prop0
+import dev.entao.kava.base.Prop1
 import dev.entao.ken.WebPath
-import dev.entao.kbase.getValue
+import dev.entao.kava.base.getValue
 import dev.entao.kage.TagCallback
 import dev.entao.kage.div
 import kotlin.reflect.KFunction

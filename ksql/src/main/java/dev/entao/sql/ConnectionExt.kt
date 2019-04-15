@@ -1,12 +1,12 @@
 package dev.entao.sql
 
-import dev.entao.kbase.getValue
-import dev.entao.kbase.hasAnnotation
-import dev.entao.kbase.isTypeLong
-import dev.entao.kbase.setValue
-import dev.entao.yog.logd
-import dev.entao.kbase.Prop
-import dev.entao.yson.*
+import dev.entao.kava.json.*
+import dev.entao.kava.base.getValue
+import dev.entao.kava.base.hasAnnotation
+import dev.entao.kava.base.isTypeLong
+import dev.entao.kava.base.setValue
+import dev.entao.kava.log.logd
+import dev.entao.kava.base.Prop
 import java.lang.IllegalArgumentException
 import java.sql.Connection
 import java.sql.PreparedStatement

@@ -1,8 +1,5 @@
 package dev.entao.kage
 
-import dev.entao.kbase.userName
-import kotlin.reflect.KProperty
-
 /**
  * Created by entaoyang@163.com on 2017/6/20.
  */

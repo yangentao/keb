@@ -1,10 +1,10 @@
 package dev.entao.kage.widget
 
 import dev.entao.kage.Tag
-import dev.entao.kbase.*
+import dev.entao.kava.base.*
 import dev.entao.ken.anno.*
 import dev.entao.sql.Length
-import dev.entao.kbase.Prop
+import dev.entao.kava.base.Prop
 import dev.entao.kage.div
 import dev.entao.kage.label
 import dev.entao.kage.B

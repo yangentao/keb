@@ -1,8 +1,8 @@
 package dev.entao.ken.anno
 
-import dev.entao.kbase.userName
+import dev.entao.kava.base.userName
 import dev.entao.sql.*
-import dev.entao.yog.loge
+import dev.entao.kava.log.loge
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
 

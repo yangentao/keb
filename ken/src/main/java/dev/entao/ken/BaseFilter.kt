@@ -1,6 +1,6 @@
 package dev.entao.ken
 
-import dev.entao.yog.logd
+import dev.entao.kava.log.logd
 import javax.servlet.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse

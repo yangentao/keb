@@ -2,8 +2,8 @@
 
 package dev.entao.ken
 
-import dev.entao.kbase.urlDecoded
-import dev.entao.kbase.urlEncoded
+import dev.entao.kava.base.urlDecoded
+import dev.entao.kava.base.urlEncoded
 import javax.servlet.http.HttpServletRequest
 
 /**

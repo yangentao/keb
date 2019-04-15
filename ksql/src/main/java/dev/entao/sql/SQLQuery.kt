@@ -2,8 +2,8 @@
 
 package dev.entao.sql
 
-import dev.entao.kbase.Prop
-import dev.entao.kbase.plusAssign
+import dev.entao.kava.base.Prop
+import dev.entao.kava.base.plusAssign
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 

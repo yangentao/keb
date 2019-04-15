@@ -1,15 +1,15 @@
 package dev.entao.kage
 
-import dev.entao.kbase.FormDate
-import dev.entao.kbase.FormTime
+import dev.entao.kava.base.FormDate
+import dev.entao.kava.base.FormTime
 import dev.entao.ken.anno.KeepDot
 import dev.entao.ken.anno.singleSelectDisplay
-import dev.entao.kbase.Prop
-import dev.entao.kbase.Prop0
-import dev.entao.kbase.MyDate
-import dev.entao.kbase.getValue
-import dev.entao.kbase.keepDot
-import dev.entao.yson.YsonValue
+import dev.entao.kava.base.Prop
+import dev.entao.kava.base.Prop0
+import dev.entao.kava.base.MyDate
+import dev.entao.kava.base.getValue
+import dev.entao.kava.base.keepDot
+import dev.entao.kava.json.YsonValue
 import kotlin.reflect.full.findAnnotation
 
 /**

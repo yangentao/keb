@@ -1,6 +1,6 @@
 package dev.entao.kage
 
-import dev.entao.kbase.*
+import dev.entao.kava.base.*
 import dev.entao.ken.HttpContext
 import dev.entao.ken.WebPath
 import java.util.*

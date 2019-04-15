@@ -1,6 +1,6 @@
 package dev.entao.ken
 
-import dev.entao.kbase.userName
+import dev.entao.kava.base.userName
 import kotlin.reflect.KProperty
 
 object ParamConst {

@@ -1,12 +1,12 @@
 package dev.entao.kage.widget
 
-import dev.entao.kbase.userLabel
+import dev.entao.kava.base.userLabel
 import dev.entao.ken.anno.*
 import dev.entao.ken.HttpAction
 import dev.entao.ken.HttpContext
 import dev.entao.ken.WebPath
 import dev.entao.kage.B
-import dev.entao.kbase.firstParamName
+import dev.entao.kava.base.firstParamName
 import dev.entao.kage.Tag
 import dev.entao.kage.TagCallback
 import dev.entao.kage.scriptBlock

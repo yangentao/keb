@@ -1,8 +1,8 @@
 package dev.entao.sql
 
-import dev.entao.kbase.Name
-import dev.entao.kbase.userName
-import dev.entao.kbase.ownerClass
+import dev.entao.kava.base.Name
+import dev.entao.kava.base.userName
+import dev.entao.kava.base.ownerClass
 import kotlin.reflect.*
 import kotlin.reflect.full.findAnnotation
 

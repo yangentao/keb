@@ -1,10 +1,10 @@
 package dev.entao.ken
 
-import dev.entao.kbase.*
+import dev.entao.kava.base.*
 import dev.entao.sql.AutoInc
 import dev.entao.ken.anno.MaxRows
 import dev.entao.sql.PrimaryKey
-import dev.entao.yog.loge
+import dev.entao.kava.log.loge
 import dev.entao.sql.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation

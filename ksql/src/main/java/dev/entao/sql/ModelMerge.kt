@@ -1,9 +1,9 @@
 package dev.entao.sql
 
-import dev.entao.kbase.*
-import dev.entao.yog.logd
-import dev.entao.yson.YsonArray
-import dev.entao.yson.YsonObject
+import dev.entao.kava.base.*
+import dev.entao.kava.log.logd
+import dev.entao.kava.json.YsonArray
+import dev.entao.kava.json.YsonObject
 import java.sql.Connection
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty

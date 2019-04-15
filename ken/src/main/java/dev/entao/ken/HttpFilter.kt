@@ -1,11 +1,12 @@
+@file:Suppress("MemberVisibilityCanBePrivate", "unused")
+
 package dev.entao.ken
 
-import dev.entao.kbase.userLabel
+import dev.entao.kava.base.userLabel
 import dev.entao.ken.anno.NavItem
-import dev.entao.yog.*
+import dev.entao.kava.log.*
 import dev.entao.sql.ConnLook
-import dev.entao.kbase.MyDate
-import dev.entao.ken.ex.model.Ip
+import dev.entao.kava.base.MyDate
 import java.io.File
 import java.util.*
 import javax.servlet.FilterConfig
@@ -30,6 +31,7 @@ abstract class HttpFilter : BaseFilter() {
 	private val acceptList = ArrayList<Acceptor>(8)
 	private var timer: Timer? = null
 	private val timerList = ArrayList<HttpTimer>()
+	var permAcceptorClass: KClass<out PermAcceptor>? = null
 
 	var contextPath: String = ""
 		private set
@@ -97,14 +99,8 @@ abstract class HttpFilter : BaseFilter() {
 		logd("Server Start!")
 
 		addRouterOfThis()
-
 		addAcceptor(MethodAcceptor)
-		addAcceptor(AuthWebAcceptor)
-		addAcceptor(AuthAppAcceptor)
-		addAcceptor(IpAcceptor)
-		addAcceptor(ResAcceptor)
 
-		addTimer(TableLimitTimer(Ip::class))
 		try {
 			onInit()
 		} catch (ex: Exception) {
@@ -131,19 +127,24 @@ abstract class HttpFilter : BaseFilter() {
 	override fun doHttpFilter(request: HttpServletRequest, response: HttpServletResponse): Boolean {
 //		logd("requestURI: ", request.requestURI)
 //		request.dumpParam()
-		val r = map[request.requestURI.trimEnd('/').toLowerCase()] ?: return false
+		val uri = request.requestURI.trimEnd('/').toLowerCase()
+		val r = map[uri] ?: return false
 		try {
 			val c = HttpContext(this, request, response)
 			for (a in this.acceptList) {
-				try {
-					if (!a.accept(c, r)) {
-						return true
-					}
-				} catch (ex: Exception) {
-					loge(ex)
+				if (!a.accept(c, r)) {
+					return true
 				}
 			}
-			r.dispatch(c)
+			if (c.allow(uri)) {
+				r.dispatch(c)
+			} else {
+				if (c.acceptJson) {
+					c.resultSender.failed("未授权")
+				} else {
+					c.htmlSender.print("未授权")
+				}
+			}
 		} finally {
 			ConnLook.removeThreadLocal()
 		}

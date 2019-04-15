@@ -1,8 +1,8 @@
 package dev.entao.kage
 
 import dev.entao.ken.HttpContext
-import dev.entao.kbase.escapeHtml
-import dev.entao.kbase.trimColumns
+import dev.entao.kava.base.escapeHtml
+import dev.entao.kava.base.trimColumns
 
 class LabelLink(var label: String, var link: String)
 

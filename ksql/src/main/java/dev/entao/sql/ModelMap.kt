@@ -1,13 +1,13 @@
 package dev.entao.sql
 
-import dev.entao.kbase.defaultValue
-import dev.entao.kbase.fullName
-import dev.entao.kbase.userName
-import dev.entao.kbase.defaultValueOfProperty
-import dev.entao.kbase.isClass
-import dev.entao.kbase.strToV
-import dev.entao.yson.YsonArray
-import dev.entao.yson.YsonObject
+import dev.entao.kava.base.defaultValue
+import dev.entao.kava.base.fullName
+import dev.entao.kava.base.userName
+import dev.entao.kava.base.defaultValueOfProperty
+import dev.entao.kava.base.isClass
+import dev.entao.kava.base.strToV
+import dev.entao.kava.json.YsonArray
+import dev.entao.kava.json.YsonObject
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty
 

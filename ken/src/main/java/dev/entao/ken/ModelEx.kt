@@ -1,6 +1,6 @@
 package dev.entao.ken
 
-import dev.entao.kbase.*
+import dev.entao.kava.base.*
 import dev.entao.sql.Model
 import dev.entao.sql.modelProperties
 import javax.servlet.http.HttpServletRequest

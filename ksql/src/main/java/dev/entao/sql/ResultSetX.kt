@@ -1,7 +1,7 @@
 package dev.entao.sql
 
-import dev.entao.yog.logd
-import dev.entao.kbase.closeSafe
+import dev.entao.kava.log.logd
+import dev.entao.kava.base.closeSafe
 import java.sql.ResultSet
 import java.sql.Types
 

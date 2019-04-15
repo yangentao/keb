@@ -4,7 +4,7 @@ import dev.entao.kage.Tag
 import dev.entao.kage.flexRow
 import dev.entao.kage.scriptBlock
 import dev.entao.kage.targetBlank
-import dev.entao.kbase.*
+import dev.entao.kava.base.*
 import dev.entao.ken.HttpContext
 import dev.entao.ken.WebPath
 import dev.entao.kage.B
@@ -13,7 +13,7 @@ import dev.entao.sql.ModelMap
 import dev.entao.kage.displayOf
 import dev.entao.ken.HttpAction
 import dev.entao.ken.valOf
-import dev.entao.yson.YsonObject
+import dev.entao.kava.json.YsonObject
 import kotlin.reflect.KFunction
 import kotlin.reflect.KMutableProperty1
 

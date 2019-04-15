@@ -3,7 +3,7 @@
 package dev.entao.ken
 
 import org.w3c.dom.Element
-import dev.entao.kbase.toXml
+import dev.entao.kava.base.toXml
 
 class XmlSender(val context: HttpContext) {
 

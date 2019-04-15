@@ -2,8 +2,8 @@
 
 package dev.entao.kage
 
-import dev.entao.kbase.userName
-import dev.entao.kbase.Prop
+import dev.entao.kava.base.userName
+import dev.entao.kava.base.Prop
 
 typealias TagCallback = Tag.() -> Unit
 

@@ -1,16 +1,14 @@
 package dev.entao.kage
 
-import dev.entao.kage.TConst.name
 import dev.entao.kage.widget.a
 import dev.entao.kage.widget.button
 import dev.entao.kage.widget.configUpload
-import dev.entao.kbase.hasAnnotation
-import dev.entao.kbase.userLabel
+import dev.entao.kava.base.hasAnnotation
+import dev.entao.kava.base.userLabel
 import dev.entao.ken.anno.IndexAction
-import dev.entao.kbase.firstParamName
-import dev.entao.kbase.removeAllIf
+import dev.entao.kava.base.firstParamName
+import dev.entao.kava.base.removeAllIf
 import dev.entao.ken.*
-import dev.entao.ken.ex.pages.FilesPage
 import kotlin.reflect.KClass
 
 fun HtmlPage.sidebarPage(block: Tag.() -> Unit) {
@@ -190,7 +188,6 @@ fun HtmlPage.checkAlertMessage(tag: Tag) {
 }
 
 private fun HtmlPage.buildUserInfoFlex(parentTag: Tag) {
-	val user = context.account
 	val cfg = context.filter.webConfig
 	parentTag.flex {
 		classList += B.Flex.justifyContentBetween
@@ -199,13 +196,13 @@ private fun HtmlPage.buildUserInfoFlex(parentTag: Tag) {
 		classList += "w-100"
 		span {
 			classList += "mr-auto"
-			if (user != null) {
-				+user.name
+			if (context.loginedWeb) {
+				+context.accountName
 			} else {
 				+"未登录"
 			}
 		}
-		if (user == null) {
+		if (context.loginedWeb) {
 			a("登录", cfg.loginUri)
 		} else {
 			a("登出", cfg.logoutUri)

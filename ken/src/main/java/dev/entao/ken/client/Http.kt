@@ -1,12 +1,12 @@
 package dev.entao.ken.client
 
-import dev.entao.yog.log
-import dev.entao.yog.logd
-import dev.entao.yog.loge
-import dev.entao.kbase.Progress
-import dev.entao.kbase.SizeStream
-import dev.entao.kbase.closeSafe
-import dev.entao.kbase.copyStream
+import dev.entao.kava.log.log
+import dev.entao.kava.log.logd
+import dev.entao.kava.log.loge
+import dev.entao.kava.base.Progress
+import dev.entao.kava.base.SizeStream
+import dev.entao.kava.base.closeSafe
+import dev.entao.kava.base.copyStream
 import java.io.*
 import java.net.*
 import java.util.*

@@ -2,10 +2,10 @@
 
 package dev.entao.ken
 
-import dev.entao.kbase.Prop1
-import dev.entao.kbase.isTypeInt
-import dev.entao.kbase.isTypeLong
-import dev.entao.kbase.isTypeString
+import dev.entao.kava.base.Prop1
+import dev.entao.kava.base.isTypeInt
+import dev.entao.kava.base.isTypeLong
+import dev.entao.kava.base.isTypeString
 import dev.entao.ken.anno.NavItem
 import dev.entao.sql.*
 import javax.servlet.http.HttpServletRequest

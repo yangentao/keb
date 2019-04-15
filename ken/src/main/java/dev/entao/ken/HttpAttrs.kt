@@ -1,7 +1,7 @@
 package dev.entao.ken
 
-import dev.entao.kbase.userName
-import dev.entao.kbase.MyDate
+import dev.entao.kava.base.userName
+import dev.entao.kava.base.MyDate
 import java.sql.Date
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty

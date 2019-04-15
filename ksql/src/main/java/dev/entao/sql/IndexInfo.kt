@@ -1,6 +1,6 @@
 package dev.entao.sql
 
-import dev.entao.kbase.Name
+import dev.entao.kava.base.Name
 
 //TABLE_CAT=campus, TABLE_SCHEM=null, TABLE_NAME=ip, NON_UNIQUE=false, INDEX_QUALIFIER=,
 // INDEX_NAME=PRIMARY, TYPE=3, ORDINAL_POSITION=1, COLUMN_NAME=id, ASC_OR_DESC=A, CARDINALITY=6,

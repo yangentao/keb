@@ -1,7 +1,7 @@
 package dev.entao.ken
 
-import dev.entao.kbase.Mimes
-import dev.entao.kbase.substringBetween
+import dev.entao.kava.base.Mimes
+import dev.entao.kava.base.substringBetween
 import java.io.File
 import java.io.FileInputStream
 import javax.servlet.ServletOutputStream

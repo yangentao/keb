@@ -2,9 +2,9 @@
 
 package dev.entao.sql
 
-import dev.entao.yog.logd
-import dev.entao.kbase.Prop
-import dev.entao.kbase.Prop1
+import dev.entao.kava.log.logd
+import dev.entao.kava.base.Prop
+import dev.entao.kava.base.Prop1
 import java.sql.Connection
 import java.sql.ResultSet
 import kotlin.reflect.KClass

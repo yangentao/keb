@@ -1,6 +1,6 @@
 package dev.entao.sql
 
-import dev.entao.kbase.isPublic
+import dev.entao.kava.base.isPublic
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties

@@ -1,8 +1,8 @@
 package dev.entao.kage.widget
 
 import dev.entao.kage.*
-import dev.entao.kbase.userName
-import dev.entao.kbase.getValue
+import dev.entao.kava.base.userName
+import dev.entao.kava.base.getValue
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
 

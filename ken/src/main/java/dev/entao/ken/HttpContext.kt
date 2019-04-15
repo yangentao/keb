@@ -1,20 +1,15 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
 package dev.entao.ken
 
-import dev.entao.kbase.*
-import dev.entao.ken.ex.model.ResAccess
-import dev.entao.ken.ex.model.TokenTable
-import dev.entao.sql.AND
-import dev.entao.sql.EQ
-import dev.entao.ken.ex.model.Account
-import dev.entao.ken.ex.model.User
+import dev.entao.kava.base.Mimes
 import java.io.File
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession
 import javax.servlet.http.Part
 import kotlin.reflect.KFunction
+import kotlin.reflect.full.createInstance
 
 /**
  * Created by entaoyang@163.com on 2016/12/18.
@@ -46,29 +41,17 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	var os: String = ""
 	var token: String = ""
 	var userId: Int = 0
-	var user: User? = null
-
 	var accountId: Int = 0
-	var account: Account? = null
+	var userName: String = ""
+	var accountName: String = ""
 
 	val loginedApp: Boolean get() = userId != 0
 	val loginedWeb: Boolean get() = accountId != 0
 
-	private val accessMap = HashMap<String, Int>()
+	private val permAcceptor: PermAcceptor? = filter.permAcceptorClass?.createInstance()
 
-	fun prepareAccess() {
-		val ac = this.account
-		if (ac != null) {
-			ResAccess.findAll(ResAccess::objId to ac.deptId, ResAccess::objType to ResAccess.TDept).forEach {
-				accessMap[it.uri] = it.judge
-			}
-			ResAccess.findAll(ResAccess::objId to ac.id, ResAccess::objType to ResAccess.TAccount).forEach {
-				if (it.judge == ResAccess.Allow) {
-					accessMap[it.uri] = it.judge
-				}
-			}
-
-		}
+	init {
+		permAcceptor?.prepare(this)
 	}
 
 	fun allow(action: HttpAction): Boolean {
@@ -76,39 +59,7 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	}
 
 	fun allow(uri: String): Boolean {
-		if (!filter.webConfig.allowResAccess) {
-			return true
-		}
-		val uu = uri.substringBefore('?')
-		if (this.accountId == 0) {
-			return true
-		}
-		val n = accessMap[uu] ?: return true
-		return n == ResAccess.Allow
-	}
-
-	fun loginApp(phone: String, pwd: String): User? {
-		val u = User.findOne(User::phone EQ phone AND (User::pwd EQ pwd))
-		if (u == null) {
-			resultSender.failed("用户名或密码错误")
-			return null
-		}
-		if (u.status != 0) {
-			resultSender.failed("帐号已禁用")
-			return null
-		}
-		return u
-	}
-
-	fun saveToken(appUserId: Int, os: String): String {
-		return TokenTable.refresh(appUserId.toString(), os, 0L)
-	}
-
-	fun logoutApp() {
-		if (userId > 0) {
-			TokenTable.remove(userId.toString(), os)
-		}
-		userId = 0
+		return permAcceptor?.accept(this, uri) ?: true
 	}
 
 	fun loginWeb(accountId: Int) {

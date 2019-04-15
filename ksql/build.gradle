@@ -12,9 +12,12 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "org.jetbrains.kotlin:kotlin-reflect"
-    implementation 'dev.entao:yog:1.0.1'
-    implementation 'dev.entao:kbase:1.0.1'
-    implementation 'dev.entao:yson:1.0.1'
+//    implementation 'dev.entao:yog:1.0.1'
+//    implementation 'dev.entao:kbase:1.0.1'
+//    implementation 'dev.entao:yson:1.0.1'
+    implementation project(":base")
+    implementation project(":log")
+    implementation project(":json")
 }
 
 

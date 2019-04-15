@@ -1,6 +1,6 @@
 package dev.entao.ken
 
-import dev.entao.kbase.*
+import dev.entao.kava.base.*
 import dev.entao.ken.anno.*
 import dev.entao.sql.Exclude
 import java.net.URLEncoder

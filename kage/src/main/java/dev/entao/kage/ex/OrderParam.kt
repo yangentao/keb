@@ -1,8 +1,8 @@
 package dev.entao.ken.ex
 
 import dev.entao.kage.P
-import dev.entao.kbase.Prop1
-import dev.entao.kbase.userName
+import dev.entao.kava.base.Prop1
+import dev.entao.kava.base.userName
 import dev.entao.ken.HttpContext
 import dev.entao.ken.HttpPage
 import dev.entao.sql.SQLQuery

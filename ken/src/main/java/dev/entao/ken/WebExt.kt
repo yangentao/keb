@@ -1,8 +1,8 @@
 package dev.entao.ken
 
-import dev.entao.kbase.Mimes
-import dev.entao.kbase.matchIp4
-import dev.entao.yog.logd
+import dev.entao.kava.base.Mimes
+import dev.entao.kava.base.matchIp4
+import dev.entao.kava.log.logd
 import java.nio.charset.Charset
 import java.util.*
 import javax.servlet.ServletRequest

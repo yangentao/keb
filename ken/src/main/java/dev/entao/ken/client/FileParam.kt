@@ -1,6 +1,6 @@
 package dev.entao.ken.client
 
-import dev.entao.kbase.Progress
+import dev.entao.kava.base.Progress
 import java.io.File
 
 /**

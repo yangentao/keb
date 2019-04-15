@@ -1,16 +1,16 @@
 package dev.entao.kage.widget
 
 import dev.entao.kage.Tag
-import dev.entao.kbase.userLabel
-import dev.entao.kbase.userName
+import dev.entao.kava.base.userLabel
+import dev.entao.kava.base.userName
 import dev.entao.ken.anno.*
 import dev.entao.ken.HttpAction
-import dev.entao.kbase.Prop
-import dev.entao.kbase.Prop0
+import dev.entao.kava.base.Prop
+import dev.entao.kava.base.Prop0
 import dev.entao.kage.S
 import dev.entao.sql.Where
-import dev.entao.kbase.firstParamName
-import dev.entao.kbase.getValue
+import dev.entao.kava.base.firstParamName
+import dev.entao.kava.base.getValue
 import dev.entao.kage.TagCallback
 import dev.entao.kage.div
 import dev.entao.kage.label

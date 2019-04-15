@@ -3,12 +3,12 @@ package dev.entao.kage.widget
 import dev.entao.kage.*
 import dev.entao.ken.HttpAction
 import dev.entao.ken.ex.OrderParam
-import dev.entao.kbase.Prop1
+import dev.entao.kava.base.Prop1
 import dev.entao.kage.B
 import dev.entao.kage.P
-import dev.entao.kbase.getValue
-import dev.entao.ken.ex.pages.FilesPage
-import dev.entao.ken.ex.model.Upload
+import dev.entao.kava.base.getValue
+import dev.entao.kage.FilesPage
+import dev.entao.kage.ex.Upload
 import java.util.*
 import kotlin.reflect.KFunction
 

@@ -3,8 +3,7 @@
 package dev.entao.kage
 
 import dev.entao.kage.widget.configUpload
-import dev.entao.kbase.firstParamName
-import dev.entao.ken.ex.pages.FilesPage
+import dev.entao.kava.base.firstParamName
 
 fun HtmlPage.boot(block: HtmlDoc.() -> Unit) {
 	html {

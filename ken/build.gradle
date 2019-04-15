@@ -13,15 +13,17 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "org.jetbrains.kotlin:kotlin-reflect"
     compileOnly "javax.servlet:javax.servlet-api:3.1.0"
-    implementation 'net.dongliu:apk-parser:2.2.0'
-    implementation 'com.google.zxing:javase:3.3.2'
-    implementation 'dev.entao:yog:1.0.1'
-    implementation 'dev.entao:kbase:1.0.1'
-    implementation 'dev.entao:yson:1.0.1'
-    implementation 'dev.entao:ksql:1.0.1'
-//    implementation project(":yson")
-//    implementation project(":kbase")
-//    implementation project(":ksql")
+
+//    implementation 'dev.entao:yog:1.0.1'
+//    implementation 'dev.entao:kbase:1.0.1'
+//    implementation 'dev.entao:yson:1.0.1'
+//    implementation 'dev.entao:ksql:1.0.1'
+
+
+    implementation project(":log")
+    implementation project(":base")
+    implementation project(":json")
+    implementation project(":ksql")
 }
 
 
