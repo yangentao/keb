@@ -130,18 +130,18 @@ class Router(val uri: String, val function: KFunction<*>, obj: Any? = null) {
 				is Match -> if (!value.matches(an.value.toRegex())) {
 					err(p, if (an.msg.isEmpty()) "参数规则不匹配" else an.msg)
 				}
-				is MinValue -> if (value.toDouble() < an.value) {
+				is MinValue -> if (value.toDouble() < an.value.toDouble()) {
 					err(p, if (an.msg.isEmpty()) "参数太小" else an.msg)
 				}
-				is MaxValue -> if (value.toDouble() > an.value) {
+				is MaxValue -> if (value.toDouble() > an.value.toDouble()) {
 					err(p, if (an.msg.isEmpty()) "参数太大" else an.msg)
 				}
 				is ValueRange -> {
 					val n = value.toDouble()
-					if (n < an.minVal) {
+					if (n < an.minVal.toDouble()) {
 						err(p, if (an.msg.isEmpty()) "参数太小" else an.msg)
 					}
-					if (n > an.maxVal) {
+					if (n > an.maxVal.toDouble()) {
 						err(p, if (an.msg.isEmpty()) "参数太大" else an.msg)
 					}
 				}

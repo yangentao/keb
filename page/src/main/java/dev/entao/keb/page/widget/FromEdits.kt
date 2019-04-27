@@ -178,16 +178,16 @@ fun Tag.configEditOfProp(p: Prop) {
 		typeNumber()
 		val rr = p.findAnnotation<ValueRange>()
 		if (rr != null) {
-			min = rr.minVal.toString()
-			max = rr.maxVal.toString()
+			min = rr.minVal
+			max = rr.maxVal
 		} else {
 			val mr = p.findAnnotation<MinValue>()
 			if (mr != null) {
-				min = mr.value.toString()
+				min = mr.value
 			}
 			val mr2 = p.findAnnotation<MaxValue>()
 			if (mr2 != null) {
-				max = mr2.value.toString()
+				max = mr2.value
 			}
 		}
 		val stepAn = p.findAnnotation<StepValue>()
