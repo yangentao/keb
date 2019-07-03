@@ -416,9 +416,9 @@ open class FileSender(val context: HttpContext) {
 
 	fun sendData(data: ByteArray, contentType: String) {
 		val totalLength = data.size
-		context.response.contentType = contentType
-
-		context.response.addHeader("Content-Length", totalLength.toString())
+		val r = context.response
+		r.contentType = contentType
+		r.addHeader("Content-Length", totalLength.toString())
 		val rangeHead = findRange()
 		if (rangeHead != null) {
 			context.response.addHeader("Content-Range", "bytes 0-${totalLength - 1}/$totalLength")

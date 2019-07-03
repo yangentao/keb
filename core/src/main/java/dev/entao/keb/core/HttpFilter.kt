@@ -45,30 +45,22 @@ abstract class HttpFilter : dev.entao.keb.core.BaseFilter() {
 	private val webParentFile: File get() = webRootFile.parentFile
 
 	val baseDir: File by lazy {
-		File(webParentFile, contextPath.trim('/') + "_base").apply {
-			if (!this.exists()) {
-				this.mkdir()
-			}
-		}
+		sureDir("_base")
 	}
 
 	val uploadDir: File by lazy {
-		File(webParentFile, contextPath.trim('/') + "_files").apply {
-			if (!exists()) {
-				mkdir()
-			}
-		}
+		sureDir("_files")
 	}
 	val tmpDir: File by lazy {
-		File(webParentFile, contextPath.trim('/') + "_tmp").apply {
-			if (!exists()) {
-				mkdir()
-			}
-		}
+		sureDir("_tmp")
 	}
 
 	val logDir: File by lazy {
-		File(webParentFile, contextPath.trim('/') + "_log").apply {
+		sureDir("_log")
+	}
+
+	private fun sureDir(dirName: String): File {
+		return File(webParentFile, contextPath.trim('/') + dirName).apply {
 			if (!exists()) {
 				mkdir()
 			}
