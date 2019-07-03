@@ -4,9 +4,10 @@ package dev.entao.keb.page
 
 import dev.entao.keb.page.widget.button
 import dev.entao.kava.sql.SQLQuery
+import dev.entao.keb.core.HttpContext
 import dev.entao.keb.page.B.btnPrimary
 
-open class HtmlPage(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.HttpPage(context) {
+open class HtmlPage(context: HttpContext) : dev.entao.keb.core.HttpPage(context) {
 
 	fun SQLQuery.limitPage() {
 		val n = context.httpParams.int(P.pageN) ?: 0

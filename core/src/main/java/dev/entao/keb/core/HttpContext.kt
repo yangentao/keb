@@ -4,6 +4,7 @@ package dev.entao.keb.core
 
 import dev.entao.kava.base.Mimes
 import java.io.File
+import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession
@@ -15,7 +16,7 @@ import kotlin.reflect.full.createInstance
  * Created by entaoyang@163.com on 2016/12/18.
  */
 
-class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val response: HttpServletResponse) {
+class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val response: HttpServletResponse, val chain: FilterChain) {
 
 	val htmlSender: HtmlSender  by lazy {
 		HtmlSender(this)
@@ -48,20 +49,6 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	val loginedApp: Boolean get() = userId != 0
 	val loginedWeb: Boolean get() = accountId != 0
 
-	private val permAcceptor: PermAcceptor? = filter.permAcceptorClass?.createInstance()
-
-	init {
-		permAcceptor?.prepare(this)
-	}
-
-	fun allow(action: HttpAction): Boolean {
-		return allow(path.action(action).uri)
-	}
-
-	fun allow(uri: String): Boolean {
-		return permAcceptor?.accept(this, uri) ?: true
-	}
-
 	fun loginWeb(accountId: Int) {
 		putSession(ACCOUNT_ID, accountId.toString())
 	}
@@ -80,12 +67,9 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 			return Mimes.HTML in request.header("Accept") ?: ""
 		}
 
-	//war解压后的目录,  WEB-INF和META-INF所在的目录
-	val localAppDir: File
-		get() {
-			val s = filter.filterConfig.servletContext.getRealPath("/")
-			return File(s)
-		}
+	fun allow(uri: String): Boolean {
+		return true
+	}
 
 	fun redirect(url: String) {
 		response.sendRedirect(url)
@@ -162,8 +146,8 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 		response.sendError(code, msg)
 	}
 
-	val uploadDir: File get() = filter.uploadDir
-	val tmpDir: File get() = filter.tmpDir
+	val uploadDir: File get() = filter.webDir.uploadDir
+	val tmpDir: File get() = filter.webDir.tmpDir
 
 	companion object {
 		const val ACCOUNT_ID = "accountId"

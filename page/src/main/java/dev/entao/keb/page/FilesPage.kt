@@ -4,7 +4,6 @@ package dev.entao.keb.page
 
 import dev.entao.keb.page.ex.Upload
 import dev.entao.kava.apk.ApkInfo
-import dev.entao.kava.apk.MyApkFile
 import dev.entao.kava.base.Hex
 import dev.entao.kava.base.Mimes
 import dev.entao.kava.sql.EQ
@@ -20,25 +19,25 @@ import javax.servlet.http.Part
 
 class FilesPage(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.HttpPage(context) {
 
-	fun apkInfoAction(id: Int) {
-		val item = Upload.findByKey(id)
-		if (item == null) {
-			resultSender.failed(-1, "无效的标识")
-			return
-		}
-		val file = item.localFile(context)
-		if (!file.exists()) {
-			resultSender.failed(-1, "文件已不存在")
-			return
-		}
-
-		val info = ApkInfo.fromFileToJsonObject(file)
-		if (info != null) {
-			resultSender.obj(info)
-			return
-		}
-		resultSender.failed(-1, "解析失败")
-	}
+//	fun apkInfoAction(id: Int) {
+//		val item = Upload.findByKey(id)
+//		if (item == null) {
+//			resultSender.failed(-1, "无效的标识")
+//			return
+//		}
+//		val file = item.localFile(context)
+//		if (!file.exists()) {
+//			resultSender.failed(-1, "文件已不存在")
+//			return
+//		}
+//
+//		val info = ApkInfo.fromFileToJsonObject(file)
+//		if (info != null) {
+//			resultSender.obj(info)
+//			return
+//		}
+//		resultSender.failed(-1, "解析失败")
+//	}
 
 	//上传一个文件
 	@LoginWeb
@@ -114,21 +113,21 @@ class FilesPage(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.Ht
 			fs.media(file, Mimes.ofFile(item.rawname))
 			return
 		}
-		if ("apk" in item.extName.toLowerCase()) {
-			val data = MyApkFile.iconData(file)
-			val headData = data.copyOfRange(0, 16)
-			val hexS = Hex.encode(headData).toUpperCase()
-			val mime2: String? = when {
-				"FFD8FF" in hexS -> "image/jpeg"
-				"89504E47" in hexS -> "image/png"
-				else -> null
-			}
-			if (mime2 != null) {
-				val fs = dev.entao.keb.core.FileSender(context)
-				fs.sendData(data, mime2)
-				return
-			}
-		}
+//		if ("apk" in item.extName.toLowerCase()) {
+//			val data = MyApkFile.iconData(file)
+//			val headData = data.copyOfRange(0, 16)
+//			val hexS = Hex.encode(headData).toUpperCase()
+//			val mime2: String? = when {
+//				"FFD8FF" in hexS -> "image/jpeg"
+//				"89504E47" in hexS -> "image/png"
+//				else -> null
+//			}
+//			if (mime2 != null) {
+//				val fs = dev.entao.keb.core.FileSender(context)
+//				fs.sendData(data, mime2)
+//				return
+//			}
+//		}
 		context.abort(404, "文件已不存在")
 	}
 

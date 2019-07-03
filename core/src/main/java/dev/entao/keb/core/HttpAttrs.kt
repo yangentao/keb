@@ -10,7 +10,7 @@ import kotlin.reflect.KProperty
  * Created by entaoyang@163.com on 2018/3/18.
  */
 
-class HttpAttrs(val context: dev.entao.keb.core.HttpContext) {
+class HttpAttrs(val context: HttpContext) {
 
 	fun any(name: String): Any? {
 		return context.request.attr(name)

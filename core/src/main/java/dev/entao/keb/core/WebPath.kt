@@ -87,7 +87,7 @@ class WebPath(val filter: HttpFilter) {
 	// /app_path
 	val uriApp: String
 		get() {
-			var s = buildPath(filter.patternPath, list.joinToString("/"))
+			var s = buildPath(list.joinToString("/"))
 			if (params.isNotEmpty()) {
 				val argStr = params.filter { !it.value.isNullOrEmpty() }.map { it.key + "=" + URLEncoder.encode(it.value, Charsets.UTF_8.name()) }.joinToString("&")
 				s = "$s?$argStr"
@@ -98,7 +98,7 @@ class WebPath(val filter: HttpFilter) {
 	// /appname/app_path
 	val uri: String
 		get() {
-			var s = buildPath(filter.contextPath, filter.patternPath, list.joinToString("/"))
+			var s = buildPath(filter.contextPath, list.joinToString("/"))
 			if (params.isNotEmpty()) {
 				val argStr = params.filter { !it.value.isNullOrEmpty() }.map { it.key + "=" + URLEncoder.encode(it.value, Charsets.UTF_8.name()) }.joinToString("&")
 				s = "$s?$argStr"

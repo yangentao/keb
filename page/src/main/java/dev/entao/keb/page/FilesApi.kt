@@ -2,16 +2,13 @@
 
 package dev.entao.keb.page
 
-import dev.entao.keb.page.ex.Upload
-import dev.entao.kava.apk.ApkInfo
-import dev.entao.kava.apk.MyApkFile
-import dev.entao.kava.base.Hex
 import dev.entao.kava.base.Mimes
 import dev.entao.kava.base.Thumb
 import dev.entao.kava.sql.EQ
 import dev.entao.keb.core.FileSender
 import dev.entao.keb.core.anno.HttpMethod
 import dev.entao.keb.core.filePart
+import dev.entao.keb.page.ex.Upload
 import java.io.File
 import javax.servlet.http.Part
 
@@ -21,25 +18,25 @@ import javax.servlet.http.Part
 
 class FilesApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.HttpPage(context) {
 
-	fun apkInfoAction(id: Int) {
-		val item = Upload.findByKey(id)
-		if (item == null) {
-			resultSender.failed(-1, "无效的标识")
-			return
-		}
-		val file = item.localFile(context)
-		if (!file.exists()) {
-			resultSender.failed(-1, "文件已不存在")
-			return
-		}
-
-		val info = ApkInfo.fromFileToJsonObject(file)
-		if (info != null) {
-			resultSender.obj(info)
-			return
-		}
-		resultSender.failed(-1, "解析失败")
-	}
+//	fun apkInfoAction(id: Int) {
+//		val item = Upload.findByKey(id)
+//		if (item == null) {
+//			resultSender.failed(-1, "无效的标识")
+//			return
+//		}
+//		val file = item.localFile(context)
+//		if (!file.exists()) {
+//			resultSender.failed(-1, "文件已不存在")
+//			return
+//		}
+//
+//		val info = ApkInfo.fromFileToJsonObject(file)
+//		if (info != null) {
+//			resultSender.obj(info)
+//			return
+//		}
+//		resultSender.failed(-1, "解析失败")
+//	}
 
 	//上传一个文件
 	@HttpMethod("POST")
@@ -106,7 +103,7 @@ class FilesApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.Htt
 	}
 
 	private fun sendFile(file: File, rawName: String, isMedia: Boolean) {
-		val fs =  FileSender(context)
+		val fs = FileSender(context)
 		if (isMedia) {
 			fs.media(file, Mimes.ofFile(rawName))
 		} else {
@@ -131,21 +128,21 @@ class FilesApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.Htt
 			fs.media(file, mime)
 			return
 		}
-		if ("apk" in item.extName.toLowerCase()) {
-			val data = MyApkFile.iconData(file)
-			val headData = data.copyOfRange(0, 16)
-			val hexS = Hex.encode(headData).toUpperCase()
-			val mime2: String? = when {
-				"FFD8FF" in hexS -> "image/jpeg"
-				"89504E47" in hexS -> "image/png"
-				else -> null
-			}
-			if (mime2 != null) {
-				val fs = FileSender(context)
-				fs.sendData(data, mime2)
-				return
-			}
-		}
+//		if ("apk" in item.extName.toLowerCase()) {
+//			val data = MyApkFile.iconData(file)
+//			val headData = data.copyOfRange(0, 16)
+//			val hexS = Hex.encode(headData).toUpperCase()
+//			val mime2: String? = when {
+//				"FFD8FF" in hexS -> "image/jpeg"
+//				"89504E47" in hexS -> "image/png"
+//				else -> null
+//			}
+//			if (mime2 != null) {
+//				val fs = FileSender(context)
+//				fs.sendData(data, mime2)
+//				return
+//			}
+//		}
 		context.abort(404, "文件已不存在")
 	}
 

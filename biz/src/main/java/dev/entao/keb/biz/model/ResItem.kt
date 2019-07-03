@@ -55,7 +55,7 @@ class ResItem : Model() {
 			}
 			ps.forEach { pageClass ->
 				val resItem = ResItem()
-				resItem.uri = WebPath.buildPath(context.filter.contextPath, context.filter.patternPath, pageClass.pageName)
+				resItem.uri = WebPath.buildPath(context.filter.contextPath, pageClass.pageName)
 				resItem.name = pageClass.userDesc
 				resItem.identity = pageClass.pageName
 				resItem.accessLevel = 0

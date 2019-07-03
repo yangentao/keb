@@ -2,74 +2,132 @@
 
 package dev.entao.keb.core
 
-import dev.entao.kava.base.MyDate
-import dev.entao.kava.base.userLabel
-import dev.entao.kava.log.*
+import dev.entao.kava.log.Yog
+import dev.entao.kava.log.YogDir
+import dev.entao.kava.log.logd
 import dev.entao.kava.sql.ConnLook
-import dev.entao.keb.core.anno.NavItem
 import java.io.File
 import java.util.*
-import javax.servlet.FilterConfig
-import javax.servlet.annotation.WebFilter
+import javax.servlet.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import kotlin.collections.HashMap
+import kotlin.collections.ArrayList
 import kotlin.reflect.KClass
-import kotlin.reflect.full.findAnnotation
 
 /**
  * Created by entaoyang@163.com on 2016/12/21.
  */
-
-abstract class HttpFilter : dev.entao.keb.core.BaseFilter() {
+//    @WebFilter中的urlPatterns =  "/*"
+abstract class HttpFilter : Filter {
 
 	var webConfig = WebConfig()
 		private set
-	val allPages = ArrayList<KClass<out HttpPage>>()
 
-	private val map = HashMap<String, Router>(32)
-	private val acceptList = ArrayList<Acceptor>(8)
-	private var timer: Timer? = null
-	private val timerList = ArrayList<HttpTimer>()
-	var permAcceptorClass: KClass<out PermAcceptor>? = null
-
+	private lateinit var filterConfig: FilterConfig
 	var contextPath: String = ""
 		private set
-	// /* => "" , /person/*  => person     @WebFilter中的urlPatterns
-	var patternPath: String = ""
-		private set
+	val webDir = WebDir()
+	val routeManager = RouteManager()
 
-	private val webRootFile: File by lazy {
-		File(filterConfig.servletContext.getRealPath("/"))
-	}
-	private val webParentFile: File get() = webRootFile.parentFile
+	private val sliceList = ArrayList<HttpSlice>()
+	val timerSlice = TimerSlice()
+	val accepterSlice = AccepterManager()
 
-	val baseDir: File by lazy {
-		sureDir("_base")
-	}
+	val allPages: ArrayList<KClass<out HttpPage>> get() = routeManager.allPages
 
-	val uploadDir: File by lazy {
-		sureDir("_files")
-	}
-	val tmpDir: File by lazy {
-		sureDir("_tmp")
-	}
-
-	val logDir: File by lazy {
-		sureDir("_log")
-	}
-
-	private fun sureDir(dirName: String): File {
-		return File(webParentFile, contextPath.trim('/') + dirName).apply {
-			if (!exists()) {
-				mkdir()
-			}
-		}
+	fun addSlice(hs: HttpSlice) {
+		sliceList += hs
 	}
 
 	abstract fun onInit()
 	open fun onDestroy() {
+
+	}
+
+	final override fun init(filterConfig: FilterConfig) {
+		this.filterConfig = filterConfig
+		sliceList.clear()
+		contextPath = filterConfig.servletContext.contextPath
+		webDir.onConfig(this, filterConfig)
+		Yog.setPrinter(YogDir(webDir.logDir, 15))
+		logd("Server Start!")
+
+		routeManager.onConfig(this, filterConfig)
+		addRouterOfThis()
+
+		addSlice(timerSlice)
+		addSlice(accepterSlice)
+		accepterSlice.addAcceptor(MethodAcceptor)
+
+		try {
+			onInit()
+			for (hs in sliceList) {
+				hs.onConfig(this, filterConfig)
+			}
+		} catch (ex: Exception) {
+			ex.printStackTrace()
+		} finally {
+			ConnLook.removeThreadLocal()
+		}
+	}
+
+	final override fun destroy() {
+		routeManager.onDestory()
+		for (hs in sliceList) {
+			hs.onDestory()
+		}
+		onDestroy()
+		Yog.flush()
 		ConnLook.removeThreadLocal()
+	}
+
+	private fun addRouterOfThis() {
+		val ls = this::class.actionList
+		for (f in ls) {
+			val info = Router(WebPath.buildPath(contextPath, f.actionName), f, this)
+			routeManager.addRouter(info)
+		}
+	}
+
+	final override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+		try {
+			if (request is HttpServletRequest && response is HttpServletResponse) {
+				request.characterEncoding = "UTF-8"
+				response.characterEncoding = "UTF-8"
+				val c = HttpContext(this, request, response, chain)
+				for (hs in sliceList) {
+					hs.beforeAll(c)
+				}
+				val r = routeManager.find(c)
+				if (r == null) {
+					chain.doFilter(request, response)
+				} else {
+					doHttpFilter(c, r)
+				}
+				for (hs in sliceList) {
+					hs.afterAll(c)
+				}
+			} else {
+				chain.doFilter(request, response)
+			}
+		} catch (ex: Exception) {
+			logd(ex)
+			throw  ex
+		} finally {
+			ConnLook.removeThreadLocal()
+		}
+	}
+
+	fun doHttpFilter(c: HttpContext, r: Router) {
+		for (hs in sliceList) {
+			if (!hs.beforeService(c, r)) {
+				return
+			}
+		}
+		r.dispatch(c)
+		for (hs in sliceList) {
+			hs.afterService(c)
+		}
 	}
 
 	//hour [0-23]
@@ -80,180 +138,20 @@ abstract class HttpFilter : dev.entao.keb.core.BaseFilter() {
 	open fun onMinute(m: Int) {
 	}
 
-	override fun init(filterConfig: FilterConfig) {
-		super.init(filterConfig)
-		contextPath = formatPatternPath(filterConfig.servletContext.contextPath)
-		val pat = this::class.findAnnotation<WebFilter>()?.urlPatterns?.toList()?.firstOrNull()
-				?: throw IllegalArgumentException("urlPatterns只能设置一条, 比如: /* 或 /person/*")
-		patternPath = formatPatternPath(pat)
-
-		Yog.setPrinter(YogDir(logDir, 15))
-		logd("Server Start!")
-
-		addRouterOfThis()
-		addAcceptor(MethodAcceptor)
-
-		try {
-			onInit()
-		} catch (ex: Exception) {
-			ex.printStackTrace()
-		} finally {
-			ConnLook.removeThreadLocal()
-		}
-		timer?.cancel()
-		timer = null
-		val tm = Timer("everyMinute", true)
-		val delay: Long = 1000 * 60
-		tm.scheduleAtFixedRate(tmtask, delay, delay)
-		timer = tm
-	}
-
-	private fun addRouterOfThis() {
-		val ls = this::class.actionList
-		for (f in ls) {
-			val info = Router(WebPath.buildPath(contextPath, patternPath, f.actionName), f, this)
-			addRouter(info)
-		}
-	}
-
-	override fun doHttpFilter(request: HttpServletRequest, response: HttpServletResponse): Boolean {
-//		logd("requestURI: ", request.requestURI)
-//		request.dumpParam()
-		val uri = request.requestURI.trimEnd('/').toLowerCase()
-		val r = map[uri] ?: return false
-		try {
-			val c = HttpContext(this, request, response)
-			for (a in this.acceptList) {
-				if (!a.accept(c, r)) {
-					return true
-				}
-			}
-			if (c.allow(uri)) {
-				r.dispatch(c)
-			} else {
-				if (c.acceptJson) {
-					c.resultSender.failed("未授权")
-				} else {
-					c.htmlSender.print("未授权")
-				}
-			}
-		} finally {
-			ConnLook.removeThreadLocal()
-		}
-		return true
-	}
-
-	fun addAcceptor(a: Acceptor) {
-		if (a !in this.acceptList) {
-			this.acceptList += a
-		}
-	}
-
-	fun addTimer(t: HttpTimer) {
-		if (t !in this.timerList) {
-			this.timerList += t
-		}
-	}
-
-	fun addPages(vararg clses: KClass<out HttpPage>) {
-		allPages.addAll(clses)
-		clses.forEach { cls ->
-			for (f in cls.actionList) {
-				val info = Router(WebPath.buildPath(contextPath, patternPath, cls.pageName, f.actionName), f)
-				addRouter(info)
-			}
-		}
-	}
-
-	private fun addRouter(router: Router) {
-		val u = router.uri.toLowerCase()
-		if (map.containsKey(u)) {
-			val old = map[u]
-			logd("AddRouter: ", u)
-			fatal("已经存在对应的Route: ${old?.function} ", u, old.toString())
-		}
-		map[u] = router
-		logd("Add Router: ", u)
-	}
-
-	override fun destroy() {
-		timer?.cancel()
-		timer = null
-		map.clear()
-		allPages.clear()
-		acceptList.clear()
-		timerList.clear()
-		onDestroy()
-		super.destroy()
-		Yog.flush()
-	}
-
 	val navControlerList: List<Pair<String, KClass<*>>> by lazy {
 		val navConList = ArrayList<Pair<String, KClass<*>>>()
-		for (c in allPages) {
-			val ni = c.findAnnotation<NavItem>()
-			if (ni != null) {
-				val lb = if (ni.group.isNotEmpty()) {
-					ni.group
-				} else {
-					c.userLabel
-				}
-				navConList.add(lb to c)
-			}
-		}
+//		for (c in allPages) {
+//			val ni = c.findAnnotation<NavItem>()
+//			if (ni != null) {
+//				val lb = if (ni.group.isNotEmpty()) {
+//					ni.group
+//				} else {
+//					c.userLabel
+//				}
+//				navConList.add(lb to c)
+//			}
+//		}
 		navConList
-	}
-	private val tmtask = object : TimerTask() {
-
-		private var minN: Int = 0
-		private var preHour = -1
-
-		override fun run() {
-			val timers = ArrayList<HttpTimer>(this@HttpFilter.timerList)
-			try {
-				val h = MyDate().hour
-				if (h != preHour) {
-					preHour = h
-					try {
-						onHour(h)
-					} catch (ex: Exception) {
-						loge(ex)
-					}
-					for (ht in timers) {
-						try {
-							ht.onHour(h)
-						} catch (ex: Exception) {
-							loge(ex)
-						}
-					}
-				}
-			} catch (ex: Exception) {
-				loge(ex)
-			}
-			try {
-				val n = minN++
-				try {
-					onMinute(n)
-				} catch (ex: Exception) {
-					loge(ex)
-				}
-				for (mt in timers) {
-					try {
-						mt.onMinute(n)
-					} catch (ex: Exception) {
-						loge(ex)
-					}
-				}
-			} catch (ex: Exception) {
-				loge(ex)
-			}
-			try {
-				Yog.flush()
-			} catch (ex: Exception) {
-
-			}
-			ConnLook.removeThreadLocal()
-		}
 	}
 
 	companion object {

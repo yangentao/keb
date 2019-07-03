@@ -126,7 +126,7 @@ fun HtmlPage.sidebarPage(block: Tag.() -> Unit) {
 			scriptLink(R.JS.boot)
 			scriptLink("https://buttons.github.io/buttons.js")
 			scriptLink(resUri(R.myJS))
-			if (FilesPage::class in httpContext.filter.allPages) {
+			if (FilesPage::class in httpContext.filter.routeManager.allPages) {
 				val uploadUri = httpContext.path.action(FilesPage::uploadAction).uri
 				val viewUri = httpContext.path.action(FilesPage::imgAction).uri
 				val viewParam = FilesPage::imgAction.firstParamName ?: "id"
