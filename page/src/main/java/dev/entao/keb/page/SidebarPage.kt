@@ -124,7 +124,7 @@ fun HtmlPage.sidebarPage(block: Tag.() -> Unit) {
 			scriptLink(R.JS.boot)
 			scriptLink("https://buttons.github.io/buttons.js")
 			scriptLink(resUri(R.myJS))
-			if (FilesPage::class in httpContext.filter.routeManager.allPages) {
+			if (FilesPage::class in httpContext.filter.routeManager.allGroups) {
 				val uploadUri = httpContext.path.action(FilesPage::uploadAction).uri
 				val viewUri = httpContext.path.action(FilesPage::imgAction).uri
 				val viewParam = FilesPage::imgAction.firstParamName ?: "id"
@@ -210,7 +210,7 @@ private fun HtmlPage.buildUserInfoFlex(parentTag: Tag) {
 	}
 }
 
-private fun dev.entao.keb.core.HttpPage.buildTopActionMenu(parentTag: Tag) {
+private fun dev.entao.keb.core.HttpGroup.buildTopActionMenu(parentTag: Tag) {
 //	val ls = actionItems
 //	if (ls.isEmpty()) {
 //		return
@@ -222,7 +222,7 @@ private fun dev.entao.keb.core.HttpPage.buildTopActionMenu(parentTag: Tag) {
 //	}
 }
 
-private fun dev.entao.keb.core.HttpPage.navLinks(): ArrayList<LinkItem> {
+private fun dev.entao.keb.core.HttpGroup.navLinks(): ArrayList<LinkItem> {
 	val currUri = context.request.requestURI
 	val navConList = ArrayList<Pair<String, KClass<*>>>(filter.navControlerList)
 
@@ -259,7 +259,7 @@ private fun dev.entao.keb.core.HttpPage.navLinks(): ArrayList<LinkItem> {
 	return linkList
 }
 
-private fun dev.entao.keb.core.HttpPage.makeLinkItem(c: Pair<String, KClass<*>>, currUri: String): LinkItem {
+private fun dev.entao.keb.core.HttpGroup.makeLinkItem(c: Pair<String, KClass<*>>, currUri: String): LinkItem {
 	val s = WebPath(filter).append(c.second.pageName).uri
 	val indexAction = c.second.actionList.firstOrNull { it.hasAnnotation<IndexAction>() }
 	val ss = if (indexAction != null) {

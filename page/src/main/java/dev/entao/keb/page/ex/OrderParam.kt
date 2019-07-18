@@ -28,7 +28,7 @@ class OrderParam(val context: dev.entao.keb.core.HttpContext, p: Prop1, desc: Bo
 	}
 }
 
-fun dev.entao.keb.core.HttpPage.OrderBy(p: Prop1, desc: Boolean = true): OrderParam {
+fun dev.entao.keb.core.HttpGroup.OrderBy(p: Prop1, desc: Boolean = true): OrderParam {
 	return OrderParam(context, p, desc)
 }
 

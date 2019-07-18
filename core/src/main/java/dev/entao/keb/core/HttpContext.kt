@@ -4,6 +4,7 @@ package dev.entao.keb.core
 
 import dev.entao.kava.base.Mimes
 import java.io.File
+import java.util.HashMap
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -36,6 +37,8 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	val httpParams: HttpParams  by lazy {
 		HttpParams(this)
 	}
+
+	val ctxMap = HashMap<String, Any>()
 
 	val path: WebPath get() = WebPath(this.filter)
 

@@ -12,7 +12,7 @@ import dev.entao.kava.sql.EQ
 import dev.entao.keb.core.HttpAction
 
 @Label("保存", "保存权限")
-fun dev.entao.keb.core.HttpPage.saveAccess() {
+fun dev.entao.keb.core.HttpGroup.saveAccess() {
 	val objId: Int = httpParams.int("_objId") ?: 0
 	val objType: Int = httpParams.int("_objType") ?: 0
 	val allResItem = ResItem.fromContext(context)

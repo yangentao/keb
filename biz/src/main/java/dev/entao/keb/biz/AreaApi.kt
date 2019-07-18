@@ -3,7 +3,7 @@ package dev.entao.keb.biz
 import dev.entao.kava.json.ysonObject
 import dev.entao.kava.sql.EQ
 
-class AreaApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.HttpPage(context) {
+class AreaApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.HttpGroup(context) {
 
 	fun citiesOfProvAction(provId: String) {
 		val ls = City.findAll(City::parentId EQ provId)

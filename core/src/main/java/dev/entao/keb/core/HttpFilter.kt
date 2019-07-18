@@ -6,7 +6,6 @@ import dev.entao.kava.log.Yog
 import dev.entao.kava.log.YogDir
 import dev.entao.kava.log.logd
 import dev.entao.kava.sql.ConnLook
-import java.io.File
 import java.util.*
 import javax.servlet.*
 import javax.servlet.http.HttpServletRequest
@@ -27,13 +26,15 @@ abstract class HttpFilter : Filter {
 	var contextPath: String = ""
 		private set
 	val webDir = WebDir()
-	val routeManager = RouteManager()
+	val routeManager = HttpActionManager()
 
 	private val sliceList = ArrayList<HttpSlice>()
 	val timerSlice = TimerSlice()
 	val accepterSlice = AccepterManager()
 
-	val allPages: ArrayList<KClass<out HttpPage>> get() = routeManager.allPages
+	val allGroups: ArrayList<KClass<out HttpGroup>> get() = routeManager.allGroups
+
+	val infoMap = HashMap<String, Any>()
 
 	fun addSlice(hs: HttpSlice) {
 		sliceList += hs

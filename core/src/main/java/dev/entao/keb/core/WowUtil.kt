@@ -14,7 +14,7 @@ import kotlin.reflect.full.memberFunctions
 
 
 
-typealias HttpAction = KFunction<Unit>
+
 
 fun Prop1.pairOf(item: Any): Pair<String, String> {
 	return this.userName to (this.getValue(item)?.toString() ?: "")

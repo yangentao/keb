@@ -22,7 +22,7 @@ fun HtmlPage.boot(block: HtmlDoc.() -> Unit) {
 			scriptLink(R.JS.popper)
 			scriptLink(R.JS.boot)
 			scriptLink(resUri(R.myJS))
-			if (FilesPage::class in httpContext.filter.routeManager.allPages) {
+			if (FilesPage::class in httpContext.filter.routeManager.allGroups) {
 				val uploadUri = httpContext.path.action(FilesPage::uploadAction).uri
 				val viewUri = httpContext.path.action(FilesPage::imgAction).uri
 				val viewParam = FilesPage::imgAction.firstParamName ?: "id"

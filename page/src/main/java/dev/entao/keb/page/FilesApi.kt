@@ -16,7 +16,7 @@ import javax.servlet.http.Part
  * Created by entaoyang@163.com on 2017/4/14.
  */
 
-class FilesApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.HttpPage(context) {
+class FilesApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.HttpGroup(context) {
 
 //	fun apkInfoAction(id: Int) {
 //		val item = Upload.findByKey(id)

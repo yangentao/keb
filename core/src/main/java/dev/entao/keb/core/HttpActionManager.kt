@@ -19,10 +19,12 @@ interface HttpSlice {
 	fun onDestory() {}
 }
 
-class RouteManager {
+typealias HttpAction = KFunction<Unit>
+
+class HttpActionManager {
 	private var baseUri: String = ""
 
-	val allPages = ArrayList<KClass<out HttpPage>>()
+	val allGroups = ArrayList<KClass<out HttpGroup>>()
 	private val map = HashMap<String, Router>(32)
 
 	fun onConfig(filter: HttpFilter, config: FilterConfig) {
@@ -31,7 +33,7 @@ class RouteManager {
 
 	fun onDestory() {
 		map.clear()
-		allPages.clear()
+		allGroups.clear()
 	}
 
 	fun find(c: HttpContext): Router? {
@@ -39,8 +41,8 @@ class RouteManager {
 		return map[uri]
 	}
 
-	fun addPages(vararg clses: KClass<out HttpPage>) {
-		allPages.addAll(clses)
+	fun addGroup(vararg clses: KClass<out HttpGroup>) {
+		allGroups.addAll(clses)
 		clses.forEach { cls ->
 			for (f in cls.actionList) {
 				val info = Router(WebPath.buildPath(baseUri, cls.pageName, f.actionName), f)
