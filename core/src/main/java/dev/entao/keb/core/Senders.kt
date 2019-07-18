@@ -34,64 +34,7 @@ open class HtmlSender(val context: HttpContext) {
 	}
 }
 
-class JsonSender(val context: HttpContext) {
 
-	init {
-		context.response.contentTypeJson()
-	}
-
-	fun send(value: YsonValue) {
-		context.response.writer.print(value.toString())
-	}
-
-	fun obj(block: YsonObject.() -> Unit) {
-		val yo = YsonObject()
-		yo.block()
-		send(yo)
-	}
-
-	fun <T> arr(list: Collection<T>, block: (T) -> Any?) {
-		val ar = ysonArray(list, block)
-		send(ar)
-	}
-}
-
-class XmlSender(val context: HttpContext) {
-
-	init {
-		context.response.contentTypeXml()
-	}
-
-	fun send(xml: String) {
-		context.response.writer.print(xml)
-	}
-
-	fun send(ele: Element) {
-		send(ele.toXml(false))
-	}
-}
-
-@Suppress("unused")
-open class TextSender(val context: HttpContext) {
-
-	private val writer: PrintWriter by lazy { context.response.writer }
-
-	init {
-		context.response.contentTypePlain()
-	}
-
-	fun print(s: String) {
-		writer.print(s)
-	}
-
-	fun println(s: String) {
-		writer.println(s)
-	}
-
-	fun text(s: String) {
-		print(s)
-	}
-}
 
 class Result {
 

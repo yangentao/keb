@@ -22,12 +22,6 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	val htmlSender: HtmlSender  by lazy {
 		HtmlSender(this)
 	}
-	val jsonSender: JsonSender  by lazy {
-		JsonSender(this)
-	}
-	val xmlSender: XmlSender by lazy {
-		XmlSender(this)
-	}
 	val resultSender: ResultSender  by lazy {
 		ResultSender(this)
 	}

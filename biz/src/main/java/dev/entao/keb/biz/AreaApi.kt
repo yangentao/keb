@@ -2,12 +2,13 @@ package dev.entao.keb.biz
 
 import dev.entao.kava.json.ysonObject
 import dev.entao.kava.sql.EQ
+import dev.entao.keb.core.render.YsonRender
 
 class AreaApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.HttpGroup(context) {
 
 	fun citiesOfProvAction(provId: String) {
 		val ls = City.findAll(City::parentId EQ provId)
-		jsonSender.arr(ls) { a ->
+		YsonRender(context).writeArray(ls) { a ->
 			ysonObject {
 				"code" to a.id
 				"label" to a.name

@@ -23,8 +23,6 @@ open class HttpGroup(val context: HttpContext) {
 	val filter: HttpFilter get() = context.filter
 
 	val htmlSender: HtmlSender get() = context.htmlSender
-	val jsonSender: JsonSender get() = context.jsonSender
-	val xmlSender: XmlSender get() = context.xmlSender
 	val resultSender: ResultSender get() = context.resultSender
 	val fileSender: FileSender get() = context.fileSender
 
@@ -35,8 +33,6 @@ open class HttpGroup(val context: HttpContext) {
 		get() {
 			return this.fullUrlOf(request)
 		}
-
-
 
 	fun resUri(file: String): String {
 		return path.uriRes(file)
@@ -69,7 +65,6 @@ open class HttpGroup(val context: HttpContext) {
 	fun path(action: KFunction<*>): WebPath {
 		return path.action(action)
 	}
-
 
 	private fun paramValue(p: Prop1): Any? {
 		if (p.isTypeInt) {
@@ -144,6 +139,5 @@ open class HttpGroup(val context: HttpContext) {
 		val v = paramValue(p) ?: return null
 		return p LT v
 	}
-
 
 }
