@@ -20,11 +20,10 @@ class ParamError(val function: KFunction<*>, val param: KParameter, msg: String)
 //function 必须是类的成员, 不能是全局函数
 class Router(val uri: String, val function: KFunction<*>, obj: Any? = null) {
 
-	private val cls: KClass<*> = function.ownerClass!!
+	val cls: KClass<*> = function.ownerClass!!
 	private val inst: Any? = obj ?: function.ownerObject
 	private val paramList = function.parameters
-	val needLoginApp: Boolean = function.hasAnnotation<LoginApp>() || cls.hasAnnotation<LoginApp>()
-	val needLoginWeb: Boolean = function.hasAnnotation<LoginWeb>() || cls.hasAnnotation<LoginWeb>()
+
 	val methods: Set<String>  by lazy {
 		val a = HashSet<String>()
 		val b = function.findAnnotation<HttpMethod>()?.value?.map { it.toUpperCase() }?.toSet()

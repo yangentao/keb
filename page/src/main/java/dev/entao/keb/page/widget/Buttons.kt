@@ -8,7 +8,7 @@ import dev.entao.kava.base.firstParamName
 import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.HttpAction
 import dev.entao.keb.core.WebPath
-import dev.entao.keb.core.anno.*
+import dev.entao.keb.core.html.*
 import kotlin.reflect.full.findAnnotation
 
 /**

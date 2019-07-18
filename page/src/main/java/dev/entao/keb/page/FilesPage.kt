@@ -9,7 +9,6 @@ import dev.entao.kava.base.Mimes
 import dev.entao.kava.sql.EQ
 import dev.entao.keb.core.FileSender
 import dev.entao.keb.core.anno.HttpMethod
-import dev.entao.keb.core.anno.LoginWeb
 import dev.entao.keb.core.filePart
 import javax.servlet.http.Part
 
@@ -40,7 +39,6 @@ class FilesPage(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.Ht
 //	}
 
 	//上传一个文件
-	@LoginWeb
 	@HttpMethod("POST")
 	fun uploadAction() {
 		val part: Part? = request.filePart

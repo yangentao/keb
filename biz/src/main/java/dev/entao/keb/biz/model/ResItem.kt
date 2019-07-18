@@ -6,7 +6,6 @@ import dev.entao.kava.sql.Model
 import dev.entao.kava.sql.ModelClass
 import dev.entao.keb.core.WebPath
 import dev.entao.keb.core.actionList
-import dev.entao.keb.core.anno.NavItem
 import dev.entao.keb.core.pageName
 import java.util.*
 import kotlin.reflect.full.findAnnotation
@@ -50,28 +49,28 @@ class ResItem : Model() {
 
 		fun fromContext(context: dev.entao.keb.core.HttpContext): List<Parent<ResItem>> {
 			val nodeList = ArrayList<Parent<ResItem>>()
-			val ps = context.filter.allPages.filter { it.hasAnnotation<NavItem>() }.sortedBy {
-				it.findAnnotation<NavItem>()!!.order
-			}
-			ps.forEach { pageClass ->
-				val resItem = ResItem()
-				resItem.uri = WebPath.buildPath(context.filter.contextPath, pageClass.pageName)
-				resItem.name = pageClass.userDesc
-				resItem.identity = pageClass.pageName
-				resItem.accessLevel = 0
-				val node = Parent(resItem)
-				nodeList += node
-				pageClass.actionList.filter { it.hasAnnotation<Label>() || it.hasAnnotation<NavItem>() }.sortedBy {
-					it.findAnnotation<NavItem>()?.order ?: 99
-				}.forEach { ac ->
-					val acItem = ResItem()
-					acItem.name = ac.userDesc
-					acItem.uri = context.path.action(ac).uri
-					acItem.identity = pageClass.pageName + "." + ac.userName
-					resItem.accessLevel = ac.findAnnotation<AccessLevel>()?.level?.value ?: 0
-					node.add(acItem)
-				}
-			}
+//			val ps = context.filter.allPages.filter { it.hasAnnotation<NavItem>() }.sortedBy {
+//				it.findAnnotation<NavItem>()!!.order
+//			}
+//			ps.forEach { pageClass ->
+//				val resItem = ResItem()
+//				resItem.uri = WebPath.buildPath(context.filter.contextPath, pageClass.pageName)
+//				resItem.name = pageClass.userDesc
+//				resItem.identity = pageClass.pageName
+//				resItem.accessLevel = 0
+//				val node = Parent(resItem)
+//				nodeList += node
+//				pageClass.actionList.filter { it.hasAnnotation<Label>() || it.hasAnnotation<NavItem>() }.sortedBy {
+//					it.findAnnotation<NavItem>()?.order ?: 99
+//				}.forEach { ac ->
+//					val acItem = ResItem()
+//					acItem.name = ac.userDesc
+//					acItem.uri = context.path.action(ac).uri
+//					acItem.identity = pageClass.pageName + "." + ac.userName
+//					resItem.accessLevel = ac.findAnnotation<AccessLevel>()?.level?.value ?: 0
+//					node.add(acItem)
+//				}
+//			}
 			return nodeList
 		}
 	}

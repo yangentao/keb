@@ -213,15 +213,15 @@ private fun HtmlPage.buildUserInfoFlex(parentTag: Tag) {
 }
 
 private fun dev.entao.keb.core.HttpPage.buildTopActionMenu(parentTag: Tag) {
-	val ls = actionItems
-	if (ls.isEmpty()) {
-		return
-	}
-	parentTag.navPills {
-		actionItems.forEach {
-			navLink(it, null)
-		}
-	}
+//	val ls = actionItems
+//	if (ls.isEmpty()) {
+//		return
+//	}
+//	parentTag.navPills {
+//		actionItems.forEach {
+//			navLink(it, null)
+//		}
+//	}
 }
 
 private fun dev.entao.keb.core.HttpPage.navLinks(): ArrayList<LinkItem> {

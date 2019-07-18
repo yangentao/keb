@@ -8,19 +8,15 @@ import dev.entao.kava.sql.AND
 import dev.entao.kava.sql.EQ
 import dev.entao.kava.sql.IN
 import dev.entao.kava.sql.Where
-import dev.entao.keb.core.anno.FormConfirm
-import dev.entao.keb.core.anno.LoginWeb
-import dev.entao.keb.core.anno.NavItem
+import dev.entao.keb.biz.ex.LoginWeb
+import dev.entao.keb.core.html.FormConfirm
 import dev.entao.keb.core.anno.NotEmpty
 import dev.entao.keb.core.ok
 import dev.entao.keb.page.*
-import dev.entao.keb.page.B.Flex.column
 import dev.entao.keb.page.ex.OrderBy
 import dev.entao.keb.page.ex.orderBy
 import dev.entao.keb.page.widget.*
 
-@LoginWeb
-@NavItem
 @Label("角色管理")
 class RolePage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 
@@ -28,7 +24,6 @@ class RolePage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 		redirect(::listAction)
 	}
 
-	@NavItem( 1)
 	@Label("查询")
 	fun listAction() {
 		val w: Where? = EQ(Role::id, Role::status) AND LIKE(Role::name)
@@ -80,7 +75,6 @@ class RolePage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 		}
 	}
 
-	@NavItem( 2)
 	@Label("添加", "添加角色")
 	fun addAction() {
 		cardPage {

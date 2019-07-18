@@ -5,7 +5,7 @@ import dev.entao.kava.base.substr
 import dev.entao.kava.log.loge
 import dev.entao.kava.sql.Model
 import dev.entao.kava.sql.ModelClass
-import dev.entao.keb.core.anno.MaxRows
+import dev.entao.keb.biz.ex.MaxRows
 import dev.entao.keb.core.clientIp
 import dev.entao.keb.core.headerUserAgent
 import dev.entao.keb.core.paramMap

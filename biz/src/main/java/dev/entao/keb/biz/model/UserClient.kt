@@ -3,7 +3,7 @@ package dev.entao.keb.biz.model
 import dev.entao.kava.base.DefaultValue
 import dev.entao.kava.sql.Model
 import dev.entao.kava.sql.ModelClass
-import dev.entao.keb.core.anno.FormOptions
+import dev.entao.keb.core.html.FormOptions
 
 /**
  * Created by entaoyang@163.com on 2018/7/11.

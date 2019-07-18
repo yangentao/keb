@@ -3,7 +3,7 @@ package dev.entao.keb.biz.model
 import dev.entao.kava.base.Label
 import dev.entao.kava.sql.Model
 import dev.entao.kava.sql.ModelClass
-import dev.entao.keb.core.anno.FormOptions
+import dev.entao.keb.core.html.FormOptions
 
 @Label("角色")
 class Role : Model() {

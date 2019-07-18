@@ -9,6 +9,8 @@ import dev.entao.kava.sql.EQ
 import dev.entao.kava.sql.IN
 import dev.entao.kava.sql.Where
 import dev.entao.keb.core.anno.*
+import dev.entao.keb.core.html.ActionDanger
+import dev.entao.keb.core.html.FormConfirm
 import dev.entao.keb.core.intList
 import dev.entao.keb.core.ok
 import dev.entao.keb.page.*
@@ -16,13 +18,10 @@ import dev.entao.keb.page.ex.OrderBy
 import dev.entao.keb.page.ex.orderBy
 import dev.entao.keb.page.widget.*
 
-@LoginWeb
-@NavItem
 @Label("WEB账号管理")
 class AccountPage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 
 	@IndexAction
-	@NavItem(1)
 	@Label("查询")
 	fun listAction() {
 		val w: Where? = EQ(Account::id, Account::status, Account::phone, Account::deptId) AND LIKE(Account::name)
@@ -121,7 +120,6 @@ class AccountPage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 		}
 	}
 
-	@NavItem(2)
 	@Label("添加", "添加账号")
 	fun addAction() {
 		cardPage {

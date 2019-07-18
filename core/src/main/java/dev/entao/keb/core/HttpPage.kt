@@ -7,7 +7,6 @@ import dev.entao.kava.base.isTypeInt
 import dev.entao.kava.base.isTypeLong
 import dev.entao.kava.base.isTypeString
 import dev.entao.kava.sql.*
-import dev.entao.keb.core.anno.NavItem
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import kotlin.reflect.KFunction
@@ -37,12 +36,7 @@ open class HttpPage(val context: HttpContext) {
 			return this.fullUrlOf(request)
 		}
 
-	//label to uri
-	val actionItems: List<KFunction<*>> by lazy {
-		this@HttpPage::class.actionListWithNavItem.sortedBy {
-			it.findAnnotation<NavItem>()?.order ?: 0
-		}
-	}
+
 
 	fun resUri(file: String): String {
 		return path.uriRes(file)

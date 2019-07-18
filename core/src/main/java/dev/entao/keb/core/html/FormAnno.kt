@@ -1,4 +1,4 @@
-package dev.entao.keb.core.anno
+package dev.entao.keb.core.html
 
 /**
  * Created by entaoyang@163.com on 2017/6/20.

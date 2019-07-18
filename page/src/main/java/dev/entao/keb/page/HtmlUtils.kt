@@ -2,7 +2,7 @@ package dev.entao.keb.page
 
 import dev.entao.kava.base.*
 import dev.entao.kava.json.YsonValue
-import dev.entao.keb.core.anno.KeepDot
+import dev.entao.keb.core.html.KeepDot
 import dev.entao.keb.core.anno.singleSelectDisplay
 import kotlin.reflect.full.findAnnotation
 

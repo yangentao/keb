@@ -8,8 +8,8 @@ import dev.entao.kava.sql.EQ
 import dev.entao.kava.sql.Model
 import dev.entao.kava.sql.ModelClass
 import dev.entao.keb.core.anno.ColumnWidth
-import dev.entao.keb.core.anno.FormOptions
-import dev.entao.keb.core.anno.FormRequired
+import dev.entao.keb.core.html.FormOptions
+import dev.entao.keb.core.html.FormRequired
 
 /**
  * Created by entaoyang@163.com on 2018/4/2.

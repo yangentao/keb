@@ -1,7 +1,6 @@
 package dev.entao.keb.core
 
 import dev.entao.kava.base.*
-import dev.entao.keb.core.anno.NavItem
 import java.net.URLEncoder
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
@@ -37,10 +36,7 @@ val KClass<*>.actionList: List<KFunction<*>>
 	get() {
 		return this.memberFunctions.filter { it.isHttpAction }
 	}
-val KClass<*>.actionListWithNavItem: List<KFunction<*>>
-	get() {
-		return this.actionList.filter { it.hasAnnotation<NavItem>() }
-	}
+
 
 //fun loginAction()
 val KFunction<*>.isHttpAction: Boolean
