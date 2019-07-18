@@ -1,8 +1,12 @@
-package dev.entao.keb.core.html
+package dev.entao.keb.page
 
 /**
  * Created by entaoyang@163.com on 2017/6/20.
  */
+
+@Target(AnnotationTarget.PROPERTY)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class EditRows(val value: Int)
 
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)

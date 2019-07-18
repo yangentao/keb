@@ -2,9 +2,10 @@ package dev.entao.keb.page.widget
 
 import dev.entao.keb.page.*
 import dev.entao.kava.base.*
+import dev.entao.keb.core.MaxValue
+import dev.entao.keb.core.MinValue
 import dev.entao.keb.core.ParamConst
-import dev.entao.keb.core.anno.*
-import dev.entao.keb.core.html.*
+import dev.entao.keb.core.ValueRange
 import dev.entao.keb.page.B
 import kotlin.reflect.KProperty0
 import kotlin.reflect.full.findAnnotation

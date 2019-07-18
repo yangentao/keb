@@ -8,9 +8,7 @@ import dev.entao.kava.base.hasAnnotation
 import dev.entao.kava.base.removeAllIf
 import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.*
-import dev.entao.keb.core.anno.IndexAction
-import dev.entao.keb.page.B.btnPrimary
-import dev.entao.keb.page.B.button
+import dev.entao.keb.core.IndexAction
 import kotlin.reflect.KClass
 
 fun HtmlPage.sidebarPage(block: Tag.() -> Unit) {

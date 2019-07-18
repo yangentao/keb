@@ -75,13 +75,13 @@ open class Url(s: String) {
 }
 
 class ReferUrl(val request: HttpServletRequest) : Url(request.headerReferer!!) {
-	fun withReqParam(): ReferUrl {
+	fun withReqParam(block: (String) -> Boolean): ReferUrl {
 		val map = request.paramMap
 		map.forEach {
 			val k = it.key
 			val ar = it.value
 			this.remove(k)
-			if (!ParamConst.isErr(k)) {
+			if (block(k)) {
 				if (ar.size == 1) {
 					this.append(k, ar[0])
 				} else if (ar.size > 1) {
@@ -96,23 +96,6 @@ class ReferUrl(val request: HttpServletRequest) : Url(request.headerReferer!!) {
 
 	fun arg(key: String, value: String): ReferUrl {
 		this.replace(key, value)
-		return this
-	}
-
-	fun ok(msg: String): ReferUrl {
-		arg(ParamConst.SUCCESS, msg)
-		return this
-	}
-
-	//上面显示的一个错误信息条
-	fun err(msg: String): ReferUrl {
-		arg(ParamConst.ERROR, msg)
-		return this
-	}
-
-	//具体某个字段的错误信息
-	fun errOf(name: String, msg: String): ReferUrl {
-		arg(ParamConst.err(name), msg)
 		return this
 	}
 

@@ -1,4 +1,4 @@
-package dev.entao.keb.core.anno
+package dev.entao.keb.core
 
 
 /**
@@ -10,9 +10,7 @@ package dev.entao.keb.core.anno
 @Retention(AnnotationRetention.RUNTIME)
 annotation class HttpMethod(vararg val value: String)
 
-@Target(AnnotationTarget.PROPERTY)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class EditRows(val value: Int)
+
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)

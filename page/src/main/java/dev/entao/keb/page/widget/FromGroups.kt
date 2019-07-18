@@ -1,7 +1,7 @@
 package dev.entao.keb.page.widget
 
 import dev.entao.kava.base.*
-import dev.entao.keb.core.html.FormHelpBlock
+import dev.entao.keb.page.FormHelpBlock
 import dev.entao.keb.page.*
 import kotlin.reflect.KProperty0
 import kotlin.reflect.full.findAnnotation

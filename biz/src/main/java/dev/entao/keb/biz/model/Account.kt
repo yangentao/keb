@@ -7,8 +7,8 @@ import dev.entao.kava.base.Label
 import dev.entao.kava.sql.EQ
 import dev.entao.kava.sql.Model
 import dev.entao.kava.sql.ModelClass
-import dev.entao.keb.core.html.FormOptions
-import dev.entao.keb.core.html.FormRequired
+import dev.entao.keb.page.FormOptions
+import dev.entao.keb.page.FormRequired
 
 //账号是指web管理端的账号
 

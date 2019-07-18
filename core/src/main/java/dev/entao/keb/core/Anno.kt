@@ -1,17 +1,12 @@
-package dev.entao.keb.core.anno
+package dev.entao.keb.core
 
 /**
- * 参数检查
- * Created by entaoyang@163.com on 2017/4/15.
+ * 通用注释
+ * Created by yangentao on 2016/12/14.
  */
 
-//step属性
-@Target(AnnotationTarget.PROPERTY,
-		AnnotationTarget.FIELD,
-		AnnotationTarget.VALUE_PARAMETER
-)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class StepValue(val value: String)
+
+
 
 //参数或属性的最小值Int
 @Target(AnnotationTarget.PROPERTY,

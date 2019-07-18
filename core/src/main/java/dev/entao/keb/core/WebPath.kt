@@ -138,19 +138,3 @@ class WebPath(val filter: HttpFilter) {
 	}
 
 }
-
-fun WebPath.ok(msg: String): WebPath {
-	return arg(ParamConst.SUCCESS, msg)
-}
-
-fun WebPath.err(msg: String): WebPath {
-	return arg(ParamConst.ERROR, msg)
-}
-
-fun WebPath.success(msg: String): WebPath {
-	return arg(ParamConst.SUCCESS, msg)
-}
-
-fun WebPath.error(msg: String): WebPath {
-	return arg(ParamConst.ERROR, msg)
-}

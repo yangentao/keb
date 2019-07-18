@@ -6,7 +6,7 @@ import dev.entao.kava.base.Mimes
 import dev.entao.kava.base.Thumb
 import dev.entao.kava.sql.EQ
 import dev.entao.keb.core.FileSender
-import dev.entao.keb.core.anno.HttpMethod
+import dev.entao.keb.core.HttpMethod
 import dev.entao.keb.core.filePart
 import dev.entao.keb.page.ex.Upload
 import java.io.File
