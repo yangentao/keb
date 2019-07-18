@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'dev.entao.keb'
-version '1.0.1'
+version '1.1.0'
 
 sourceCompatibility = 1.8
 
@@ -15,10 +15,10 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect"
     compileOnly "javax.servlet:javax.servlet-api:3.1.0"
 
-    implementation 'dev.entao.kava:log:1.0.1'
-    implementation 'dev.entao.kava:base:1.0.1'
-    implementation 'dev.entao.kava:json:1.0.0'
-    implementation 'dev.entao.kava:sql:1.0.1'
+    implementation 'dev.entao.kava:log:1.1.0'
+    implementation 'dev.entao.kava:base:1.1.0'
+    implementation 'dev.entao.kava:json:1.1.0'
+    implementation 'dev.entao.kava:sql:1.1.0'
 }
 compileKotlin {
     kotlinOptions {
@@ -44,11 +44,11 @@ artifacts {
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: 'http://app800.cn/maven/repository/releases/') {
+            repository(url: 'http://maven.app800.cn/repository/public/') {
                 authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
             }
             pom.artifactId = "core"
-            pom.groupId = project.group //'dev.entao'
+            pom.groupId = project.group
             pom.version = project.version
             pom.packaging = 'jar'
 
