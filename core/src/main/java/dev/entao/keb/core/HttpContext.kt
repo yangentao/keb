@@ -3,6 +3,7 @@
 package dev.entao.keb.core
 
 import dev.entao.kava.base.Mimes
+import dev.entao.keb.core.render.FileSender
 import java.io.File
 import java.util.HashMap
 import javax.servlet.FilterChain
@@ -11,7 +12,6 @@ import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession
 import javax.servlet.http.Part
 import kotlin.reflect.KFunction
-import kotlin.reflect.full.createInstance
 
 /**
  * Created by entaoyang@163.com on 2016/12/18.
@@ -21,9 +21,6 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 
 	val htmlSender: HtmlSender  by lazy {
 		HtmlSender(this)
-	}
-	val resultSender: ResultSender  by lazy {
-		ResultSender(this)
 	}
 	val fileSender: FileSender by lazy {
 		FileSender(this)

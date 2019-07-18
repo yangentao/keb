@@ -3,6 +3,7 @@ package dev.entao.keb.core
 import dev.entao.kava.base.*
 import dev.entao.kava.json.YsonArray
 import dev.entao.kava.json.YsonObject
+import dev.entao.keb.core.render.ResultRender
 import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
@@ -55,7 +56,7 @@ class Router(val uri: String, val function: KFunction<*>, obj: Any? = null) {
 			is ParamError -> {
 				ex.printStackTrace()
 				if (context.acceptJson) {
-					context.resultSender.failed("参数错误:${ex.message}")
+					ResultRender(context).failed("参数错误:${ex.message}")
 				} else {
 					context.backward { err(ex.message ?: "参数错误") }
 				}

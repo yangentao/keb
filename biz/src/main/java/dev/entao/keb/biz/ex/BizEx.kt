@@ -10,6 +10,7 @@ import dev.entao.keb.core.HttpTimer
 import dev.entao.keb.core.ParamConst
 import dev.entao.keb.core.Router
 import dev.entao.keb.core.Url
+import dev.entao.keb.core.render.ResultRender
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
@@ -24,10 +25,10 @@ class DefaultPermAcceptor : dev.entao.keb.core.PermAcceptor {
 
 	override fun prepare(context: dev.entao.keb.core.HttpContext) {
 		val aid = context.accountId
-		if(aid < 0) {
+		if (aid < 0) {
 			return
 		}
-		val ac = Account.findByKey(aid )
+		val ac = Account.findByKey(aid)
 		if (ac != null) {
 			ResAccess.findAll(ResAccess::objId to ac.deptId, ResAccess::objType to ResAccess.TDept).forEach {
 				accessMap[it.uri] = it.judge
@@ -55,8 +56,6 @@ class DefaultPermAcceptor : dev.entao.keb.core.PermAcceptor {
 	}
 
 }
-
-
 
 //限制表的记录行数
 //TableLimitTimer(Ip::class, 10000)  限制Ip表10000行记录, 每小时删除一次旧数据
@@ -127,10 +126,6 @@ class TableLimitTimer(private val cls: KClass<out Model>, limitValue: Int = 0) :
 
 }
 
-
-
-
-
 //需要登录后请求
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
@@ -140,7 +135,6 @@ annotation class LoginApp
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class LoginWeb
-
 
 object AuthAppAcceptor : dev.entao.keb.core.Acceptor {
 	override fun accept(context: dev.entao.keb.core.HttpContext, router: Router): Boolean {
@@ -154,7 +148,7 @@ object AuthAppAcceptor : dev.entao.keb.core.Acceptor {
 			}
 		}
 		if (needLoginApp && context.userId == 0) {
-			context.resultSender.failed("未登录")
+			ResultRender(context).failed("未登录")
 			return false
 		}
 		return true

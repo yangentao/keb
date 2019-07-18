@@ -14,6 +14,7 @@ import dev.entao.keb.page.ActionDanger
 import dev.entao.keb.page.FormConfirm
 import dev.entao.keb.core.intList
 import dev.entao.keb.core.ok
+import dev.entao.keb.core.render.ResultRender
 import dev.entao.keb.page.*
 import dev.entao.keb.page.ex.OrderBy
 import dev.entao.keb.page.ex.orderBy
@@ -88,7 +89,7 @@ class AccountPage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 		a.updateByKey {
 			a.status = Account.Disabled
 		}
-		resultSender.ok()
+		ResultRender(context).ok()
 	}
 
 	@Label("启用", "启用账号")
@@ -97,7 +98,7 @@ class AccountPage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 		a.updateByKey {
 			a.status = Account.Enabled
 		}
-		resultSender.ok()
+		ResultRender(context).ok()
 	}
 
 //	@Label("Dialog")
@@ -163,7 +164,7 @@ class AccountPage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 	@FormConfirm("要删除这些记录吗?")
 	fun delArrAction(@NotEmpty id: String) {
 		Account.delete(Account::id IN id.intList)
-		resultSender.ok()
+		ResultRender(context).ok()
 	}
 
 	@Label("查看")

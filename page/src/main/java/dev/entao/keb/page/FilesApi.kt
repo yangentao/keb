@@ -5,9 +5,10 @@ package dev.entao.keb.page
 import dev.entao.kava.base.Mimes
 import dev.entao.kava.base.Thumb
 import dev.entao.kava.sql.EQ
-import dev.entao.keb.core.FileSender
 import dev.entao.keb.core.HttpMethod
 import dev.entao.keb.core.filePart
+import dev.entao.keb.core.render.FileSender
+import dev.entao.keb.core.render.ResultRender
 import dev.entao.keb.page.ex.Upload
 import java.io.File
 import javax.servlet.http.Part
@@ -18,6 +19,7 @@ import javax.servlet.http.Part
 
 class FilesApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.HttpGroup(context) {
 
+	private val resultSender = ResultRender(context)
 //	fun apkInfoAction(id: Int) {
 //		val item = Upload.findByKey(id)
 //		if (item == null) {

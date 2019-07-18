@@ -10,6 +10,7 @@ import dev.entao.kava.log.logd
 import dev.entao.kava.sql.AND
 import dev.entao.kava.sql.EQ
 import dev.entao.keb.core.HttpAction
+import dev.entao.keb.core.render.ResultRender
 
 @Label("保存", "保存权限")
 fun dev.entao.keb.core.HttpGroup.saveAccess() {
@@ -47,7 +48,7 @@ fun dev.entao.keb.core.HttpGroup.saveAccess() {
 		ra.condition = ""
 		ra.replace()
 	}
-	resultSender.ok()
+	ResultRender(context).ok()
 }
 
 @Label("权限", "编辑权限")

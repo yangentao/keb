@@ -2,6 +2,7 @@ package dev.entao.keb.biz
 
 import dev.entao.kava.json.ysonObject
 import dev.entao.kava.sql.EQ
+import dev.entao.keb.core.render.ResultRender
 import dev.entao.keb.core.render.YsonRender
 
 class AreaApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.HttpGroup(context) {
@@ -18,7 +19,7 @@ class AreaApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.Http
 
 	fun citiesAction(provId: String) {
 		val ls = City.findAll(City::parentId EQ provId)
-		resultSender.arr(ls) { a ->
+		ResultRender(context).arr(ls) { a ->
 			ysonObject {
 				"code" to a.id
 				"label" to a.name
@@ -30,7 +31,7 @@ class AreaApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.Http
 		val ls = Province.findAll {
 			asc(Province::id)
 		}
-		resultSender.arr(ls) { p ->
+		ResultRender(context).arr(ls) { p ->
 			ysonObject {
 				"code" to p.id
 				"label" to p.name

@@ -7,10 +7,10 @@ import dev.entao.kava.base.isTypeInt
 import dev.entao.kava.base.isTypeLong
 import dev.entao.kava.base.isTypeString
 import dev.entao.kava.sql.*
+import dev.entao.keb.core.render.FileSender
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import kotlin.reflect.KFunction
-import kotlin.reflect.full.findAnnotation
 
 /**
  * Created by entaoyang@163.com on 2016/12/19.
@@ -23,7 +23,6 @@ open class HttpGroup(val context: HttpContext) {
 	val filter: HttpFilter get() = context.filter
 
 	val htmlSender: HtmlSender get() = context.htmlSender
-	val resultSender: ResultSender get() = context.resultSender
 	val fileSender: FileSender get() = context.fileSender
 
 	val httpParams: HttpParams get() = context.httpParams

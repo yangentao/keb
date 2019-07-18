@@ -15,6 +15,7 @@ import dev.entao.keb.page.ActionDanger
 import dev.entao.keb.page.FormConfirm
 import dev.entao.keb.core.intList
 import dev.entao.keb.core.ok
+import dev.entao.keb.core.render.ResultRender
 import dev.entao.keb.page.*
 import dev.entao.keb.page.ex.OrderBy
 import dev.entao.keb.page.ex.orderBy
@@ -143,7 +144,7 @@ class DeptPage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 	@FormConfirm("要删除这些记录吗?")
 	fun delArrAction(@NotEmpty id: String) {
 		Dept.delete(Dept::id IN id.intList)
-		resultSender.ok()
+		ResultRender(context).ok()
 	}
 
 	@Label("查看")

@@ -11,6 +11,7 @@ import dev.entao.kava.sql.Where
 import dev.entao.keb.page.FormConfirm
 import dev.entao.keb.core.NotEmpty
 import dev.entao.keb.core.ok
+import dev.entao.keb.core.render.ResultRender
 import dev.entao.keb.page.*
 import dev.entao.keb.page.ex.OrderBy
 import dev.entao.keb.page.ex.orderBy
@@ -106,7 +107,7 @@ class RolePage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 	fun delArrAction(@NotEmpty id: String) {
 		val ls = id.split(',').map { it.toInt() }
 		Role.delete(Role::id IN ls)
-		resultSender.ok()
+		ResultRender(context).ok()
 	}
 
 	@Label("查看")

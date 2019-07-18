@@ -11,11 +11,11 @@ class XmlRender(val context: HttpContext) {
 		context.response.contentTypeXml()
 	}
 
-	fun send(xml: String) {
+	fun write(xml: String) {
 		context.response.writer.print(xml)
 	}
 
-	fun send(ele: Element) {
-		send(ele.toXml(false))
+	fun write(ele: Element) {
+		write(ele.toXml(false))
 	}
 }
