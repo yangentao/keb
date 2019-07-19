@@ -22,7 +22,7 @@ import dev.entao.keb.page.ex.orderBy
 import dev.entao.keb.page.widget.*
 
 @Label("WEB账号管理")
-class AccountPage(context: HttpContext) : HtmlPage(context) {
+class AccountPage(context: HttpContext) : HttpGroup(context) {
 
 	@IndexAction
 	@Label("查询")
@@ -33,7 +33,7 @@ class AccountPage(context: HttpContext) : HtmlPage(context) {
 		val rowCount = Account.countAll(w)
 		val itemList = Account.findAll(w) {
 			orderBy(od)
-			limitPage()
+			limitPage(context)
 		}
 
 		cardBodyPage("账号") {
@@ -110,7 +110,7 @@ class AccountPage(context: HttpContext) : HtmlPage(context) {
 			it.textEscaped("Hello Yang: $id")
 		}
 		val s = d.build().toString()
-		HtmlSender(context).write(s)
+		context.writeHtml(s)
 
 	}
 

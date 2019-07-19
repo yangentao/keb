@@ -2,82 +2,82 @@
 
 package dev.entao.keb.page
 
-import dev.entao.keb.page.widget.button
 import dev.entao.kava.sql.SQLQuery
-import dev.entao.keb.core.HtmlSender
 import dev.entao.keb.core.HttpContext
+import dev.entao.keb.core.HttpScope
+import dev.entao.keb.page.html.HtmlDoc
+import dev.entao.keb.page.html.Tag
+import dev.entao.keb.page.html.p
+import dev.entao.keb.page.widget.button
 
-open class HtmlPage(context: HttpContext) : dev.entao.keb.core.HttpGroup(context) {
+fun SQLQuery.limitPage(context:HttpContext) {
+	val n = context.httpParams.int(P.pageN) ?: 0
+	this.limit(P.pageSize, n * P.pageSize)
+}
 
-	fun SQLQuery.limitPage() {
-		val n = context.httpParams.int(P.pageN) ?: 0
-		this.limit(P.pageSize, n * P.pageSize)
+fun HttpScope.formError(title: String, msg: String) {
+	val d = DialogBuild(context)
+	d.modal.outputScript = true
+	d.title(title)
+	d.bodyBlock = {
+		it.p {
+			textEscaped(msg)
+		}
 	}
+	d.closeText = "确定"
+	d.build()
+	val s = d.modal.toString()
+	context.writeHtml(s)
+}
 
-	fun formError(title: String, msg: String) {
-		val d = DialogBuild(context)
-		d.modal.outputScript = true
-		d.title(title)
-		d.bodyBlock = {
-			it.p {
-				textEscaped(msg)
+fun HttpScope.html(block: HtmlDoc.() -> Unit) {
+	val h = HtmlDoc(context)
+	h.block()
+	h.body.filterDeep { it.tagName == "a" || it.tagName == "button" }.forEach {
+		val s = when {
+			it.href.isNotEmpty() -> it.href
+			it.dataUrl.isNotEmpty() -> it.dataUrl
+			else -> ""
+		}
+		if (s.isNotEmpty()) {
+			if (!context.allow(s)) {
+				it.addClass("d-none")
 			}
 		}
-		d.closeText = "确定"
-		d.build()
-		val s = d.modal.toString()
-		HtmlSender(context).write(s)
 	}
 
-	fun html(block: HtmlDoc.() -> Unit) {
-		val h = HtmlDoc(context)
-		h.block()
-		h.body.filterDeep { it.tagName == "a" || it.tagName == "button" }.forEach {
-			val s = when {
-				it.href.isNotEmpty() -> it.href
-				it.dataUrl.isNotEmpty() -> it.dataUrl
-				else -> ""
-			}
-			if (s.isNotEmpty()) {
-				if (!context.allow(s)) {
-					it.addClass("d-none")
-				}
-			}
-		}
+	context.writeHtml(h.toString())
+}
 
-		HtmlSender(context).write(h.toString())
+fun HttpScope.formDialog(title: String, block: (Tag) -> Unit) {
+	val d = DialogBuild(context)
+	d.modal.outputScript = true
+	d.title(title)
+	d.bodyBlock = {
+		block(it)
 	}
+	d.closeText = "取消"
+	d.buttonsBlock = {
+		it.button {
+			+"提交"
+			classList += "m-1"
+			btnPrimary()
+			onclick = "yet.submitDialogPanel(this);"
+		}
+	}
+	d.build()
+	context.writeHtml(d.modal.toString())
+}
 
-	fun formDialog(title: String, block: (Tag) -> Unit) {
-		val d = DialogBuild(context)
-		d.modal.outputScript = true
-		d.title(title)
-		d.bodyBlock = {
-			block(it)
-		}
-		d.closeText = "取消"
-		d.buttonsBlock = {
-			it.button {
-				+"提交"
-				classList += "m-1"
-				btnPrimary()
-				onclick = "yet.submitDialogPanel(this);"
-			}
-		}
-		d.build()
-		HtmlSender(context).write(d.modal.toString())
+fun HttpScope.formDialogDisplay(title: String, block: (Tag) -> Unit) {
+	val d = DialogBuild(context)
+	d.modal.outputScript = true
+	d.title(title)
+	d.bodyBlock = {
+		block(it)
 	}
-
-	fun formDialogDisplay(title: String, block: (Tag) -> Unit) {
-		val d = DialogBuild(context)
-		d.modal.outputScript = true
-		d.title(title)
-		d.bodyBlock = {
-			block(it)
-		}
-		d.closeText = "确定"
-		d.build()
-		val s = d.modal.toString()
-		HtmlSender(context).write(s)
-	}
+	d.closeText = "确定"
+	d.build()
+	val s = d.modal.toString()
+	context.writeHtml(s)
 }

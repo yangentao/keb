@@ -1,6 +1,6 @@
 package dev.entao.keb.page
 
-import dev.entao.keb.page.B.button
+import dev.entao.keb.page.html.*
 import dev.entao.keb.page.widget.a
 import dev.entao.keb.page.widget.button
 import kotlin.math.max

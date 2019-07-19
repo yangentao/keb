@@ -10,10 +10,12 @@ import dev.entao.kava.log.logd
 import dev.entao.kava.sql.AND
 import dev.entao.kava.sql.EQ
 import dev.entao.keb.core.HttpAction
+import dev.entao.keb.core.HttpScope
 import dev.entao.keb.core.render.ResultRender
+import dev.entao.keb.page.html.*
 
 @Label("保存", "保存权限")
-fun dev.entao.keb.core.HttpGroup.saveAccess() {
+fun HttpScope.saveAccess() {
 	val objId: Int = httpParams.int("_objId") ?: 0
 	val objType: Int = httpParams.int("_objType") ?: 0
 	val allResItem = ResItem.fromContext(context)
@@ -52,7 +54,7 @@ fun dev.entao.keb.core.HttpGroup.saveAccess() {
 }
 
 @Label("权限", "编辑权限")
-fun HtmlPage.editAccess(saveAction: HttpAction, objId: Int, objType: Int, title: String) {
+fun HttpScope.editAccess(saveAction: HttpAction, objId: Int, objType: Int, title: String) {
 	val allResItem = ResItem.fromContext(context)
 	val w = (ResAccess::objId EQ objId) AND (ResAccess::objType EQ objType)
 	val resList: List<ResAccess> = ResAccess.findAll(w)

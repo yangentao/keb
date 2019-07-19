@@ -1,19 +1,16 @@
-package dev.entao.keb.page
+package dev.entao.keb.page.html
 
 import dev.entao.kava.base.escapeHtml
 import dev.entao.kava.base.trimColumns
+import dev.entao.keb.core.HttpContext
+import dev.entao.keb.page.ident
 
 class LabelLink(var label: String, var link: String)
 
-open class HtmlDoc(httpContext: dev.entao.keb.core.HttpContext) : Tag(httpContext, "html") {
+open class HtmlDoc(httpContext: HttpContext) : Tag(httpContext, "html") {
 	val comments = ArrayList<String>()
-	val head = Tag(httpContext, "head")
-	val body = BodyTag(httpContext)
-
-	init {
-		addTag(head)
-		addTag(body)
-	}
+	val head = this.head { }
+	val body = this.body { }
 
 	fun comment(block: () -> String) {
 		comments.add(block())
@@ -28,16 +25,8 @@ open class HtmlDoc(httpContext: dev.entao.keb.core.HttpContext) : Tag(httpContex
 	}
 }
 
-class BodyTag(httpContext: dev.entao.keb.core.HttpContext) : Tag(httpContext, "body") {
-
+class ScriptBlock(httpContext: HttpContext, s: String) : Tag(httpContext, "script") {
 	init {
-		outputScript = true
-	}
-}
-
-class ScriptBlock(httpContext: dev.entao.keb.core.HttpContext, s: String) : Tag(httpContext, "script") {
-	init {
-		this.type = "text/javascript"
 		textUnsafe(s)
 	}
 
@@ -53,14 +42,7 @@ class ScriptBlock(httpContext: dev.entao.keb.core.HttpContext, s: String) : Tag(
 	}
 }
 
-class ScriptLink(httpContext: dev.entao.keb.core.HttpContext, src: String) : Tag(httpContext, "script") {
-	init {
-		this.type = "text/javascript"
-		this.src = src
-	}
-}
-
-class TextEscaped(httpContext: dev.entao.keb.core.HttpContext, var text: String = "") : Tag(httpContext, "__textescaped__") {
+class TextEscaped(httpContext: HttpContext, var text: String = "") : Tag(httpContext, "__textescaped__") {
 	var forView = false
 
 	override fun writeTo(buf: Appendable, level: Int) {

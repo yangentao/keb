@@ -10,9 +10,10 @@ import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.*
 import dev.entao.keb.core.IndexAction
 import dev.entao.keb.core.ParamConst
+import dev.entao.keb.page.html.*
 import kotlin.reflect.KClass
 
-fun HtmlPage.sidebarPage(block: Tag.() -> Unit) {
+fun HttpScope.sidebarPage(block: Tag.() -> Unit) {
 	val config = context.filter.webConfig
 	html {
 		head.apply {
@@ -177,7 +178,7 @@ private fun installDialogs(tag: Tag) {
 	}
 }
 
-fun HtmlPage.checkAlertMessage(tag: Tag) {
+fun HttpScope.checkAlertMessage(tag: Tag) {
 	val er = httpParams.str(ParamConst.ERROR) ?: ""
 	if (er.isNotEmpty()) {
 		tag.alertError { +er }
@@ -188,7 +189,7 @@ fun HtmlPage.checkAlertMessage(tag: Tag) {
 	}
 }
 
-private fun HtmlPage.buildUserInfoFlex(parentTag: Tag) {
+private fun HttpScope.buildUserInfoFlex(parentTag: Tag) {
 	val cfg = context.filter.webConfig
 	parentTag.flex {
 		classList += B.Flex.justifyContentBetween
@@ -211,7 +212,7 @@ private fun HtmlPage.buildUserInfoFlex(parentTag: Tag) {
 	}
 }
 
-private fun dev.entao.keb.core.HttpGroup.buildTopActionMenu(parentTag: Tag) {
+private fun HttpScope.buildTopActionMenu(parentTag: Tag) {
 //	val ls = actionItems
 //	if (ls.isEmpty()) {
 //		return
@@ -223,7 +224,7 @@ private fun dev.entao.keb.core.HttpGroup.buildTopActionMenu(parentTag: Tag) {
 //	}
 }
 
-private fun dev.entao.keb.core.HttpGroup.navLinks(): ArrayList<LinkItem> {
+private fun HttpScope.navLinks(): ArrayList<LinkItem> {
 	val currUri = context.request.requestURI
 	val navConList = ArrayList<Pair<String, KClass<*>>>(context.filter.navControlerList)
 
@@ -260,7 +261,7 @@ private fun dev.entao.keb.core.HttpGroup.navLinks(): ArrayList<LinkItem> {
 	return linkList
 }
 
-private fun dev.entao.keb.core.HttpGroup.makeLinkItem(c: Pair<String, KClass<*>>, currUri: String): LinkItem {
+private fun HttpScope.makeLinkItem(c: Pair<String, KClass<*>>, currUri: String): LinkItem {
 	val s = WebPath(context.filter).append(c.second.pageName).uri
 	val indexAction = c.second.actionList.firstOrNull { it.hasAnnotation<IndexAction>() }
 	val ss = if (indexAction != null) {

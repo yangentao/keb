@@ -1,7 +1,8 @@
-package dev.entao.keb.page
+package dev.entao.keb.page.html
 
 import dev.entao.kava.base.*
 import dev.entao.keb.core.WebPath
+import dev.entao.keb.page.*
 import java.util.*
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
@@ -10,7 +11,7 @@ open class Tag(val httpContext: dev.entao.keb.core.HttpContext, var tagName: Str
 	private val attrs: TagMap = TagMap()
 	var parentTag: Tag? = null
 
-	var outputScript = false
+	var outputScript = tagName == "body"
 
 	val children = ArrayList<Tag>(32)
 	val classList: ArrayList<String> = ArrayList()
@@ -128,6 +129,12 @@ open class Tag(val httpContext: dev.entao.keb.core.HttpContext, var tagName: Str
 
 	@Name("data-select-value")
 	var dataSelectValue: String by attrs
+
+	init {
+		if (tagName == "script") {
+			this.type = "text/javascript"
+		}
+	}
 
 	val htmlTag: Tag?
 		get() {
@@ -340,7 +347,7 @@ open class Tag(val httpContext: dev.entao.keb.core.HttpContext, var tagName: Str
 	open fun writeChildren(singleLine: Boolean, buf: Appendable, level: Int) {
 		writeChildren2(singleLine, buf, level)
 		if (outputScript) {
-			this.filterDeep { it is ScriptLink }.forEach {
+			this.filterDeep { it.tagName == "script" && it.src.isNotEmpty() }.forEach {
 				buf.appendln()
 				it.writeTo(buf, level)
 			}
@@ -418,50 +425,6 @@ open class Tag(val httpContext: dev.entao.keb.core.HttpContext, var tagName: Str
 		val singleLineTags = setOf("span", "textarea", "label", "button", "title", "td", "th", "input", "option", "a", "h1", "h2", "h3", "h4", "h5", "h6")
 		val keepAttrs = setOf("col.width", "option.value")
 
-	}
-
-}
-
-@Suppress("UNCHECKED_CAST")
-class TagMap : HashMap<String, String>(16) {
-
-	fun removeProperty(p: KProperty<*>) {
-		this.remove(p.userName)
-	}
-
-	operator fun <T> setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-		val k = property.userName
-		when (value) {
-			is String -> put(k, value)
-			is Boolean -> {
-				if (value) {
-					put(k, k)
-				} else {
-					remove(k)
-				}
-			}
-			else -> put(k, value.toString())
-		}
-	}
-
-	operator fun <T> getValue(thisRef: Any?, property: KProperty<*>): T {
-		val pname = property.userName
-		val rt = property.returnType
-		val v = this[pname] ?: ""
-		if (rt.isTypeString) {
-			return v as T
-		}
-		if (rt.isTypeBoolean) {
-			return (v == pname) as T
-		}
-		if (rt.isTypeInt) {
-			if (v.isEmpty()) {
-				return 0 as T
-			} else {
-				return v.toInt() as T
-			}
-		}
-		throw IllegalArgumentException("不支持的类型$property")
 	}
 
 }

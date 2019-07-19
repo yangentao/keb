@@ -2,9 +2,9 @@
 
 package dev.entao.keb.page.widget
 
-import dev.entao.keb.page.Tag
-import dev.entao.keb.page.TagCallback
-import dev.entao.keb.page.div
+import dev.entao.keb.page.html.Tag
+import dev.entao.keb.page.html.TagCallback
+import dev.entao.keb.page.html.div
 import dev.entao.kava.base.*
 import dev.entao.keb.core.WebPath
 import kotlin.reflect.KFunction

@@ -16,7 +16,11 @@ import kotlin.reflect.KFunction
  * Created by entaoyang@163.com on 2016/12/19.
  */
 
-open class HttpGroup(val context: HttpContext) {
+open class HttpGroup(context: HttpContext) : HttpScope(context) {
+
+}
+
+open class HttpScope(val context: HttpContext) {
 
 
 	val httpParams: HttpParams get() = context.httpParams
@@ -30,7 +34,6 @@ open class HttpGroup(val context: HttpContext) {
 	fun resUri(file: String): String {
 		return path.uriRes(file)
 	}
-
 
 	fun redirect(action: KFunction<*>, param: Any?) {
 		redirect(action) {
@@ -68,7 +71,5 @@ open class HttpGroup(val context: HttpContext) {
 		}
 		return null
 	}
-
-
 
 }

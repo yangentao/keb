@@ -8,7 +8,9 @@ import dev.entao.keb.core.HttpAction
 import dev.entao.keb.core.WebPath
 import dev.entao.keb.core.valOf
 import dev.entao.keb.page.B
-import javax.management.Query.attr
+import dev.entao.keb.page.html.Tag
+import dev.entao.keb.page.html.scriptBlock
+import dev.entao.keb.page.html.targetBlank
 import kotlin.reflect.KFunction
 import kotlin.reflect.KMutableProperty1
 

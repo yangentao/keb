@@ -9,12 +9,9 @@ import dev.entao.kava.sql.AND
 import dev.entao.kava.sql.EQ
 import dev.entao.kava.sql.IN
 import dev.entao.kava.sql.Where
-import dev.entao.keb.core.IndexAction
-import dev.entao.keb.core.NotEmpty
+import dev.entao.keb.core.*
 import dev.entao.keb.page.ActionDanger
 import dev.entao.keb.page.FormConfirm
-import dev.entao.keb.core.intList
-import dev.entao.keb.core.ok
 import dev.entao.keb.core.render.ResultRender
 import dev.entao.keb.core.sql.EQ
 import dev.entao.keb.core.sql.LIKE
@@ -25,7 +22,7 @@ import dev.entao.keb.page.ex.orderBy
 import dev.entao.keb.page.widget.*
 
 @Label("部门管理")
-class DeptPage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
+class DeptPage(context: dev.entao.keb.core.HttpContext) : HttpGroup(context) {
 
 	@IndexAction
 	@Label("查询")
@@ -36,7 +33,7 @@ class DeptPage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 		val rowCount = Dept.countAll(w)
 		val itemList = Dept.findAll(w) {
 			orderBy(od)
-			limitPage()
+			limitPage(context)
 		}
 
 		cardBodyPage("部门") {

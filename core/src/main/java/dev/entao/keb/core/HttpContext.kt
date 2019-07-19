@@ -19,9 +19,6 @@ import kotlin.reflect.KFunction
 
 class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val response: HttpServletResponse, val chain: FilterChain) {
 
-	val htmlSender: HtmlSender  by lazy {
-		HtmlSender(this)
-	}
 	val fileSender: FileSender by lazy {
 		FileSender(this)
 	}
@@ -42,6 +39,26 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 
 	val loginedApp: Boolean get() = userId != 0
 	val loginedWeb: Boolean get() = accountId != 0
+
+	fun writeHtml(s: String) {
+		this.response.contentTypeHtml()
+		this.response.writer.write(s)
+	}
+
+	fun writeTextPlain(s: String) {
+		this.response.contentType = Mimes.PLAIN
+		this.response.writer.write(s)
+	}
+
+	fun writeXML(s: String) {
+		this.response.contentType = Mimes.XML
+		this.response.writer.write(s)
+	}
+
+	fun writeJSON(s: String) {
+		this.response.contentType = Mimes.JSON
+		this.response.writer.write(s)
+	}
 
 	fun loginWeb(accountId: Int) {
 		putSession(ACCOUNT_ID, accountId.toString())

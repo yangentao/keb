@@ -7,6 +7,9 @@ import dev.entao.keb.core.MinValue
 import dev.entao.keb.core.ParamConst
 import dev.entao.keb.core.ValueRange
 import dev.entao.keb.page.B
+import dev.entao.keb.page.html.Tag
+import dev.entao.keb.page.html.div
+import dev.entao.keb.page.html.label
 import kotlin.reflect.KProperty0
 import kotlin.reflect.full.findAnnotation
 

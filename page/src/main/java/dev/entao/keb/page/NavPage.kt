@@ -4,8 +4,10 @@ package dev.entao.keb.page
 
 import dev.entao.keb.page.widget.configUpload
 import dev.entao.kava.base.firstParamName
+import dev.entao.keb.core.HttpScope
+import dev.entao.keb.page.html.*
 
-fun HtmlPage.boot(block: HtmlDoc.() -> Unit) {
+fun HttpScope.boot(block: HtmlDoc.() -> Unit) {
 	html {
 		head.apply {
 			metaCharset("UTF-8")
@@ -34,7 +36,7 @@ fun HtmlPage.boot(block: HtmlDoc.() -> Unit) {
 	}
 }
 
-fun HtmlPage.bootPage(block: Tag.() -> Unit) {
+fun HttpScope.bootPage(block: Tag.() -> Unit) {
 	boot {
 		head.apply {
 			title(context.filter.webConfig.appName)
@@ -47,7 +49,7 @@ fun HtmlPage.bootPage(block: Tag.() -> Unit) {
 	}
 }
 
-fun HtmlPage.cardPage(block: Tag.() -> Unit) {
+fun HttpScope.cardPage(block: Tag.() -> Unit) {
 	sidebarPage {
 		card {
 			this.block()
@@ -55,7 +57,7 @@ fun HtmlPage.cardPage(block: Tag.() -> Unit) {
 	}
 }
 
-fun HtmlPage.cardBodyPage(title: String, block: Tag.() -> Unit) {
+fun HttpScope.cardBodyPage(title: String, block: Tag.() -> Unit) {
 	sidebarPage {
 		card {
 			cardHeader(title)

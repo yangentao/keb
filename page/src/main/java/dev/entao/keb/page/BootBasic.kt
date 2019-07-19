@@ -6,7 +6,7 @@ import dev.entao.keb.page.widget.a
 import dev.entao.keb.page.widget.button
 import dev.entao.keb.page.widget.radio
 import dev.entao.kava.base.userLabel
-import dev.entao.keb.page.B.button
+import dev.entao.keb.page.html.*
 import kotlin.reflect.KFunction
 
 fun Tag.flex(block: Tag.() -> Unit): Tag {

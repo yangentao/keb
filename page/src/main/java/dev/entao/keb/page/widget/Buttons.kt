@@ -5,6 +5,9 @@ import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.HttpAction
 import dev.entao.keb.core.WebPath
 import dev.entao.keb.page.*
+import dev.entao.keb.page.html.Tag
+import dev.entao.keb.page.html.TagCallback
+import dev.entao.keb.page.html.scriptBlock
 import kotlin.reflect.full.findAnnotation
 
 /**

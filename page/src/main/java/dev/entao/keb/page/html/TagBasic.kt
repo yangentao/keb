@@ -1,11 +1,39 @@
 @file:Suppress("unused")
 
-package dev.entao.keb.page
+package dev.entao.keb.page.html
 
 import dev.entao.kava.base.Prop
 import dev.entao.kava.base.userName
+import dev.entao.keb.page.B
 
 typealias TagCallback = Tag.() -> Unit
+
+fun Tag.head(block: TagCallback): Tag {
+	return addTag("head", block)
+}
+
+fun Tag.body(block: TagCallback): Tag {
+	return addTag("body", block)
+}
+
+val Tag.topMost: Tag
+	get() {
+		var p = this
+		while (p.parentTag != null) {
+			p = p.parentTag!!
+		}
+		return p
+	}
+
+val Tag.head: Tag
+	get() {
+		return this.topMost.findChildDeep { it.tagName == "head" }!!
+	}
+
+val Tag.body: Tag
+	get() {
+		return this.topMost.findChildDeep { it.tagName == "body" }!!
+	}
 
 fun Tag.lang(language: String = "zh-CN"): Tag {
 	this.lang = language
@@ -111,10 +139,14 @@ fun Tag.label(block: TagCallback): Tag {
 	return addTag("label", block)
 }
 
+fun Tag.script(block: TagCallback): Tag {
+	return addTag("script", block)
+}
+
 fun Tag.scriptLink(src: String): Tag {
-	val t = ScriptLink(this.httpContext, src)
-	addTag(t)
-	return t
+	return this.script {
+		this.src = src
+	}
 }
 
 fun Tag.scriptBlock(block: () -> String): ScriptBlock {

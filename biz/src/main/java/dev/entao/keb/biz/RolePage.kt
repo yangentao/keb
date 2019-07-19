@@ -8,6 +8,7 @@ import dev.entao.kava.sql.AND
 import dev.entao.kava.sql.EQ
 import dev.entao.kava.sql.IN
 import dev.entao.kava.sql.Where
+import dev.entao.keb.core.HttpGroup
 import dev.entao.keb.page.FormConfirm
 import dev.entao.keb.core.NotEmpty
 import dev.entao.keb.core.ok
@@ -21,7 +22,7 @@ import dev.entao.keb.page.ex.orderBy
 import dev.entao.keb.page.widget.*
 
 @Label("角色管理")
-class RolePage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
+class RolePage(context: dev.entao.keb.core.HttpContext) : HttpGroup(context) {
 
 	fun indexAction() {
 		redirect(::listAction)
@@ -34,7 +35,7 @@ class RolePage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 		val rowCount = Role.countAll(w)
 		val itemList = Role.findAll(w) {
 			orderBy(od)
-			limitPage()
+			limitPage(context)
 		}
 
 		cardPage {
