@@ -36,8 +36,7 @@ class HttpActionManager {
 	}
 
 	fun find(context: HttpContext): Router? {
-		val uri = context.request.requestURI.trimEnd('/').toLowerCase()
-		return map[uri]
+		return map[context.currentUri]
 	}
 
 	fun addGroup(vararg clses: KClass<out HttpGroup>) {

@@ -26,6 +26,8 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 		HttpParams(this)
 	}
 
+	val currentUri: String = request.requestURI.trimEnd('/').toLowerCase()
+
 	val ctxMap = HashMap<String, Any>()
 
 	val path: WebPath get() = WebPath(this.filter)
@@ -39,6 +41,14 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 
 	val loginedApp: Boolean get() = userId != 0
 	val loginedWeb: Boolean get() = accountId != 0
+
+	fun actionUri(a: HttpAction): String {
+		return filter.actionUri(a)
+	}
+
+	fun resUri(res: String): String {
+		return filter.resUri(res)
+	}
 
 	fun writeHtml(s: String) {
 		this.response.contentTypeHtml()

@@ -6,6 +6,7 @@ import dev.entao.kava.log.loge
 import dev.entao.kava.sql.Model
 import dev.entao.kava.sql.ModelClass
 import dev.entao.keb.biz.ex.MaxRows
+import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.clientIp
 import dev.entao.keb.core.headerUserAgent
 import dev.entao.keb.core.paramMap
@@ -55,7 +56,7 @@ class Ip : Model() {
 	var reqTime: java.sql.Time by model
 
 	companion object : ModelClass<Ip>() {
-		fun save(context: dev.entao.keb.core.HttpContext) {
+		fun save(context: HttpContext) {
 			val req = context.request
 			val ip = Ip()
 			ip.ip = req.clientIp

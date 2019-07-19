@@ -15,6 +15,7 @@ import kotlin.reflect.KClass
 
 fun HttpScope.sidebarPage(block: Tag.() -> Unit) {
 	val config = context.filter.webConfig
+
 	html {
 		head.apply {
 			metaCharset("UTF-8")
@@ -225,7 +226,7 @@ private fun HttpScope.buildTopActionMenu(parentTag: Tag) {
 }
 
 private fun HttpScope.navLinks(): ArrayList<LinkItem> {
-	val currUri = context.request.requestURI
+	val currUri = context.currentUri
 	val navConList = ArrayList<Pair<String, KClass<*>>>(context.filter.navControlerList)
 
 	val linkList = ArrayList<LinkItem>()

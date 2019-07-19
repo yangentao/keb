@@ -6,7 +6,6 @@ import dev.entao.kava.base.removeAllIf
 import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.*
 import dev.entao.keb.page.*
-import dev.entao.keb.page.ex.Html
 import dev.entao.keb.page.ex.HtmlTemplate
 import dev.entao.keb.page.html.*
 import dev.entao.keb.page.widget.a
@@ -17,9 +16,13 @@ import kotlin.reflect.KClass
 class SidebarPage(context: HttpContext) : HttpScope(context), HtmlTemplate {
 
 	var title: String = context.filter.webConfig.appName
+
+	var navItems: List<LinkItem> = emptyList()
+	var topItems: List<LinkItem> = emptyList()
+
 	var pageBlock: Tag.() -> Unit = {}
 
-	fun build(html: HtmlDoc) {
+	private fun build(html: HtmlDoc) {
 		val config = context.filter.webConfig
 		html.head {
 			metaCharset("UTF-8")
@@ -75,7 +78,7 @@ class SidebarPage(context: HttpContext) : HttpScope(context), HtmlTemplate {
 					buildUserInfoFlex(this)
 					ul {
 						clazz = "navbar-nav"
-						for (item in navLinks()) {
+						for (item in navItems) {
 							li {
 								clazz = "nav-item"
 								if (item.active) {
@@ -119,7 +122,20 @@ class SidebarPage(context: HttpContext) : HttpScope(context), HtmlTemplate {
 			}
 			div {
 				clazz = "container-fluid"
-				buildTopActionMenu(this)
+				if (topItems.isNotEmpty()) {
+					navPills {
+						for (ti in topItems) {
+							a {
+								addClass("nav-link")
+								if (ti.active) {
+									addClass("active")
+								}
+								href = ti.url
+								+ti.label
+							}
+						}
+					}
+				}
 				checkAlertMessage(this)
 				this.pageBlock()
 			}
@@ -163,16 +179,12 @@ class SidebarPage(context: HttpContext) : HttpScope(context), HtmlTemplate {
 		}
 	}
 
-	private fun buildTopActionMenu(parentTag: Tag) {
-//	val ls = actionItems
-//	if (ls.isEmpty()) {
-//		return
-//	}
-//	parentTag.navPills {
-//		actionItems.forEach {
-//			navLink(it, null)
-//		}
-//	}
+	fun buildTopMenu(actionList: List<HttpAction>) {
+		val c = context.currentUri
+		this.topItems = actionList.map {
+			val a = context.actionUri(it)
+			LinkItem(it.userLabel, a, c == a)
+		}
 	}
 
 	private fun installDialogs(tag: Tag) {
@@ -216,7 +228,7 @@ class SidebarPage(context: HttpContext) : HttpScope(context), HtmlTemplate {
 	}
 
 	private fun navLinks(): ArrayList<LinkItem> {
-		val currUri = context.request.requestURI
+		val currUri = context.currentUri
 		val navConList = ArrayList<Pair<String, KClass<*>>>(context.filter.navControlerList)
 
 		val linkList = ArrayList<LinkItem>()

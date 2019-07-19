@@ -167,11 +167,10 @@ fun Tag.navPills(block: TagCallback) {
 }
 
 fun Tag.navLink(action: KFunction<*>, param: Any?) {
-	val uri = httpContext.request.requestURI.trimEnd('/')
 	val actionUri = httpContext.path.action(action).param(param).uri
 	a {
 		addClass("nav-link")
-		if (uri in actionUri) {
+		if (httpContext.currentUri in actionUri) {
 			addClass("active")
 		}
 		href = actionUri
