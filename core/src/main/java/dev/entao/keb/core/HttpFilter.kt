@@ -183,8 +183,7 @@ abstract class HttpFilter : Filter {
 	}
 
 	companion object {
-		const val PAGE = "Page"
-		const val API_PAGE = "Api"
+		const val GROUP_SURFIX = "Page"
 		const val ACTION = "Action"
 		const val INDEX = "index"
 

@@ -50,28 +50,16 @@ val KFunction<*>.isHttpAction: Boolean
 
 val KFunction<*>.actionName: String
 	get() {
-		val funName = this.userName
-		val fname = funName.substringBefore(HttpFilter.ACTION).toLowerCase()
+		val fname = this.userName.substringBefore(HttpFilter.ACTION).toLowerCase()
 		return if (fname == HttpFilter.INDEX) "" else fname
 	}
 val KClass<*>.pageName: String
 	get() {
-		val nameValue = this.findAnnotation<Name>()?.value
-		if (nameValue != null) {
-			return nameValue.toLowerCase()
-		}
-		val simName = this.simpleName ?: throw IllegalArgumentException("Page类必须有类名")
-		val groupName = if (simName.endsWith(HttpFilter.PAGE)) {
-			simName.substringBefore(HttpFilter.PAGE).toLowerCase()
-		} else if (simName.endsWith(HttpFilter.API_PAGE)) {
-			"api/" + simName.substringBefore(HttpFilter.API_PAGE).toLowerCase()
-		} else {
-			simName.toLowerCase()
-		}
-		if (groupName == HttpFilter.INDEX) {
+		val gname = this.userName.substringBefore(HttpFilter.GROUP_SURFIX).toLowerCase()
+		if (gname == HttpFilter.INDEX) {
 			return ""
 		}
-		return groupName
+		return gname
 	}
 
 fun urlBuild(url: String, params: Map<String, String?>): String {

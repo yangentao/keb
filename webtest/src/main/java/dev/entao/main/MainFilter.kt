@@ -5,14 +5,15 @@ import dev.entao.keb.core.HttpFilter
 import dev.entao.keb.page.html.*
 import javax.servlet.annotation.WebFilter
 
-@WebFilter(urlPatterns = ["/y/*"])
+@WebFilter(urlPatterns = ["/*"])
 class MainFilter : HttpFilter() {
 
 	override fun onInit() {
 
+		addGroup(PersonGroup::class)
 	}
 
-	fun helloAction(context: HttpContext) {
+	fun indexAction(context: HttpContext) {
 		val h = HtmlDoc(context)
 		h.head {
 			title("Hello Title")
