@@ -3,8 +3,10 @@
 package dev.entao.keb.core
 
 import dev.entao.kava.base.Mimes
+import dev.entao.kava.base.firstParamName
 import dev.entao.keb.core.render.FileSender
 import java.io.File
+import java.net.URLEncoder
 import java.util.HashMap
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
@@ -31,7 +33,6 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 
 	val ctxMap = HashMap<String, Any>()
 
-	val path: WebPath get() = WebPath(this.filter)
 
 	var os: String = ""
 	var token: String = ""
@@ -43,12 +44,32 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	val loginedApp: Boolean get() = userId != 0
 	val loginedWeb: Boolean get() = accountId != 0
 
-	fun groupUri(g: KClass<out HttpGroup>): String {
+	val rootUri: String
+		get() {
+			return buildPath(filter.contextPath)
+		}
+
+	fun fullUrlOf(uri: String): String {
+		return "http://" + request.getHeader("host") + uri
+	}
+
+	fun groupUri(g: KClass<*>): String {
 		return filter.groupUri(g)
 	}
 
-	fun actionUri(a: HttpAction): String {
+	fun actionUri(a: KFunction<*>): String {
 		return filter.actionUri(a)
+	}
+
+	fun actionUri(a: KFunction<*>, paramValue: Any?): String {
+		val s = filter.actionUri(a)
+		if (paramValue != null) {
+			val k = a.firstParamName
+			if (k != null) {
+				return s + "?" + k + "=" + URLEncoder.encode(paramValue.toString(), Charsets.UTF_8.name())
+			}
+		}
+		return s
 	}
 
 	fun resUri(res: String): String {
@@ -101,20 +122,6 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 		response.sendRedirect(url)
 	}
 
-	fun redirect(p: WebPath, block: WebPath.() -> Unit = {}) {
-		p.block()
-		response.sendRedirect(p.uri)
-	}
-
-	fun redirect(f: KFunction<*>, block: WebPath.() -> Unit = {}) {
-		val p = WebPath(filter, f)
-		p.block()
-		redirect(p)
-	}
-
-	fun forward(p: WebPath) {
-		request.getRequestDispatcher(p.uriApp).forward(request, response)
-	}
 
 	fun backward(block: ReferUrl.() -> Unit): Boolean {
 		val s = request.headerReferer

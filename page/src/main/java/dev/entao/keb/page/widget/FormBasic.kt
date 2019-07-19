@@ -6,7 +6,7 @@ import dev.entao.keb.page.html.Tag
 import dev.entao.keb.page.html.TagCallback
 import dev.entao.keb.page.html.div
 import dev.entao.kava.base.*
-import dev.entao.keb.core.WebPath
+import dev.entao.keb.core.UriMake
 import kotlin.reflect.KFunction
 
 /**
@@ -27,12 +27,12 @@ fun Tag.enctypeMultipart() {
 
 fun Tag.form(formAction: KFunction<Unit>, block: TagCallback): Tag {
 	return form {
-		action = formAction.path.uri
+		action = httpContext.actionUri(formAction)
 		this.block()
 	}
 }
 
-fun Tag.form(formAction: WebPath, block: TagCallback): Tag {
+fun Tag.form(formAction: UriMake, block: TagCallback): Tag {
 	return form {
 		action = formAction.uri
 		this.block()

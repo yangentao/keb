@@ -24,8 +24,8 @@ import dev.entao.keb.page.widget.*
 @Label("角色管理")
 class RolePage(context: dev.entao.keb.core.HttpContext) : HttpGroup(context) {
 
-	fun indexAction() {
-		redirect(::listAction)
+	override fun indexAction() {
+		listAction()
 	}
 
 	@Label("查询")
@@ -74,9 +74,7 @@ class RolePage(context: dev.entao.keb.core.HttpContext) : HttpGroup(context) {
 		val r = Role()
 		r.fromRequest(context)
 		r.insert()
-		redirect(::viewAction) {
-			arg(r::id)
-		}
+		redirect(::viewAction, r.id)
 	}
 
 	@Label("添加", "添加角色")
@@ -137,9 +135,7 @@ class RolePage(context: dev.entao.keb.core.HttpContext) : HttpGroup(context) {
 		val r = Role()
 		r.fromRequest(context)
 		r.updateByKey(r::name, r::status)
-		redirect(::viewAction) {
-			arg(r::id)
-		}
+		redirect(::viewAction, r.id)
 	}
 
 	@Label("编辑", "编辑角色")

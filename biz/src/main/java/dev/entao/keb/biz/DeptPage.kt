@@ -24,7 +24,10 @@ import dev.entao.keb.page.widget.*
 @Label("部门管理")
 class DeptPage(context: dev.entao.keb.core.HttpContext) : HttpGroup(context) {
 
-	@IndexAction
+	override fun indexAction() {
+		listAction()
+	}
+
 	@Label("查询")
 	fun listAction() {
 		val w: Where? = EQ(Dept::id, Dept::status) AND LIKE(Dept::name)
@@ -104,9 +107,7 @@ class DeptPage(context: dev.entao.keb.core.HttpContext) : HttpGroup(context) {
 		val r = Dept()
 		r.fromRequest(context)
 		r.insert()
-		redirect(::viewAction) {
-			arg(r::id)
-		}
+		redirect(::viewAction, r.id)
 	}
 
 	@Label("添加", "添加部门")
@@ -171,9 +172,7 @@ class DeptPage(context: dev.entao.keb.core.HttpContext) : HttpGroup(context) {
 		val r = Dept()
 		r.fromRequest(context)
 		r.updateByKey()
-		redirect(::viewAction) {
-			arg(r::id)
-		}
+		redirect(::viewAction, r.id)
 	}
 
 	@Label("编辑", "编辑部门")

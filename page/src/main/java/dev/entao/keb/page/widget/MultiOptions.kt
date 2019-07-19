@@ -95,7 +95,7 @@ fun Tag.selectLinkage(opt: LinkageOption) {
 	} else {
 		""
 	}
-	val uri = httpContext.path.action(opt.action).uri
+	val uri = httpContext.actionUri(opt.action)
 	val argName = opt.action.firstParamName ?: "id"
 	scriptBlock {
 		"""

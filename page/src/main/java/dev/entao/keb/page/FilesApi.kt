@@ -6,7 +6,7 @@ import dev.entao.kava.base.Mimes
 import dev.entao.kava.base.Thumb
 import dev.entao.kava.sql.EQ
 import dev.entao.keb.core.HttpMethod
-import dev.entao.keb.core.filePart
+import dev.entao.keb.core.UriMake
 import dev.entao.keb.core.render.FileSender
 import dev.entao.keb.core.render.ResultRender
 import dev.entao.keb.page.ex.Upload
@@ -20,25 +20,9 @@ import javax.servlet.http.Part
 class FilesApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.HttpGroup(context) {
 
 	private val resultSender = ResultRender(context)
-//	fun apkInfoAction(id: Int) {
-//		val item = Upload.findByKey(id)
-//		if (item == null) {
-//			resultSender.failed(-1, "无效的标识")
-//			return
-//		}
-//		val file = item.localFile(context)
-//		if (!file.exists()) {
-//			resultSender.failed(-1, "文件已不存在")
-//			return
-//		}
-//
-//		val info = ApkInfo.fromFileToJsonObject(file)
-//		if (info != null) {
-//			resultSender.obj(info)
-//			return
-//		}
-//		resultSender.failed(-1, "解析失败")
-//	}
+	override fun indexAction() {
+
+	}
 
 	//上传一个文件
 	@HttpMethod("POST")
@@ -151,7 +135,7 @@ class FilesApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.Htt
 
 	companion object {
 		fun urlOf(context: dev.entao.keb.core.HttpContext, id: Int): String {
-			return context.path.action(FilesApi::downloadAction).param(id).fullUrlOf(context.request)
+			return UriMake(context, FilesApi::downloadAction).param(id).fullUrl
 		}
 
 		fun removeRes(context: dev.entao.keb.core.HttpContext, resId: Int) {

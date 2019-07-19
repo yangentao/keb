@@ -24,7 +24,9 @@ import dev.entao.keb.page.widget.*
 @Label("WEB账号管理")
 class AccountPage(context: HttpContext) : HttpGroup(context) {
 
-	@IndexAction
+	override fun indexAction() {
+		listAction()
+	}
 	@Label("查询")
 	fun listAction() {
 		val w: Where? = EQ(Account::id, Account::status, Account::phone, Account::deptId) AND LIKE(Account::name)
@@ -118,9 +120,7 @@ class AccountPage(context: HttpContext) : HttpGroup(context) {
 		val r = Account()
 		r.fromRequest(context)
 		r.insert()
-		redirect(::viewAction) {
-			arg(r::id)
-		}
+		redirect(::viewAction, r.id)
 	}
 
 	@Label("添加", "添加账号")
@@ -193,9 +193,7 @@ class AccountPage(context: HttpContext) : HttpGroup(context) {
 		val r = Account()
 		r.fromRequest(context)
 		r.updateByKey()
-		redirect(::viewAction) {
-			arg(r::id)
-		}
+		redirect(::viewAction, r.id )
 	}
 
 	@Label("编辑", "编辑账号")

@@ -1,14 +1,11 @@
 package dev.entao.keb.biz.model
 
-import dev.entao.keb.biz.Parent
-import dev.entao.kava.base.*
+import dev.entao.kava.base.DefaultValue
+import dev.entao.kava.base.Label
 import dev.entao.kava.sql.Model
 import dev.entao.kava.sql.ModelClass
-import dev.entao.keb.core.WebPath
-import dev.entao.keb.core.actionList
-import dev.entao.keb.core.pageName
+import dev.entao.keb.biz.Parent
 import java.util.*
-import kotlin.reflect.full.findAnnotation
 
 enum class Access(val value: Int) {
 	Page(-1), None(0), View(1), Edit(2), Create(3), Delete(4)

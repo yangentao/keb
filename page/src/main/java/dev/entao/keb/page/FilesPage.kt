@@ -38,6 +38,9 @@ class FilesPage(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.Ht
 //		resultSender.failed(-1, "解析失败")
 //	}
 
+	override fun indexAction() {
+
+	}
 	//上传一个文件
 	@HttpMethod("POST")
 	fun uploadAction() {

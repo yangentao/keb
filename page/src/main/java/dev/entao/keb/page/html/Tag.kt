@@ -1,7 +1,6 @@
 package dev.entao.keb.page.html
 
 import dev.entao.kava.base.*
-import dev.entao.keb.core.WebPath
 import dev.entao.keb.page.*
 import dev.entao.keb.page.ex.HtmlTemplate
 import java.util.*
@@ -326,10 +325,6 @@ open class Tag(val httpContext: dev.entao.keb.core.HttpContext, var tagName: Str
 		return c
 	}
 
-	val KFunction<Unit>.path: WebPath
-		get() {
-			return WebPath(httpContext.filter, this)
-		}
 
 	private fun writeChildren2(singleLine: Boolean, buf: Appendable, level: Int) {
 		val ls = children.filter { it.tagName != "script" }

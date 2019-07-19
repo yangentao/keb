@@ -12,10 +12,6 @@ annotation class HttpMethod(vararg val value: String)
 
 
 
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class IndexAction(vararg val value: String)
-
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class LengthRange(val minValue: Int, val maxValue: Int, val msg: String = "")

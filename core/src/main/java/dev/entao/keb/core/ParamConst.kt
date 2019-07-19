@@ -23,19 +23,19 @@ object ParamConst {
 	}
 }
 
-fun WebPath.ok(msg: String): WebPath {
+fun UriMake.ok(msg: String): UriMake {
 	return arg(ParamConst.SUCCESS, msg)
 }
 
-fun WebPath.err(msg: String): WebPath {
+fun UriMake.err(msg: String): UriMake {
 	return arg(ParamConst.ERROR, msg)
 }
 
-fun WebPath.success(msg: String): WebPath {
+fun UriMake.success(msg: String): UriMake {
 	return arg(ParamConst.SUCCESS, msg)
 }
 
-fun WebPath.error(msg: String): WebPath {
+fun UriMake.error(msg: String): UriMake {
 	return arg(ParamConst.ERROR, msg)
 }
 

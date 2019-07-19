@@ -16,47 +16,38 @@ import kotlin.reflect.KFunction
  * Created by entaoyang@163.com on 2016/12/19.
  */
 
-open class HttpGroup(context: HttpContext) : HttpScope(context) {
+abstract class HttpGroup(context: HttpContext) : HttpScope(context) {
 
+	abstract fun indexAction()
 }
 
 open class HttpScope(val context: HttpContext) {
 
 
 	val httpParams: HttpParams get() = context.httpParams
-	val path: WebPath get() = context.path
 
-	val WebPath.fullUrl: String
-		get() {
-			return this.fullUrlOf(context.request)
-		}
+	fun HttpAction.param(value: Any): UriMake {
+		return UriMake(context, this).param(value)
+	}
+
+	fun HttpAction.arg(key: String, value: Any): UriMake {
+		return UriMake(context, this).arg(key, value)
+	}
 
 	fun resUri(file: String): String {
-		return path.uriRes(file)
+		return context.resUri(file)
 	}
 
 	fun redirect(action: KFunction<*>, param: Any?) {
-		redirect(action) {
-			param(param)
-		}
+		context.redirect(context.actionUri(action, param))
 	}
 
-	fun redirect(action: KFunction<*>) {
-		context.redirect(action)
-	}
 
-	fun redirect(action: KFunction<*>, block: WebPath.() -> Unit) {
-		val p = WebPath(context.filter, action)
+
+	fun redirect(action: KFunction<*>, block: UriMake.() -> Unit) {
+		val p = UriMake(context, action)
 		p.block()
-		context.redirect(p)
-	}
-
-	fun redirect(p: WebPath) {
-		context.redirect(p)
-	}
-
-	fun path(action: KFunction<*>): WebPath {
-		return path.action(action)
+		context.redirect(p.uri)
 	}
 
 	fun paramValue(p: Prop1): Any? {

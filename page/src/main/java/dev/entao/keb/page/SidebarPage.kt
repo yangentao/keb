@@ -1,16 +1,13 @@
 package dev.entao.keb.page
 
-import dev.entao.keb.page.widget.a
-import dev.entao.keb.page.widget.button
-import dev.entao.keb.page.widget.configUpload
 import dev.entao.kava.base.firstParamName
-import dev.entao.kava.base.hasAnnotation
 import dev.entao.kava.base.removeAllIf
 import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.*
-import dev.entao.keb.core.IndexAction
-import dev.entao.keb.core.ParamConst
 import dev.entao.keb.page.html.*
+import dev.entao.keb.page.widget.a
+import dev.entao.keb.page.widget.button
+import dev.entao.keb.page.widget.configUpload
 import kotlin.reflect.KClass
 
 fun HttpScope.sidebarPage(block: Tag.() -> Unit) {
@@ -51,7 +48,7 @@ fun HttpScope.sidebarPage(block: Tag.() -> Unit) {
 				clazz = "navbar navbar-expand-md navbar-dark fixed-left"
 				a {
 					clazz = "navbar-brand"
-					href = context.path.uriRoot
+					href = context.rootUri
 					+config.appName
 				}
 				button {
@@ -128,10 +125,10 @@ fun HttpScope.sidebarPage(block: Tag.() -> Unit) {
 			scriptLink("https://buttons.github.io/buttons.js")
 			scriptLink(resUri(R.myJS))
 			if (FilesPage::class in httpContext.filter.routeManager.allGroups) {
-				val uploadUri = httpContext.path.action(FilesPage::uploadAction).uri
-				val viewUri = httpContext.path.action(FilesPage::imgAction).uri
+				val uploadUri = httpContext.actionUri(FilesPage::uploadAction)
+				val viewUri = httpContext.actionUri(FilesPage::imgAction)
 				val viewParam = FilesPage::imgAction.firstParamName ?: "id"
-				val missImg = httpContext.path.uriRes(R.fileImageDefault)
+				val missImg = httpContext.resUri(R.fileImageDefault)
 				configUpload(uploadUri, viewUri, viewParam, 30, missImg)
 			}
 		}
@@ -263,14 +260,8 @@ private fun HttpScope.navLinks(): ArrayList<LinkItem> {
 }
 
 private fun HttpScope.makeLinkItem(c: Pair<String, KClass<*>>, currUri: String): LinkItem {
-	val s = WebPath(context.filter).append(c.second.pageName).uri
-	val indexAction = c.second.actionList.firstOrNull { it.hasAnnotation<IndexAction>() }
-	val ss = if (indexAction != null) {
-		path.action(indexAction).uri
-	} else {
-		s
-	}
-	return LinkItem(c.second.userLabel, ss, isSubpath(currUri, s))
+	val s = context.groupUri(c.second)
+	return LinkItem(c.second.userLabel, s, isSubpath(currUri, s))
 }
 
 class LinkItem(val label: String, val url: String, var active: Boolean = false) {

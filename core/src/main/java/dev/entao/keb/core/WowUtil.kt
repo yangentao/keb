@@ -88,3 +88,17 @@ fun isSubpath(longPath: String, shortPath: String): Boolean {
 		uu.startsWith("$shortPath/")
 	}
 }
+
+fun buildPath(vararg ps: String): String {
+	val sb = StringBuilder(128)
+	for (s in ps) {
+		if (s.isNotEmpty()) {
+			if (s.startsWith("/")) {
+				sb.append(s)
+			} else {
+				sb.append('/').append(s)
+			}
+		}
+	}
+	return sb.toString()
+}

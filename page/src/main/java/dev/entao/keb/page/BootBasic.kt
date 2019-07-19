@@ -6,6 +6,7 @@ import dev.entao.keb.page.widget.a
 import dev.entao.keb.page.widget.button
 import dev.entao.keb.page.widget.radio
 import dev.entao.kava.base.userLabel
+import dev.entao.keb.core.UriMake
 import dev.entao.keb.page.html.*
 import kotlin.reflect.KFunction
 
@@ -167,7 +168,7 @@ fun Tag.navPills(block: TagCallback) {
 }
 
 fun Tag.navLink(action: KFunction<*>, param: Any?) {
-	val actionUri = httpContext.path.action(action).param(param).uri
+	val actionUri = UriMake(httpContext, action).param(param).uri
 	a {
 		addClass("nav-link")
 		if (httpContext.currentUri in actionUri) {

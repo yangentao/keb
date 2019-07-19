@@ -5,7 +5,7 @@ import dev.entao.kava.base.*
 import dev.entao.kava.json.YsonObject
 import dev.entao.kava.sql.ModelMap
 import dev.entao.keb.core.HttpAction
-import dev.entao.keb.core.WebPath
+import dev.entao.keb.core.UriMake
 import dev.entao.keb.core.valOf
 import dev.entao.keb.page.B
 import dev.entao.keb.page.html.Tag
@@ -148,7 +148,7 @@ open class XTextColumn<T>(table: XTable<T>) : XColumn<T>(table) {
 				targetBlank()
 			}
 		} else {
-			val p = httpContext.path.action(ac).param(v2)
+			val p = httpContext.actionUri(ac, v2)
 			tdTag.a(v, p).apply {
 				targetBlank()
 			}
@@ -258,7 +258,7 @@ class XColumnAction<T>(val td: Tag, val item: T) {
 		return lk
 	}
 
-	fun actionLink(action: HttpAction, block: WebPath.() -> Unit): LinkButton {
+	fun actionLink(action: HttpAction, block: UriMake.() -> Unit): LinkButton {
 		val t = group.linkButton(action, block)
 		t.classList.clear()
 		t.addClass("px-2")

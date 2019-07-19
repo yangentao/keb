@@ -17,7 +17,7 @@ fun HttpScope.boot(block: HtmlDoc.() -> Unit) {
 				content = "width=device-width, initial-scale=1, shrink-to-fit=no"
 			}
 			linkStylesheet(R.CSS.boot)
-			linkStylesheet(httpContext.path.uriRes(R.myCSS))
+			linkStylesheet(httpContext.resUri(R.myCSS))
 		}
 		body.apply {
 			scriptLink(resUri(R.jquery))
@@ -25,10 +25,10 @@ fun HttpScope.boot(block: HtmlDoc.() -> Unit) {
 			scriptLink(R.JS.boot)
 			scriptLink(resUri(R.myJS))
 			if (FilesPage::class in httpContext.filter.routeManager.allGroups) {
-				val uploadUri = httpContext.path.action(FilesPage::uploadAction).uri
-				val viewUri = httpContext.path.action(FilesPage::imgAction).uri
+				val uploadUri = httpContext.actionUri(FilesPage::uploadAction)
+				val viewUri = httpContext.actionUri(FilesPage::imgAction)
 				val viewParam = FilesPage::imgAction.firstParamName ?: "id"
-				val missImg = httpContext.path.uriRes(R.fileImageDefault)
+				val missImg = httpContext.resUri(R.fileImageDefault)
 				configUpload(uploadUri, viewUri, viewParam, 30, missImg)
 			}
 		}

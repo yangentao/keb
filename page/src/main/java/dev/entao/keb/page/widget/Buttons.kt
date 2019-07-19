@@ -3,7 +3,7 @@ package dev.entao.keb.page.widget
 import dev.entao.kava.base.firstParamName
 import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.HttpAction
-import dev.entao.keb.core.WebPath
+import dev.entao.keb.core.UriMake
 import dev.entao.keb.page.*
 import dev.entao.keb.page.html.Tag
 import dev.entao.keb.page.html.TagCallback
@@ -32,8 +32,8 @@ class LinkButton(httpContext: dev.entao.keb.core.HttpContext) : ATag(httpContext
 		return this
 	}
 
-	fun fromAction(action: HttpAction, block: WebPath.() -> Unit): LinkButton {
-		val p = httpContext.path.action(action)
+	fun fromAction(action: HttpAction, block: UriMake.() -> Unit): LinkButton {
+		val p = UriMake(httpContext, action)
 		p.block()
 		this.href = p.uri
 		this.textEscaped(action.userLabel)
@@ -60,7 +60,7 @@ class ButtonTag(httpContext: dev.entao.keb.core.HttpContext) : Tag(httpContext, 
 		needId()
 		this.applyTheme(action, true)
 		+action.userLabel
-		dataUrl = httpContext.path.action(action).uri
+		dataUrl = httpContext.actionUri(action)
 		dataParamName = action.firstParamName ?: "id"
 		dataConfirm = action.findAnnotation<FormConfirm>()?.value ?: ""
 	}
@@ -115,7 +115,7 @@ fun Tag.a(text: String, href: String): Tag {
 	}
 }
 
-fun Tag.a(text: String, webpath: WebPath): Tag {
+fun Tag.a(text: String, webpath: UriMake): Tag {
 	return this.a(text, webpath.uri)
 }
 
@@ -154,7 +154,7 @@ fun Tag.linkButton(text: String, href: String): LinkButton {
 }
 
 //link 用于跳转
-fun Tag.linkButton(action: HttpAction, block: WebPath.() -> Unit): LinkButton {
+fun Tag.linkButton(action: HttpAction, block: UriMake.() -> Unit): LinkButton {
 	val b = LinkButton(this.httpContext)
 	addTag(b)
 	b.fromAction(action, block)

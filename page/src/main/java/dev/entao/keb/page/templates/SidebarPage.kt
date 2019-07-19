@@ -59,7 +59,7 @@ class SidebarPage(context: HttpContext) : HttpScope(context), HtmlTemplate {
 				clazz = "navbar navbar-expand-md navbar-dark fixed-left"
 				a {
 					clazz = "navbar-brand"
-					href = context.path.uriRoot
+					href = context.rootUri
 					+config.appName
 				}
 				button {
@@ -149,10 +149,10 @@ class SidebarPage(context: HttpContext) : HttpScope(context), HtmlTemplate {
 			scriptLink("https://buttons.github.io/buttons.js")
 			scriptLink(resUri(R.myJS))
 			if (FilesPage::class in httpContext.filter.routeManager.allGroups) {
-				val uploadUri = httpContext.path.action(FilesPage::uploadAction).uri
-				val viewUri = httpContext.path.action(FilesPage::imgAction).uri
+				val uploadUri = httpContext.actionUri(FilesPage::uploadAction)
+				val viewUri = httpContext.actionUri(FilesPage::imgAction)
 				val viewParam = FilesPage::imgAction.firstParamName ?: "id"
-				val missImg = httpContext.path.uriRes(R.fileImageDefault)
+				val missImg = httpContext.resUri(R.fileImageDefault)
 				configUpload(uploadUri, viewUri, viewParam, 30, missImg)
 			}
 		}

@@ -4,7 +4,6 @@ import dev.entao.kava.json.ysonArray
 import dev.entao.kava.json.ysonObject
 import dev.entao.kava.sql.EQ
 import dev.entao.keb.core.render.ResultRender
-import dev.entao.keb.core.render.YsonRender
 
 class AreaApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.HttpGroup(context) {
 
@@ -19,7 +18,9 @@ class AreaApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.Http
 		context.writeJSON(ya.yson())
 
 	}
+	override fun indexAction() {
 
+	}
 	fun citiesAction(provId: String) {
 		val ls = City.findAll(City::parentId EQ provId)
 		ResultRender(context).arr(ls) { a ->

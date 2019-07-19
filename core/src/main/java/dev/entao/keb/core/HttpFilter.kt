@@ -93,19 +93,19 @@ abstract class HttpFilter : Filter {
 	}
 
 	fun resUri(res: String): String {
-		return WebPath.buildPath(contextPath, res)
+		return buildPath(contextPath, res)
 	}
 
 	fun actionUri(ac: KFunction<*>): String {
 		val cls = ac.ownerClass!!
 		if (cls == this::class) {
-			return WebPath.buildPath(contextPath, patternPath, ac.actionName)
+			return buildPath(contextPath, patternPath, ac.actionName)
 		}
-		return WebPath.buildPath(contextPath, patternPath, cls.pageName, ac.actionName)
+		return buildPath(contextPath, patternPath, cls.pageName, ac.actionName)
 	}
 
-	fun groupUri(g: KClass<out HttpGroup>): String {
-		return WebPath.buildPath(contextPath, patternPath, g.pageName)
+	fun groupUri(g: KClass<*>): String {
+		return buildPath(contextPath, patternPath, g.pageName)
 	}
 
 	private fun addRouterOfThis() {
