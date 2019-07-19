@@ -147,25 +147,8 @@ private fun <T> enumToSet(e: Enumeration<T>): HashSet<T> {
 	return set
 }
 
-//response exten
-fun HttpServletResponse.print(s: String) {
-	this.writer.print(s)
-}
-
-fun HttpServletResponse.contentTypeJson() {
-	this.contentType = Mimes.JSON
-}
-
 fun HttpServletResponse.contentTypeHtml() {
 	this.contentType = "${Mimes.HTML};charset=UTF-8"
-}
-
-fun HttpServletResponse.contentTypePlain() {
-	this.contentType = Mimes.PLAIN
-}
-
-fun HttpServletResponse.contentTypeXml() {
-	this.contentType = Mimes.XML
 }
 
 fun HttpServletResponse.contentTypeStream() {

@@ -1,12 +1,11 @@
 package dev.entao.keb.core.render
 
+import dev.entao.kava.base.Mimes
 import dev.entao.kava.json.YsonArray
 import dev.entao.kava.json.YsonObject
 import dev.entao.kava.json.YsonObjectBuilder
 import dev.entao.kava.json.ysonArray
-import dev.entao.kava.log.logd
 import dev.entao.keb.core.HttpContext
-import dev.entao.keb.core.contentTypeJson
 
 class Result {
 	val jo = YsonObject()
@@ -121,7 +120,7 @@ class Result {
 class ResultRender(val context: HttpContext) {
 
 	init {
-		context.response.contentTypeJson()
+		context.response.contentType = Mimes.JSON
 	}
 
 	fun send(value: Result) {

@@ -1,15 +1,15 @@
 package dev.entao.keb.core.render
 
+import dev.entao.kava.base.Mimes
 import dev.entao.kava.json.YsonObject
 import dev.entao.kava.json.YsonValue
 import dev.entao.kava.json.ysonArray
 import dev.entao.keb.core.HttpContext
-import dev.entao.keb.core.contentTypeJson
 
 class YsonRender(val context: HttpContext) {
 
 	init {
-		context.response.contentTypeJson()
+		context.response.contentType = Mimes.JSON
 	}
 
 	fun write(value: YsonValue) {

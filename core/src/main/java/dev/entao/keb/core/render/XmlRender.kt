@@ -1,14 +1,14 @@
 package dev.entao.keb.core.render
 
+import dev.entao.kava.base.Mimes
 import dev.entao.kava.base.toXml
 import dev.entao.keb.core.HttpContext
-import dev.entao.keb.core.contentTypeXml
 import org.w3c.dom.Element
 
 class XmlRender(val context: HttpContext) {
 
 	init {
-		context.response.contentTypeXml()
+		context.response.contentType = Mimes.XML
 	}
 
 	fun write(xml: String) {

@@ -4,6 +4,7 @@ package dev.entao.keb.page
 
 import dev.entao.keb.page.widget.button
 import dev.entao.kava.sql.SQLQuery
+import dev.entao.keb.core.HtmlSender
 import dev.entao.keb.core.HttpContext
 
 open class HtmlPage(context: HttpContext) : dev.entao.keb.core.HttpGroup(context) {
@@ -25,7 +26,7 @@ open class HtmlPage(context: HttpContext) : dev.entao.keb.core.HttpGroup(context
 		d.closeText = "确定"
 		d.build()
 		val s = d.modal.toString()
-		htmlSender.text(s)
+		HtmlSender(context).write(s)
 	}
 
 	fun html(block: HtmlDoc.() -> Unit) {
@@ -44,7 +45,7 @@ open class HtmlPage(context: HttpContext) : dev.entao.keb.core.HttpGroup(context
 			}
 		}
 
-		htmlSender.text(h.toString())
+		HtmlSender(context).write(h.toString())
 	}
 
 	fun formDialog(title: String, block: (Tag) -> Unit) {
@@ -64,7 +65,7 @@ open class HtmlPage(context: HttpContext) : dev.entao.keb.core.HttpGroup(context
 			}
 		}
 		d.build()
-		htmlSender.text(d.modal.toString())
+		HtmlSender(context).write(d.modal.toString())
 	}
 
 	fun formDialogDisplay(title: String, block: (Tag) -> Unit) {
@@ -77,6 +78,6 @@ open class HtmlPage(context: HttpContext) : dev.entao.keb.core.HttpGroup(context
 		d.closeText = "确定"
 		d.build()
 		val s = d.modal.toString()
-		htmlSender.text(s)
+		HtmlSender(context).write(s)
 	}
 }

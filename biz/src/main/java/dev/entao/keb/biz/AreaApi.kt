@@ -2,6 +2,7 @@ package dev.entao.keb.biz
 
 import dev.entao.kava.json.ysonObject
 import dev.entao.kava.sql.EQ
+import dev.entao.keb.core.HtmlSender
 import dev.entao.keb.core.render.ResultRender
 import dev.entao.keb.core.render.YsonRender
 
@@ -47,7 +48,7 @@ class AreaApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.Http
 			p.name = it.name
 			p.insert()
 		}
-		htmlSender.text("OK")
+		HtmlSender(context).write("OK")
 	}
 
 	fun initcAction() {
@@ -59,7 +60,7 @@ class AreaApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.Http
 			c.parentId = it.parent
 			c.insert()
 		}
-		htmlSender.text("OK")
+		HtmlSender(context).write("OK")
 	}
 
 }

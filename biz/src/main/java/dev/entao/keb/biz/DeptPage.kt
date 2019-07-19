@@ -16,6 +16,9 @@ import dev.entao.keb.page.FormConfirm
 import dev.entao.keb.core.intList
 import dev.entao.keb.core.ok
 import dev.entao.keb.core.render.ResultRender
+import dev.entao.keb.core.sql.EQ
+import dev.entao.keb.core.sql.LIKE
+import dev.entao.keb.core.sql.fromRequest
 import dev.entao.keb.page.*
 import dev.entao.keb.page.ex.OrderBy
 import dev.entao.keb.page.ex.orderBy
@@ -102,7 +105,7 @@ class DeptPage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 
 	fun insertAction() {
 		val r = Dept()
-		r.fromRequest()
+		r.fromRequest(context)
 		r.insert()
 		redirect(::viewAction) {
 			arg(r::id)
@@ -169,7 +172,7 @@ class DeptPage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 
 	fun saveAction() {
 		val r = Dept()
-		r.fromRequest()
+		r.fromRequest(context)
 		r.updateByKey()
 		redirect(::viewAction) {
 			arg(r::id)

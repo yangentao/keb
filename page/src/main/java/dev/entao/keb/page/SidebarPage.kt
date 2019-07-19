@@ -9,6 +9,7 @@ import dev.entao.kava.base.removeAllIf
 import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.*
 import dev.entao.keb.core.IndexAction
+import dev.entao.keb.core.ParamConst
 import kotlin.reflect.KClass
 
 fun HtmlPage.sidebarPage(block: Tag.() -> Unit) {
@@ -224,7 +225,7 @@ private fun dev.entao.keb.core.HttpGroup.buildTopActionMenu(parentTag: Tag) {
 
 private fun dev.entao.keb.core.HttpGroup.navLinks(): ArrayList<LinkItem> {
 	val currUri = context.request.requestURI
-	val navConList = ArrayList<Pair<String, KClass<*>>>(filter.navControlerList)
+	val navConList = ArrayList<Pair<String, KClass<*>>>(context.filter.navControlerList)
 
 	val linkList = ArrayList<LinkItem>()
 
@@ -260,7 +261,7 @@ private fun dev.entao.keb.core.HttpGroup.navLinks(): ArrayList<LinkItem> {
 }
 
 private fun dev.entao.keb.core.HttpGroup.makeLinkItem(c: Pair<String, KClass<*>>, currUri: String): LinkItem {
-	val s = WebPath(filter).append(c.second.pageName).uri
+	val s = WebPath(context.filter).append(c.second.pageName).uri
 	val indexAction = c.second.actionList.firstOrNull { it.hasAnnotation<IndexAction>() }
 	val ss = if (indexAction != null) {
 		path.action(indexAction).uri

@@ -37,7 +37,7 @@ fun HtmlPage.boot(block: HtmlDoc.() -> Unit) {
 fun HtmlPage.bootPage(block: Tag.() -> Unit) {
 	boot {
 		head.apply {
-			title(filter.webConfig.appName)
+			title(context.filter.webConfig.appName)
 		}
 		body.apply {
 			divContainerFluid {

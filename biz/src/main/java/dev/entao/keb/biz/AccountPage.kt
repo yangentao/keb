@@ -8,20 +8,21 @@ import dev.entao.kava.sql.AND
 import dev.entao.kava.sql.EQ
 import dev.entao.kava.sql.IN
 import dev.entao.kava.sql.Where
-import dev.entao.keb.core.IndexAction
-import dev.entao.keb.core.NotEmpty
+import dev.entao.keb.core.*
 import dev.entao.keb.page.ActionDanger
 import dev.entao.keb.page.FormConfirm
-import dev.entao.keb.core.intList
-import dev.entao.keb.core.ok
 import dev.entao.keb.core.render.ResultRender
+import dev.entao.keb.core.sql.EQ
+import dev.entao.keb.core.sql.LIKE
+import dev.entao.keb.core.sql.fromRequest
 import dev.entao.keb.page.*
 import dev.entao.keb.page.ex.OrderBy
+import dev.entao.keb.core.ok
 import dev.entao.keb.page.ex.orderBy
 import dev.entao.keb.page.widget.*
 
 @Label("WEB账号管理")
-class AccountPage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
+class AccountPage(context: HttpContext) : HtmlPage(context) {
 
 	@IndexAction
 	@Label("查询")
@@ -101,7 +102,7 @@ class AccountPage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 		ResultRender(context).ok()
 	}
 
-//	@Label("Dialog")
+	//	@Label("Dialog")
 	fun dlgAction(id: String = "") {
 		val d = DialogBuild(context)
 		d.title("Title")
@@ -109,13 +110,13 @@ class AccountPage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 			it.textEscaped("Hello Yang: $id")
 		}
 		val s = d.build().toString()
-		htmlSender.print(s)
+		HtmlSender(context).write(s)
 
 	}
 
 	fun insertAction() {
 		val r = Account()
-		r.fromRequest()
+		r.fromRequest(context)
 		r.insert()
 		redirect(::viewAction) {
 			arg(r::id)
@@ -190,7 +191,7 @@ class AccountPage(context: dev.entao.keb.core.HttpContext) : HtmlPage(context) {
 
 	fun saveAction() {
 		val r = Account()
-		r.fromRequest()
+		r.fromRequest(context)
 		r.updateByKey()
 		redirect(::viewAction) {
 			arg(r::id)

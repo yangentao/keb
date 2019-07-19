@@ -18,28 +18,19 @@ import kotlin.reflect.KFunction
 
 open class HttpGroup(val context: HttpContext) {
 
-	val request: HttpServletRequest get() = context.request
-	val response: HttpServletResponse get() = context.response
-	val filter: HttpFilter get() = context.filter
-
-	val htmlSender: HtmlSender get() = context.htmlSender
-	val fileSender: FileSender get() = context.fileSender
 
 	val httpParams: HttpParams get() = context.httpParams
 	val path: WebPath get() = context.path
 
 	val WebPath.fullUrl: String
 		get() {
-			return this.fullUrlOf(request)
+			return this.fullUrlOf(context.request)
 		}
 
 	fun resUri(file: String): String {
 		return path.uriRes(file)
 	}
 
-	fun Model.fromRequest() {
-		this.fromRequest(request)
-	}
 
 	fun redirect(action: KFunction<*>, param: Any?) {
 		redirect(action) {
@@ -52,7 +43,7 @@ open class HttpGroup(val context: HttpContext) {
 	}
 
 	fun redirect(action: KFunction<*>, block: WebPath.() -> Unit) {
-		val p = WebPath(filter, action)
+		val p = WebPath(context.filter, action)
 		p.block()
 		context.redirect(p)
 	}
@@ -65,7 +56,7 @@ open class HttpGroup(val context: HttpContext) {
 		return path.action(action)
 	}
 
-	private fun paramValue(p: Prop1): Any? {
+	fun paramValue(p: Prop1): Any? {
 		if (p.isTypeInt) {
 			return context.httpParams.int(p)
 		}
@@ -78,65 +69,6 @@ open class HttpGroup(val context: HttpContext) {
 		return null
 	}
 
-	fun EQ(vararg ps: Prop1): Where? {
-		var w: Where? = null
-		for (p in ps) {
-			val v = paramValue(p) ?: continue
-			w = w AND p.sqlFullName.EQ(v)
-		}
-		return w
-	}
 
-	// %value%
-	fun LIKE(p: Prop1): Where? {
-		val v = httpParams.str(p)?.trim() ?: return null
-		if (v.isEmpty()) {
-			return null
-		}
-		return p LIKE """%$v%"""
-	}
-
-	// value%
-	fun LIKE_(p: Prop1): Where? {
-		val v = httpParams.str(p)?.trim() ?: return null
-		if (v.isEmpty()) {
-			return null
-		}
-		return p LIKE """$v%"""
-	}
-
-	// %value
-	fun _LIKE(p: Prop1): Where? {
-		val v = httpParams.str(p)?.trim() ?: return null
-		if (v.isEmpty()) {
-			return null
-		}
-		return p LIKE """%$v"""
-	}
-
-	fun NE(p: Prop1): Where? {
-		val v = paramValue(p) ?: return null
-		return p NE v
-	}
-
-	fun GE(p: Prop1): Where? {
-		val v = paramValue(p) ?: return null
-		return p GE v
-	}
-
-	fun GT(p: Prop1): Where? {
-		val v = paramValue(p) ?: return null
-		return p GT v
-	}
-
-	fun LE(p: Prop1): Where? {
-		val v = paramValue(p) ?: return null
-		return p LE v
-	}
-
-	fun LT(p: Prop1): Where? {
-		val v = paramValue(p) ?: return null
-		return p LT v
-	}
 
 }

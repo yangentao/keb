@@ -43,7 +43,8 @@ class FilesApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.Htt
 	//上传一个文件
 	@HttpMethod("POST")
 	fun uploadAction() {
-		val part: Part? = request.filePart
+
+		val part: Part? = context.fileParts().firstOrNull()
 		if (part == null) {
 			context.abort(400, "没有file part")
 			return
