@@ -16,8 +16,8 @@ interface HttpTimer {
 	fun onMinute(m: Int) {}
 }
 
-object MethodAcceptor : Acceptor {
-	override fun accept(context: HttpContext, router: Router): Boolean {
+object MethodAcceptor : HttpSlice {
+	override fun beforeService(context: HttpContext, router: Router): Boolean {
 		if (router.methods.isNotEmpty()) {
 			if (context.request.method.toUpperCase() !in router.methods) {
 				context.abort(400, "Method Error")

@@ -2,16 +2,20 @@
 
 package dev.entao.keb.core
 
+import dev.entao.kava.base.ownerClass
 import dev.entao.kava.log.Yog
 import dev.entao.kava.log.YogDir
 import dev.entao.kava.log.logd
 import dev.entao.kava.sql.ConnLook
 import java.util.*
 import javax.servlet.*
+import javax.servlet.annotation.WebFilter
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import kotlin.collections.ArrayList
 import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
+import kotlin.reflect.full.findAnnotation
 
 /**
  * Created by entaoyang@163.com on 2016/12/21.
@@ -25,12 +29,15 @@ abstract class HttpFilter : Filter {
 	private lateinit var filterConfig: FilterConfig
 	var contextPath: String = ""
 		private set
+	// /* => "" , /person/*  => person     @WebFilter中的urlPatterns
+	var patternPath: String = ""
+		private set
+
 	val webDir = WebDir()
 	val routeManager = HttpActionManager()
 
 	private val sliceList = ArrayList<HttpSlice>()
 	val timerSlice = TimerSlice()
-	val accepterSlice = AccepterManager()
 
 	val allGroups: ArrayList<KClass<out HttpGroup>> get() = routeManager.allGroups
 
@@ -49,6 +56,10 @@ abstract class HttpFilter : Filter {
 		this.filterConfig = filterConfig
 		sliceList.clear()
 		contextPath = filterConfig.servletContext.contextPath
+		val pat = this::class.findAnnotation<WebFilter>()?.urlPatterns?.toList()?.firstOrNull()
+				?: throw IllegalArgumentException("urlPatterns只能设置一条, 比如: /* 或 /person/*")
+		patternPath = pat.filter { it.isLetterOrDigit() || it == '_' }
+
 		webDir.onConfig(this, filterConfig)
 		Yog.setPrinter(YogDir(webDir.logDir, 15))
 		logd("Server Start!")
@@ -57,8 +68,7 @@ abstract class HttpFilter : Filter {
 		addRouterOfThis()
 
 		addSlice(timerSlice)
-		addSlice(accepterSlice)
-		accepterSlice.addAcceptor(MethodAcceptor)
+		addSlice(MethodAcceptor)
 
 		try {
 			onInit()
@@ -82,12 +92,29 @@ abstract class HttpFilter : Filter {
 		ConnLook.removeThreadLocal()
 	}
 
+	fun resUri(res: String): String {
+		return WebPath.buildPath(contextPath, res)
+	}
+
+	fun actionUri(ac: KFunction<*>): String {
+		val cls = ac.ownerClass!!
+		if (cls == this::class) {
+			return WebPath.buildPath(contextPath, patternPath, ac.actionName)
+		}
+		return WebPath.buildPath(contextPath, patternPath, cls.pageName, ac.actionName)
+	}
+
 	private fun addRouterOfThis() {
 		val ls = this::class.actionList
 		for (f in ls) {
-			val info = Router(WebPath.buildPath(contextPath, f.actionName), f, this)
+			val uri = actionUri(f)
+			val info = Router(uri, f, this)
 			routeManager.addRouter(info)
 		}
+	}
+
+	fun addGroup(vararg clses: KClass<out HttpGroup>) {
+		this.routeManager.addGroup(*clses)
 	}
 
 	final override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {

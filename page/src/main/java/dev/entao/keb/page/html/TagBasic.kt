@@ -9,11 +9,23 @@ import dev.entao.keb.page.B
 typealias TagCallback = Tag.() -> Unit
 
 fun Tag.head(block: TagCallback): Tag {
-	return addTag("head", block)
+	val h = this.head
+	if (h == null) {
+		return addTag("head", block)
+	} else {
+		block(h)
+		return h
+	}
 }
 
 fun Tag.body(block: TagCallback): Tag {
-	return addTag("body", block)
+	val b = this.body
+	if (b == null) {
+		return addTag("body", block)
+	} else {
+		block(b)
+		return b
+	}
 }
 
 val Tag.topMost: Tag
@@ -25,14 +37,14 @@ val Tag.topMost: Tag
 		return p
 	}
 
-val Tag.head: Tag
+val Tag.head: Tag?
 	get() {
-		return this.topMost.findChildDeep { it.tagName == "head" }!!
+		return this.topMost.findChildDeep { it.tagName == "head" }
 	}
 
-val Tag.body: Tag
+val Tag.body: Tag?
 	get() {
-		return this.topMost.findChildDeep { it.tagName == "body" }!!
+		return this.topMost.findChildDeep { it.tagName == "body" }
 	}
 
 fun Tag.lang(language: String = "zh-CN"): Tag {

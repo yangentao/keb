@@ -18,7 +18,7 @@ dependencies {
     implementation 'dev.entao.kava:log:1.1.0'
     implementation 'dev.entao.kava:base:1.1.0'
     implementation 'dev.entao.kava:json:1.1.0'
-    implementation 'dev.entao.kava:sql:1.1.0'
+    implementation 'dev.entao.kava:sql:1.1.1'
 }
 compileKotlin {
     kotlinOptions {

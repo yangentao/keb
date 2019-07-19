@@ -9,26 +9,25 @@ import kotlin.reflect.KFunction
 
 interface HttpSlice {
 	fun onConfig(filter: HttpFilter, config: FilterConfig) {}
-	fun beforeAll(c: HttpContext) {}
-	fun afterAll(c: HttpContext) {}
-	fun beforeService(c: HttpContext, r: Router): Boolean {
+	fun beforeAll(context: HttpContext) {}
+	fun afterAll(context: HttpContext) {}
+	fun beforeService(context: HttpContext, router: Router): Boolean {
 		return true
 	}
 
-	fun afterService(c: HttpContext) {}
+	fun afterService(context: HttpContext) {}
 	fun onDestory() {}
 }
 
 typealias HttpAction = KFunction<Unit>
 
 class HttpActionManager {
-	private var baseUri: String = ""
-
 	val allGroups = ArrayList<KClass<out HttpGroup>>()
 	private val map = HashMap<String, Router>(32)
+	private lateinit var filter: HttpFilter
 
 	fun onConfig(filter: HttpFilter, config: FilterConfig) {
-		baseUri = config.servletContext.contextPath
+		this.filter = filter
 	}
 
 	fun onDestory() {
@@ -36,8 +35,8 @@ class HttpActionManager {
 		allGroups.clear()
 	}
 
-	fun find(c: HttpContext): Router? {
-		val uri = c.request.requestURI.trimEnd('/').toLowerCase()
+	fun find(context: HttpContext): Router? {
+		val uri = context.request.requestURI.trimEnd('/').toLowerCase()
 		return map[uri]
 	}
 
@@ -45,7 +44,8 @@ class HttpActionManager {
 		allGroups.addAll(clses)
 		clses.forEach { cls ->
 			for (f in cls.actionList) {
-				val info = Router(WebPath.buildPath(baseUri, cls.pageName, f.actionName), f)
+				val uri = filter.actionUri(f)
+				val info = Router(uri, f)
 				addRouter(info)
 			}
 		}

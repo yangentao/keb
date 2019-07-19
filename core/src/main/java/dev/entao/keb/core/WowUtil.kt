@@ -12,10 +12,6 @@ import kotlin.reflect.full.memberFunctions
  * Created by entaoyang@163.com on 2017/5/7.
  */
 
-
-
-
-
 fun Prop1.pairOf(item: Any): Pair<String, String> {
 	return this.userName to (this.getValue(item)?.toString() ?: "")
 }
@@ -36,7 +32,6 @@ val KClass<*>.actionList: List<KFunction<*>>
 	get() {
 		return this.memberFunctions.filter { it.isHttpAction }
 	}
-
 
 //fun loginAction()
 val KFunction<*>.isHttpAction: Boolean
@@ -91,33 +86,6 @@ fun urlBuild(url: String, params: Map<String, String?>): String {
 		return url + argStr
 	}
 	return url + "&" + argStr
-}
-
-//	/ =>
-//  /* =>
-//  /person => person
-//  /person/ => person
-//  /person/* => person
-fun formatPatternPath(s: String): String {
-	val sb = StringBuilder(36)
-	var first = true
-	for (ch in s) {
-		if (first) {
-			if (ch == '/') {
-				continue
-			}
-		}
-		if (ch in '0'..'9' || ch in 'a'..'z' || ch in 'A'..'Z' || ch == '_') {
-			sb.append(ch)
-			first = false
-			continue
-		}
-		if (!first) {
-			break
-		}
-
-	}
-	return sb.toString()
 }
 
 val String.intList: List<Int>

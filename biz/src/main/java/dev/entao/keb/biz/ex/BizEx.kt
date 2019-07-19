@@ -6,10 +6,7 @@ import dev.entao.kava.sql.*
 import dev.entao.keb.biz.model.Account
 import dev.entao.keb.biz.model.ResAccess
 import dev.entao.keb.biz.model.TokenTable
-import dev.entao.keb.core.HttpTimer
-import dev.entao.keb.core.ParamConst
-import dev.entao.keb.core.Router
-import dev.entao.keb.core.Url
+import dev.entao.keb.core.*
 import dev.entao.keb.core.render.ResultRender
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
@@ -136,8 +133,8 @@ annotation class LoginApp
 @Retention(AnnotationRetention.RUNTIME)
 annotation class LoginWeb
 
-object AuthAppAcceptor : dev.entao.keb.core.Acceptor {
-	override fun accept(context: dev.entao.keb.core.HttpContext, router: Router): Boolean {
+object AuthAppAcceptor : HttpSlice {
+	override fun beforeService(context: HttpContext, router: Router): Boolean {
 		context.os = context.httpParams.str("os") ?: ""
 		context.token = context.httpParams.str(dev.entao.keb.core.HttpContext.TOKEN) ?: ""
 		val needLoginApp: Boolean = router.function.hasAnnotation<LoginApp>() || router.cls.hasAnnotation<LoginApp>()
@@ -155,9 +152,9 @@ object AuthAppAcceptor : dev.entao.keb.core.Acceptor {
 	}
 }
 
-object AuthWebAcceptor : dev.entao.keb.core.Acceptor {
-	override fun accept(context: dev.entao.keb.core.HttpContext, router: Router): Boolean {
-		context.accountId = context.getSession(dev.entao.keb.core.HttpContext.ACCOUNT_ID)?.toIntOrNull() ?: 0
+object AuthWebAcceptor : HttpSlice {
+	override fun beforeService(context: HttpContext, router: Router): Boolean {
+		context.accountId = context.getSession(HttpContext.ACCOUNT_ID)?.toIntOrNull() ?: 0
 
 		val needLoginWeb: Boolean = router.function.hasAnnotation<LoginWeb>() || router.cls.hasAnnotation<LoginWeb>()
 
