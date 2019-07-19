@@ -5,7 +5,6 @@ import java.net.URLEncoder
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KVisibility
-import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberFunctions
 
 /**
@@ -55,7 +54,7 @@ val KFunction<*>.actionName: String
 	}
 val KClass<*>.pageName: String
 	get() {
-		val gname = this.userName.substringBefore(HttpFilter.GROUP_SURFIX).toLowerCase()
+		val gname = this.userName.substringBefore(HttpFilter.GROUP_SUFFIX).toLowerCase()
 		if (gname == HttpFilter.INDEX) {
 			return ""
 		}

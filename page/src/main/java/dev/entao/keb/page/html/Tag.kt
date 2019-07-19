@@ -3,11 +3,12 @@ package dev.entao.keb.page.html
 import dev.entao.kava.base.*
 import dev.entao.keb.core.WebPath
 import dev.entao.keb.page.*
+import dev.entao.keb.page.ex.HtmlTemplate
 import java.util.*
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 
-open class Tag(val httpContext: dev.entao.keb.core.HttpContext, var tagName: String) {
+open class Tag(val httpContext: dev.entao.keb.core.HttpContext, var tagName: String) : HtmlTemplate {
 	private val attrs: TagMap = TagMap()
 	var parentTag: Tag? = null
 
@@ -401,6 +402,10 @@ open class Tag(val httpContext: dev.entao.keb.core.HttpContext, var tagName: Str
 
 	}
 
+	override fun toHtml(): String {
+		return this.toString()
+	}
+
 	override fun toString(): String {
 		val n = preferBufferSize()
 		val sb = StringBuilder(n)
@@ -424,7 +429,6 @@ open class Tag(val httpContext: dev.entao.keb.core.HttpContext, var tagName: Str
 		val selfEndTags = setOf("meta", "link", "input", "img", "hr")
 		val singleLineTags = setOf("span", "textarea", "label", "button", "title", "td", "th", "input", "option", "a", "h1", "h2", "h3", "h4", "h5", "h6")
 		val keepAttrs = setOf("col.width", "option.value")
-
 	}
 
 }
