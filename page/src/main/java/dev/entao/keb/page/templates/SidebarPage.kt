@@ -1,17 +1,16 @@
 package dev.entao.keb.page.templates
 
 import dev.entao.kava.base.firstParamName
-import dev.entao.kava.base.hasAnnotation
-import dev.entao.kava.base.removeAllIf
 import dev.entao.kava.base.userLabel
-import dev.entao.keb.core.*
+import dev.entao.keb.core.HttpAction
+import dev.entao.keb.core.HttpContext
+import dev.entao.keb.core.HttpScope
 import dev.entao.keb.page.*
 import dev.entao.keb.page.ex.HtmlTemplate
 import dev.entao.keb.page.html.*
 import dev.entao.keb.page.widget.a
 import dev.entao.keb.page.widget.button
 import dev.entao.keb.page.widget.configUpload
-import kotlin.reflect.KClass
 
 class SidebarPage(context: HttpContext) : HttpScope(context), HtmlTemplate {
 
@@ -227,53 +226,6 @@ class SidebarPage(context: HttpContext) : HttpScope(context), HtmlTemplate {
 		}
 	}
 
-	private fun navLinks(): ArrayList<LinkItem> {
-		val currUri = context.currentUri
-		val navConList = ArrayList<Pair<String, KClass<*>>>(context.filter.navControlerList)
-
-		val linkList = ArrayList<LinkItem>()
-
-		while (navConList.isNotEmpty()) {
-			val first = navConList.removeAt(0)
-			val ls2 = navConList.removeAllIf {
-				it.first == first.first
-			}
-			if (ls2.isEmpty()) {
-				val a = makeLinkItem(first, currUri)
-				if (context.allow(a.url)) {
-					linkList += a
-				}
-				continue
-			}
-			val item = LinkItem(first.first, "#", false)
-			val b = makeLinkItem(first, currUri)
-			if (context.allow(b.url)) {
-				item.children += b
-			}
-			for (c in ls2) {
-				val dd = makeLinkItem(c, currUri)
-				if (context.allow(dd.url)) {
-					item.children += dd
-				}
-			}
-			item.active = item.children.any { it.active }
-			if (item.children.isNotEmpty()) {
-				linkList += item
-			}
-		}
-		return linkList
-	}
-
-	private fun makeLinkItem(c: Pair<String, KClass<*>>, currUri: String): LinkItem {
-		val s = WebPath(context.filter).append(c.second.pageName).uri
-		val indexAction = c.second.actionList.firstOrNull { it.hasAnnotation<IndexAction>() }
-		val ss = if (indexAction != null) {
-			path.action(indexAction).uri
-		} else {
-			s
-		}
-		return LinkItem(c.second.userLabel, ss, isSubpath(currUri, s))
-	}
 
 	override fun toHtml(): String {
 		val html = HtmlDoc(context)
