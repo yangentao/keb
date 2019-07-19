@@ -1,9 +1,11 @@
 package dev.entao.keb.page.templates
 
 import dev.entao.kava.base.firstParamName
+import dev.entao.kava.base.ownerClass
 import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.HttpAction
 import dev.entao.keb.core.HttpContext
+import dev.entao.keb.core.HttpGroup
 import dev.entao.keb.core.HttpScope
 import dev.entao.keb.page.*
 import dev.entao.keb.page.ex.HtmlTemplate
@@ -11,6 +13,7 @@ import dev.entao.keb.page.html.*
 import dev.entao.keb.page.widget.a
 import dev.entao.keb.page.widget.button
 import dev.entao.keb.page.widget.configUpload
+import kotlin.reflect.KClass
 
 class SidebarPage(context: HttpContext) : HttpScope(context), HtmlTemplate {
 
@@ -186,6 +189,14 @@ class SidebarPage(context: HttpContext) : HttpScope(context), HtmlTemplate {
 		}
 	}
 
+	fun buildLeftMenu(ls: List<KClass<out HttpGroup>>) {
+		val c = context.currentUri
+		this.navItems = ls.map {
+			val a = context.groupUri(it)
+			LinkItem(it.userLabel, a, c.startsWith(a))
+		}
+	}
+
 	private fun installDialogs(tag: Tag) {
 		tag.apply {
 			div {
@@ -225,7 +236,6 @@ class SidebarPage(context: HttpContext) : HttpScope(context), HtmlTemplate {
 			}
 		}
 	}
-
 
 	override fun toHtml(): String {
 		val html = HtmlDoc(context)

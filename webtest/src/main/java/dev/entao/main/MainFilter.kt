@@ -10,7 +10,7 @@ class MainFilter : HttpFilter() {
 
 	override fun onInit() {
 
-		addGroup(PersonGroup::class)
+		addGroup(PersonGroup::class, SaleGroup::class)
 	}
 
 	fun indexAction(context: HttpContext) {

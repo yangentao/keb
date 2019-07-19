@@ -104,6 +104,10 @@ abstract class HttpFilter : Filter {
 		return WebPath.buildPath(contextPath, patternPath, cls.pageName, ac.actionName)
 	}
 
+	fun groupUri(g: KClass<out HttpGroup>): String {
+		return WebPath.buildPath(contextPath, patternPath, g.pageName)
+	}
+
 	private fun addRouterOfThis() {
 		val ls = this::class.actionList
 		for (f in ls) {

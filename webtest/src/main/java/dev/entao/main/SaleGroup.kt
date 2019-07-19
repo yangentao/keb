@@ -9,19 +9,19 @@ import dev.entao.keb.page.ex.writeHtml
 import dev.entao.keb.page.html.p
 import dev.entao.keb.page.templates.SidebarPage
 
-@Label("员工")
-class PersonGroup(context: HttpContext) : HttpGroup(context) {
+@Label("销售")
+class SaleGroup(context: HttpContext) : HttpGroup(context) {
 
 	@Label("添加")
 	fun addAction() {
 		writeHtml(SidebarPage(context)) {
-			this.title = "Hello Yang"
+			this.title = "销售"
 			this.buildTopMenu(listOf(::addAction, ::delAction))
 			this.buildLeftMenu(listOf(PersonGroup::class, SaleGroup::class))
 
 			this.pageBlock = {
 				p {
-					+"Hello Yang En Tao "
+					+"销售 添加"
 				}
 			}
 		}
@@ -30,13 +30,13 @@ class PersonGroup(context: HttpContext) : HttpGroup(context) {
 	@Label("删除")
 	fun delAction() {
 		writeHtml(SidebarPage(context)) {
-			this.title = "Hello Yang"
+			this.title = "销售"
 			this.buildTopMenu(listOf(::addAction, ::delAction))
 			this.buildLeftMenu(listOf(PersonGroup::class, SaleGroup::class))
 
 			this.pageBlock = {
 				p {
-					+" delete me  "
+					+" 销售删除 "
 				}
 			}
 		}

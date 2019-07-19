@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession
 import javax.servlet.http.Part
+import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 
 /**
@@ -41,6 +42,10 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 
 	val loginedApp: Boolean get() = userId != 0
 	val loginedWeb: Boolean get() = accountId != 0
+
+	fun groupUri(g: KClass<out HttpGroup>): String {
+		return filter.groupUri(g)
+	}
 
 	fun actionUri(a: HttpAction): String {
 		return filter.actionUri(a)
