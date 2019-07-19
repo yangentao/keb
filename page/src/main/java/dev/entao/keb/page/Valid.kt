@@ -12,3 +12,10 @@ package dev.entao.keb.page
 )
 @Retention(AnnotationRetention.RUNTIME)
 annotation class StepValue(val value: String)
+
+
+//@ColumnWidth("50px");,
+//@ColumnWidth("30%");,
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class ColumnWidth(val value: String)

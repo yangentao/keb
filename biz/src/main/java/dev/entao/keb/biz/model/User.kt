@@ -7,7 +7,7 @@ import dev.entao.kava.base.Name
 import dev.entao.kava.sql.EQ
 import dev.entao.kava.sql.Model
 import dev.entao.kava.sql.ModelClass
-import dev.entao.keb.core.ColumnWidth
+import dev.entao.keb.page.ColumnWidth
 import dev.entao.keb.page.FormOptions
 import dev.entao.keb.page.FormRequired
 

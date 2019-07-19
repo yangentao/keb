@@ -1,6 +1,6 @@
 @file:Suppress("unused", "MemberVisibilityCanBePrivate", "PrivatePropertyName", "PropertyName", "FunctionName")
 
-package dev.entao.keb.core
+package dev.entao.keb.core.util
 
 import dev.entao.kava.base.Progress
 import dev.entao.kava.base.SizeStream

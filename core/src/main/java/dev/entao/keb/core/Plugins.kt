@@ -2,10 +2,6 @@
 
 package dev.entao.keb.core
 
-interface Acceptor {
-	fun accept(context: HttpContext, router: Router): Boolean
-}
-
 interface PermAcceptor {
 	fun prepare(context: HttpContext)
 	fun accept(context: HttpContext, uri: String): Boolean

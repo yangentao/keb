@@ -11,17 +11,7 @@ import kotlin.reflect.full.memberFunctions
  * Created by entaoyang@163.com on 2017/5/7.
  */
 
-fun Prop1.pairOf(item: Any): Pair<String, String> {
-	return this.userName to (this.getValue(item)?.toString() ?: "")
-}
 
-infix fun Prop1.OF(item: Any): Pair<String, String> {
-	return this.userName to (this.getValue(item)?.toString() ?: "")
-}
-
-infix fun Prop1.VAL(item: Any): String {
-	return this.getValue(item)?.toString() ?: ""
-}
 
 fun Prop1.valOf(item: Any): String {
 	return this.getValue(item)?.toString() ?: ""
@@ -61,19 +51,6 @@ val KClass<*>.pageName: String
 		return gname
 	}
 
-fun urlBuild(url: String, params: Map<String, String?>): String {
-	if (params.isEmpty()) {
-		return url
-	}
-	val argStr = params.filter { !it.value.isNullOrEmpty() }.map { it.key + "=" + URLEncoder.encode(it.value, Charsets.UTF_8.name()) }.joinToString("&")
-	if ('?' !in url) {
-		return url + "?" + argStr
-	}
-	if (url.last() == '&') {
-		return url + argStr
-	}
-	return url + "&" + argStr
-}
 
 val String.intList: List<Int>
 	get() {

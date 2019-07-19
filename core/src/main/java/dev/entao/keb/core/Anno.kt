@@ -56,3 +56,15 @@ annotation class NotBlank
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Match(val value: String, val msg: String = "")
 
+//需要登录后请求, 管理员权限
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class HttpMethod(vararg val value: String)
+
+
+
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class LengthRange(val minValue: Int, val maxValue: Int, val msg: String = "")
+
+
