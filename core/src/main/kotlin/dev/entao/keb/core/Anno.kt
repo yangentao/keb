@@ -1,5 +1,8 @@
 package dev.entao.keb.core
 
+import dev.entao.kava.base.hasAnnotation
+import dev.entao.kava.base.ownerClass
+
 /**
  * 通用注释
  * Created by yangentao on 2016/12/14.
@@ -72,4 +75,8 @@ annotation class HttpMethod(vararg val value: String)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class LengthRange(val minValue: Int, val maxValue: Int, val msg: String = "")
 
+val HttpAction.isNeedLogin: Boolean
+	get() {
+		return this.hasAnnotation<NeedLogin>() || this.ownerClass!!.hasAnnotation<NeedLogin>()
+	}
 

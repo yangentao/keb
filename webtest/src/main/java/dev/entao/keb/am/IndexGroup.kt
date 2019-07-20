@@ -80,7 +80,11 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 	}
 
 	private fun buildNavBar(ptag: Tag) {
-		val acList = listOf(::listAction, ::addAction)
+		val logined = context.isLogined
+		var acList = listOf(::listAction, ::addAction)
+		if (!logined) {
+			acList = acList.filter { !it.isNeedLogin }
+		}
 		ptag.navbarDark("APP管理") {
 			navbarLeft {
 				acList.forEach {

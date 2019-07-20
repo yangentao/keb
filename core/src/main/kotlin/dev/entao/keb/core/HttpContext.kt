@@ -44,16 +44,16 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	val loginedWeb: Boolean get() = accountId != 0
 
 	fun setLoginAccount(account: String) {
-		putSession("account", account)
+		putSession(KebConst.ACCOUNT, account)
 	}
 
 	fun clearLoginAccount() {
-		removeSession("account")
+		removeSession(KebConst.ACCOUNT)
 	}
 
 	val account: String
 		get() {
-			return getSession("account") ?: ""
+			return getSession(KebConst.ACCOUNT) ?: ""
 		}
 	val isLogined: Boolean
 		get() {
