@@ -17,7 +17,7 @@ fun HttpScope.sidebarPage(block: Tag.() -> Unit) {
 	val config = context.filter.webConfig
 
 	html {
-		head.apply {
+		head {
 			metaCharset("UTF-8")
 			meta {
 				httpEquiv = "X-UA-Compatible"
@@ -46,7 +46,7 @@ fun HttpScope.sidebarPage(block: Tag.() -> Unit) {
 				}
 			}
 		}
-		body.apply {
+		body {
 			nav {
 				clazz = "navbar navbar-expand-md navbar-dark fixed-left"
 				a {

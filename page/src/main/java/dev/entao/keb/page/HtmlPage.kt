@@ -7,6 +7,7 @@ import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpScope
 import dev.entao.keb.page.html.HtmlDoc
 import dev.entao.keb.page.html.Tag
+import dev.entao.keb.page.html.bodyTag
 import dev.entao.keb.page.html.p
 import dev.entao.keb.page.widget.button
 
@@ -33,7 +34,7 @@ fun HttpScope.formError(title: String, msg: String) {
 fun HttpScope.html(block: HtmlDoc.() -> Unit) {
 	val h = HtmlDoc(context)
 	h.block()
-	h.body.filterDeep { it.tagName == "a" || it.tagName == "button" }.forEach {
+	h.bodyTag?.filterDeep { it.tagName == "a" || it.tagName == "button" }?.forEach {
 		val s = when {
 			it.href.isNotEmpty() -> it.href
 			it.dataUrl.isNotEmpty() -> it.dataUrl

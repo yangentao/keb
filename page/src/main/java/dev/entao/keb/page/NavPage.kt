@@ -9,7 +9,7 @@ import dev.entao.keb.page.html.*
 
 fun HttpScope.boot(block: HtmlDoc.() -> Unit) {
 	html {
-		head.apply {
+		head {
 			metaCharset("UTF-8")
 
 			meta {
@@ -19,7 +19,7 @@ fun HttpScope.boot(block: HtmlDoc.() -> Unit) {
 			linkStylesheet(R.CSS.boot)
 			linkStylesheet(httpContext.resUri(R.myCSS))
 		}
-		body.apply {
+		body {
 			scriptLink(resUri(R.jquery))
 			scriptLink(R.JS.popper)
 			scriptLink(R.JS.boot)
@@ -38,10 +38,10 @@ fun HttpScope.boot(block: HtmlDoc.() -> Unit) {
 
 fun HttpScope.bootPage(block: Tag.() -> Unit) {
 	boot {
-		head.apply {
+		head {
 			title(context.filter.webConfig.appName)
 		}
-		body.apply {
+		body {
 			divContainerFluid {
 				this.block()
 			}

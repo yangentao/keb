@@ -20,7 +20,6 @@ class DialogBuild(context: HttpContext) {
 		titleBlock = { it.textEscaped(titleText) }
 	}
 
-
 	fun build(): Tag {
 		modal.apply {
 			classList += "modal"
@@ -96,10 +95,12 @@ class DialogBuild(context: HttpContext) {
 fun Tag.navbarDark(brandText: String, brandLink: String = "#", block: TagCallback): Tag {
 	return nav {
 		clazz = "navbar navbar-expand-lg navbar-dark bg-dark"
-		a {
-			clazz = B.navbarBrand
-			href = brandLink
-			+brandText
+		if (brandText.isNotEmpty()) {
+			a {
+				clazz = B.navbarBrand
+				href = brandLink
+				+brandText
+			}
 		}
 		val collId = eleId("collapse")
 		button {
@@ -116,16 +117,24 @@ fun Tag.navbarDark(brandText: String, brandLink: String = "#", block: TagCallbac
 		div {
 			id = collId
 			clazz = "collapse navbar-collapse"
-			ul {
-				clazz = "navbar-nav mr-auto"
-				this.block()
-			}
+			this.block()
 		}
 	}
 }
 
+fun Tag.navbarLeft(block: TagCallback) {
+	this.ul {
+		clazz = "navbar-nav mr-auto"
+		this.block()
+	}
+}
 
-
+fun Tag.navbarRight(block: TagCallback) {
+	this.ul {
+		clazz = "navbar-nav"
+		this.block()
+	}
+}
 
 fun Tag.navbarItemLink(text: String, link: String, active: Boolean = false): Tag {
 	return li {
@@ -142,7 +151,6 @@ fun Tag.navbarItemLink(text: String, link: String, active: Boolean = false): Tag
 		}
 	}
 }
-
 
 fun Tag.navbarText(block: TagCallback): Tag {
 	return span {
@@ -168,19 +176,17 @@ fun Tag.navbarItemDropdown(text: String, block: TagCallback): Tag {
 	}
 }
 
-
 fun Tag.dropdownItemLink(itemText: String, itemLink: String, active: Boolean): Tag {
 	return a {
-		if(active) {
+		if (active) {
 			clazz = "dropdown-item active"
-		}else {
+		} else {
 			clazz = "dropdown-item"
 		}
 		href = itemLink
 		+itemText
 	}
 }
-
 
 fun Tag.pagination(block: TagCallback) {
 	nav {
@@ -249,8 +255,8 @@ fun Tag.paginationBuild(pageCount: Int, currentPage: Int) {
 				}
 			}
 		} else {
-			val from :Int
-			val end :Int
+			val from: Int
+			val end: Int
 			if (currentPage < M2) {
 				from = 0
 				end = from + M

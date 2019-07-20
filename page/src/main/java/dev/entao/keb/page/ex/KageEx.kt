@@ -18,4 +18,8 @@ fun <T : HtmlTemplate> HttpGroup.writeHtml(value: T, block: T.() -> Unit) {
 	this.context.writeHtml(value, block)
 }
 
+fun <T : HtmlTemplate> HttpGroup.writeHtml(value: T) {
+	this.context.writeHtml(value.toHtml())
+}
+
 open class Html(httpContext: HttpContext) : Tag(httpContext, "html")

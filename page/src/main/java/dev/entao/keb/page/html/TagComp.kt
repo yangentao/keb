@@ -9,8 +9,10 @@ class LabelLink(var label: String, var link: String)
 
 open class HtmlDoc(httpContext: HttpContext) : Tag(httpContext, "html") {
 	val comments = ArrayList<String>()
-	val head = this.head { }
-	val body = this.body { }
+	init {
+		this.head{}
+		this.body{}
+	}
 
 	fun comment(block: () -> String) {
 		comments.add(block())
