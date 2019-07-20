@@ -2,5 +2,4 @@ include ':webtest'
 include ':biz'
 include ':core'
 include ':page'
-include 'sql'
 

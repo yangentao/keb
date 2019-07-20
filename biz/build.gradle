@@ -22,7 +22,6 @@ dependencies {
 
     implementation project(":core")
     implementation project(":page")
-    implementation project(":sql")
 }
 compileKotlin {
     kotlinOptions {

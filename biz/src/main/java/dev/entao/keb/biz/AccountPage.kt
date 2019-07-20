@@ -12,9 +12,9 @@ import dev.entao.keb.core.*
 import dev.entao.keb.page.ActionDanger
 import dev.entao.keb.page.FormConfirm
 import dev.entao.keb.core.render.ResultRender
-import dev.entao.keb.sqlex.EQ
-import dev.entao.keb.sqlex.LIKE
-import dev.entao.keb.sqlex.fromRequest
+import dev.entao.keb.page.ex.EQ
+import dev.entao.keb.page.ex.LIKE
+import dev.entao.keb.page.ex.fromRequest
 import dev.entao.keb.page.*
 import dev.entao.keb.page.ex.OrderBy
 import dev.entao.keb.page.ex.orderBy

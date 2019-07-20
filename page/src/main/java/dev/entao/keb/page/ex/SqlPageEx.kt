@@ -1,5 +1,4 @@
-package dev.entao.keb.sqlex
-
+package dev.entao.keb.page.ex
 
 import dev.entao.kava.base.*
 import dev.entao.kava.sql.*
@@ -47,7 +46,7 @@ fun HttpScope.NE(p: Prop1): Where? {
 	return p NE v
 }
 
-fun HttpGroup.GE(p: Prop1): Where? {
+fun HttpScope.GE(p: Prop1): Where? {
 	val v = paramValue(p) ?: return null
 	return p GE v
 }
