@@ -51,9 +51,9 @@ fun Tag.labelEditRow(labelText: String, editName: String, editBlock: Tag.() -> U
 		val lb = this.label { +labelText }
 		this.div {
 			val ed = this.edit {
-				name = editName
+				editConfig(this, editName)
 			}
-			editConfig(ed, editName)
+
 			ed.editBlock()
 			labelConfig(lb, ed)
 		}
@@ -63,8 +63,10 @@ fun Tag.labelEditRow(labelText: String, editName: String, editBlock: Tag.() -> U
 fun Tag.labelEditGroup(labelText: String, editName: String, editBlock: Tag.() -> Unit = {}) {
 	formGroup {
 		val lb = this.label { +labelText }
-		val ed = this.edit { }
-		editConfig(ed, editName)
+		val ed = this.edit {
+			editConfig(this, editName)
+		}
+
 		ed.editBlock()
 		labelConfig(lb, ed)
 	}
@@ -105,7 +107,7 @@ fun Tag.labelTextAreaRow(p: Prop, editBlock: Tag.() -> Unit = {}) {
 				this.configEditOfProp(p)
 			}
 			if (er.isNotEmpty()) {
-				this.invalidFeedback(er)
+				this.feedbackInvalid(er)
 			}
 			val hb = p.findAnnotation<FormHelpBlock>()?.value
 			if (hb != null && hb.isNotEmpty()) {
@@ -116,9 +118,6 @@ fun Tag.labelTextAreaRow(p: Prop, editBlock: Tag.() -> Unit = {}) {
 		}
 	}
 }
-
-
-
 
 fun labelConfig(lb: Tag, ed: Tag) {
 	lb.forId = ed.needId()
@@ -167,7 +166,7 @@ fun editConfig(editTag: Tag, p: Prop) {
 	}
 	editTag.parentTag?.apply {
 		if (er.isNotEmpty()) {
-			this.invalidFeedback(er)
+			this.feedbackInvalid(er)
 		}
 		val hb = p.findAnnotation<FormHelpBlock>()?.value
 		if (hb != null && hb.isNotEmpty()) {
@@ -238,18 +237,13 @@ fun Tag.configEditOfProp(p: Prop) {
 }
 
 fun editConfig(editTag: Tag, editName: String) {
+	editTag.name = editName
+	editTag.value = editTag.httpContext.httpParams.str(editName) ?: ""
 	val er = editTag.httpContext.httpParams.str(ParamConst.err(editName)) ?: ""
-	editTag.apply {
-		if (er.isNotEmpty()) {
-			addClass(B.isInValid)
-		}
-		name = editName
-		value = httpContext.httpParams.str(editName)  ?: ""
+	if (er.isNotEmpty()) {
+		editTag.addClass(B.isInValid)
+		editTag.parentTag?.feedbackInvalid(er)
 	}
-	editTag.parentTag?.apply {
-		if (er.isNotEmpty()) {
-			this.invalidFeedback(er)
-		}
-	}
+
 }
 

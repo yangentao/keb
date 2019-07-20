@@ -3,11 +3,30 @@ package dev.entao.keb.page.widget
 import dev.entao.kava.base.*
 import dev.entao.keb.page.FormHelpBlock
 import dev.entao.keb.page.*
+import dev.entao.keb.page.TConst.class_
 import dev.entao.keb.page.html.*
 import kotlin.reflect.KProperty0
 import kotlin.reflect.full.findAnnotation
 
 private val InputTags = setOf("input", "select", "textarea")
+
+fun Tag.formCheckInline(block: TagCallback): Tag {
+	val a = this.formCheck(block)
+	a.addClass("form-check-inline")
+	return a
+}
+
+fun Tag.formCheck(block: TagCallback): Tag {
+	return div {
+		clazz = "form-check"
+		this.block()
+		val lb = this.findChild { it.tagName == "label" }
+		val cb = this.children.find { it.tagName == "input" && (it.type == "checkbox" || it.type == "radio") }
+		cb?.addClassFirst("form-check-input")
+		lb?.addClassFirst("form-check-label")
+		lb?.needFor(cb)
+	}
+}
 
 fun Tag.formGroup(block: TagCallback): Tag {
 	return div {
@@ -19,14 +38,7 @@ fun Tag.formGroup(block: TagCallback): Tag {
 
 private fun processStyleOfInput(divTag: Tag) {
 	divTag.apply {
-		var t = children.find { it.tagName in InputTags }
-		if (t == null) {
-			val dv = children.firstOrNull { it.tagName == "div" } ?: return
-			t = dv.children.find { it.tagName in InputTags }
-		}
-		if (t == null) {
-			return
-		}
+		val t = this.findChildDeep { it.tagName in InputTags } ?: return
 		findChild { it.tagName == "label" }?.needFor(t)
 		if (t.tagName == "input") {
 			if (t.type == "file") {
@@ -39,6 +51,22 @@ private fun processStyleOfInput(divTag: Tag) {
 			}
 		}
 		t.addClassFirst("form-control")
+	}
+}
+
+fun Tag.formGroupRow(n: Int, block: TagCallback): Tag {
+	return div {
+		clazz = "form-group row"
+		this.block()
+		val lb = findChild { it.tagName == "label" }
+		val dv = children.find { it.tagName == "div" } ?: return@div
+
+		if (lb != null) {
+			dv.clazz = "col-md-${12 - n}"
+		}
+		lb?.addClassFirst("col-form-label")
+		lb?.addClass("col-md-$n")
+		processStyleOfInput(this)
 	}
 }
 
@@ -62,6 +90,10 @@ fun Tag.formGroupRow(block: TagCallback): Tag {
 
 		processStyleOfInput(this)
 	}
+}
+
+fun Tag.formRow(block: TagCallback): Tag {
+	return this.div("form-row", block)
 }
 
 fun Tag.labelTextRow(p: Prop) {

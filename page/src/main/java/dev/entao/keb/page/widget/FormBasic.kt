@@ -60,26 +60,16 @@ fun Tag.submitRow(text: String = "提交") {
 	}
 }
 
-fun Tag.formCheck(block: TagCallback): Tag {
-	return div {
-		clazz = "form-check"
-		this.block()
-		val lb = this.findChild { it.tagName == "label" }
-		val cb = this.children.find { it.tagName == "input" && (it.type == "checkbox" || it.type == "radio") }
-		cb?.addClassFirst("form-check-input")
-		lb?.addClassFirst("form-check-label")
-		lb?.needFor(cb)
-	}
-}
 
-fun Tag.validFeedback(text: String) {
+
+fun Tag.feedbackValid(text: String) {
 	div {
 		clazz = "valid-feedback"
 		+text
 	}
 }
 
-fun Tag.invalidFeedback(text: String) {
+fun Tag.feedbackInvalid(text: String) {
 	div {
 		clazz = "invalid-feedback"
 		+text
