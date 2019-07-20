@@ -2,8 +2,10 @@ package dev.entao.keb.am
 
 import dev.entao.kava.base.Label
 import dev.entao.kava.base.userLabel
-import dev.entao.keb.core.HttpContext
-import dev.entao.keb.core.HttpGroup
+import dev.entao.kava.sql.AND
+import dev.entao.kava.sql.EQ
+import dev.entao.keb.am.model.Account
+import dev.entao.keb.core.*
 import dev.entao.keb.page.*
 import dev.entao.keb.page.ex.writeHtml
 import dev.entao.keb.page.html.*
@@ -20,7 +22,16 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 
 	}
 
-	fun loginResultAction() {
+	fun loginResultAction(username: String = "", pwd: String = "") {
+		val a = Account.findOne((Account::phone EQ username) AND (Account::pwd EQ pwd))
+		if (a == null) {
+			context.backward {
+				withoutMessage()
+				err("用户名或密码错误")
+			}
+		} else {
+			context.redirect(::indexAction.uri)
+		}
 
 	}
 
@@ -40,9 +51,9 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 							}
 							cardBodyTitle("登录") {
 								form(::loginResultAction) {
-									val backurl = httpParams.str("backurl")
+									val backurl = httpParams.str(ParamConst.BACK_URL)
 									if (backurl != null) {
-										hidden("backurl", backurl)
+										hidden(ParamConst.BACK_URL, backurl)
 									}
 									labelEditGroup("用户名", "username") {
 									}

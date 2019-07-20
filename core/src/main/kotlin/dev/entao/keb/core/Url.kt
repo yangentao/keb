@@ -135,6 +135,20 @@ class ReferUrl(val request: HttpServletRequest) : Url(request.headerReferer!!) {
 		return this
 	}
 
+	fun exclude(ks: Set<String>): ReferUrl {
+		this.withReqParam {
+			it !in ks
+		}
+		return this
+	}
+
+	fun keep(ks: Set<String>): ReferUrl {
+		this.withReqParam {
+			it in ks
+		}
+		return this
+	}
+
 	fun arg(key: String, value: String): ReferUrl {
 		this.replace(key, value)
 		return this

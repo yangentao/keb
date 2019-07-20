@@ -30,6 +30,11 @@ open class HttpScope(val context: HttpContext) {
 		return UriMake(context, this).arg(key, value)
 	}
 
+	val HttpAction.uri: String
+		get() {
+			return context.actionUri(this)
+		}
+
 	fun resUri(file: String): String {
 		return context.resUri(file)
 	}
@@ -37,8 +42,6 @@ open class HttpScope(val context: HttpContext) {
 	fun redirect(action: KFunction<*>, param: Any?) {
 		context.redirect(context.actionUri(action, param))
 	}
-
-
 
 	fun redirect(action: KFunction<*>, block: UriMake.() -> Unit) {
 		val p = UriMake(context, action)

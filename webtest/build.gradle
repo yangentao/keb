@@ -19,6 +19,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect"
     compileOnly "javax.servlet:javax.servlet-api:3.1.0"
 
+    implementation 'mysql:mysql-connector-java:6.0.5'
+
     implementation 'dev.entao.kava:log:1.1.0'
     implementation 'dev.entao.kava:base:1.1.0'
     implementation 'dev.entao.kava:json:1.1.0'

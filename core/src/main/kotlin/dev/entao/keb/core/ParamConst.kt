@@ -10,15 +10,15 @@ object ParamConst {
 
 	private const val _ERROR = "_error_"
 
-	fun err(pname: String): String {
+	fun errField(pname: String): String {
 		return _ERROR + pname
 	}
 
-	fun err(p: KProperty<*>): String {
+	fun errField(p: KProperty<*>): String {
 		return _ERROR + p.userName
 	}
 
-	fun isErr(key: String): Boolean {
+	fun isErrField(key: String): Boolean {
 		return key.startsWith(_ERROR)
 	}
 }
@@ -51,7 +51,12 @@ fun ReferUrl.err(msg: String): ReferUrl {
 }
 
 //具体某个字段的错误信息
-fun ReferUrl.errOf(name: String, msg: String): ReferUrl {
-	arg(ParamConst.err(name), msg)
+fun ReferUrl.errField(fieldName: String, msg: String): ReferUrl {
+	arg(ParamConst.errField(fieldName), msg)
+	return this
+}
+
+fun ReferUrl.withoutMessage(): ReferUrl {
+	this.exclude(setOf(ParamConst.ERROR, ParamConst.SUCCESS))
 	return this
 }

@@ -89,7 +89,7 @@ fun Tag.labelEdit(p: Prop, editBlock: Tag.() -> Unit = {}) {
 fun Tag.labelTextAreaRow(p: Prop, editBlock: Tag.() -> Unit = {}) {
 	formGroupRow {
 		val pname = p.userName
-		val er = httpContext.httpParams.str(ParamConst.err(pname)) ?: ""
+		val er = httpContext.httpParams.str(ParamConst.errField(pname)) ?: ""
 		val lb = this.label { +p.userLabel }
 		this.div {
 			val ed = this.textarea {
@@ -140,7 +140,7 @@ fun labelConfig(lb: Tag, ed: Tag) {
 
 fun editConfig(editTag: Tag, p: Prop) {
 	val pname = p.userName
-	val er = editTag.httpContext.httpParams.str(ParamConst.err(pname)) ?: ""
+	val er = editTag.httpContext.httpParams.str(ParamConst.errField(pname)) ?: ""
 	editTag.apply {
 		if (er.isNotEmpty()) {
 			addClass(B.isInValid)
@@ -239,7 +239,7 @@ fun Tag.configEditOfProp(p: Prop) {
 fun editConfig(editTag: Tag, editName: String) {
 	editTag.name = editName
 	editTag.value = editTag.httpContext.httpParams.str(editName) ?: ""
-	val er = editTag.httpContext.httpParams.str(ParamConst.err(editName)) ?: ""
+	val er = editTag.httpContext.httpParams.str(ParamConst.errField(editName)) ?: ""
 	if (er.isNotEmpty()) {
 		editTag.addClass(B.isInValid)
 		editTag.parentTag?.feedbackInvalid(er)
