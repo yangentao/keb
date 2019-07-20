@@ -156,3 +156,16 @@ fun Tag.labelFileRow(p: Prop) {
 		}
 	}
 }
+
+fun Tag.labelFileGroup(p: Prop) {
+	formGroup {
+		label(p.userLabel)
+		this.div {
+			uploadDiv(p)
+			val hb = p.findAnnotation<FormHelpBlock>()?.value
+			if (hb != null && hb.isNotEmpty()) {
+				formTextMuted(hb)
+			}
+		}
+	}
+}

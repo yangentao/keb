@@ -5,8 +5,10 @@ import dev.entao.kava.base.userLabel
 import dev.entao.kava.sql.AND
 import dev.entao.kava.sql.EQ
 import dev.entao.keb.am.model.Account
+import dev.entao.keb.am.model.ApkVersion
 import dev.entao.keb.core.*
 import dev.entao.keb.page.*
+import dev.entao.keb.page.ex.showMessagesIfPresent
 import dev.entao.keb.page.ex.writeHtml
 import dev.entao.keb.page.html.*
 import dev.entao.keb.page.widget.*
@@ -44,7 +46,7 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 	}
 
 	@LoginAction
-	fun loginAction(username: String? = null, pwd: String? = null, errorMsg: String? = null) {
+	fun loginAction() {
 		bootPage {
 			head {
 				title("登录")
@@ -55,9 +57,7 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 						style = "margin-top:3cm"
 						divCol6 {
 							offsetCol(3)
-							if (errorMsg != null) {
-								alertError { +errorMsg }
-							}
+							showMessagesIfPresent()
 							cardBodyTitle("登录") {
 								form(::loginResultAction) {
 									val backurl = httpParams.str(KebConst.BACK_URL)
@@ -125,12 +125,30 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 		}
 	}
 
+	fun addResultAction() {
+
+	}
+
 	@NeedLogin
 	@Label("添加")
 	fun addAction() {
 		writePage {
-			p {
-				+" ADD "
+			card {
+				cardBody {
+					form(::addResultAction) {
+						formRow {
+							labelEditGroup(ApkVersion::appName).addClass("col")
+							labelEditGroup(ApkVersion::pkgName).addClass("col")
+						}
+						formRow {
+							labelEditGroup(ApkVersion::versionCode).addClass("col")
+							labelEditGroup(ApkVersion::versionName).addClass("col")
+						}
+						labelEditGroup(ApkVersion::msg)
+						labelFileGroup(ApkVersion::resId)
+						submit()
+					}
+				}
 			}
 		}
 

@@ -72,8 +72,8 @@ fun Tag.labelEditGroup(labelText: String, editName: String, editBlock: Tag.() ->
 	}
 }
 
-fun Tag.labelEditGroup(p: Prop, editBlock: Tag.() -> Unit = {}) {
-	formGroup {
+fun Tag.labelEditGroup(p: Prop, editBlock: Tag.() -> Unit = {}):Tag {
+	return formGroup {
 		labelEdit(p, editBlock)
 	}
 }
