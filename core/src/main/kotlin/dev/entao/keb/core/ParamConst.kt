@@ -4,7 +4,6 @@ import dev.entao.kava.base.userName
 import kotlin.reflect.KProperty
 
 object ParamConst {
-	const val BACK_URL = "backurl"
 	const val ERROR = "errorMsg"
 	const val SUCCESS = "successMsg"
 

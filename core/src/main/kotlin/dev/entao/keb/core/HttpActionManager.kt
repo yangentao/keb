@@ -23,7 +23,7 @@ typealias HttpAction = KFunction<*>
 
 class HttpActionManager {
 	val allGroups = ArrayList<KClass<out HttpGroup>>()
-	private val map = HashMap<String, Router>(32)
+	val routeMap = HashMap<String, Router>(32)
 	private lateinit var filter: HttpFilter
 
 	fun onConfig(filter: HttpFilter, config: FilterConfig) {
@@ -31,12 +31,12 @@ class HttpActionManager {
 	}
 
 	fun onDestory() {
-		map.clear()
+		routeMap.clear()
 		allGroups.clear()
 	}
 
 	fun find(context: HttpContext): Router? {
-		return map[context.currentUri]
+		return routeMap[context.currentUri]
 	}
 
 	fun addGroup(vararg clses: KClass<out HttpGroup>) {
@@ -52,12 +52,12 @@ class HttpActionManager {
 
 	fun addRouter(router: Router) {
 		val u = router.uri.toLowerCase()
-		if (map.containsKey(u)) {
-			val old = map[u]
+		if (routeMap.containsKey(u)) {
+			val old = routeMap[u]
 			logd("AddRouter: ", u)
 			fatal("已经存在对应的Route: ${old?.function} ", u, old.toString())
 		}
-		map[u] = router
+		routeMap[u] = router
 		logd("Add Router: ", u)
 	}
 

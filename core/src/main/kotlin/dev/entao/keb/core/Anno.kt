@@ -5,8 +5,15 @@ package dev.entao.keb.core
  * Created by yangentao on 2016/12/14.
  */
 
+//需要登录后请求
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class NeedLogin
 
-
+//登录的uri
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class LoginAction
 
 //参数或属性的最小值Int
 @Target(AnnotationTarget.PROPERTY,
@@ -60,8 +67,6 @@ annotation class Match(val value: String, val msg: String = "")
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class HttpMethod(vararg val value: String)
-
-
 
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)

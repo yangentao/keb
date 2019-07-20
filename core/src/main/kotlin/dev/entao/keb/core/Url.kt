@@ -68,16 +68,16 @@ class UriMake(val context: HttpContext, val action: KFunction<*>) {
 open class Url(s: String) {
 
 	//http://localhost/a/b
-	val url: String
+	private val rawUrl: String
 	//[name to yang, age to 22, add to ""]
 	val params = ArrayList<Pair<String, String>>()
 
 	init {
 		val ls = s.split('?', limit = 2)
 		if (ls.size <= 1) {
-			url = s
+			rawUrl = s
 		} else {
-			url = ls[0]
+			rawUrl = ls[0]
 			val qls = ls[1].split('&')
 
 			qls.forEach {
@@ -95,10 +95,10 @@ open class Url(s: String) {
 
 	fun build(): String {
 		if (params.isEmpty()) {
-			return url
+			return rawUrl
 		}
 		val q = params.map { it.first + "=" + it.second.urlEncoded }
-		return url + "?" + q.joinToString("&")
+		return rawUrl + "?" + q.joinToString("&")
 	}
 
 	fun append(key: String, value: String): Url {

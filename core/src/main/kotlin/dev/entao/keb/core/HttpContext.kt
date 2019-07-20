@@ -66,7 +66,12 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 		}
 
 	fun fullUrlOf(uri: String): String {
-		return "http://" + request.getHeader("host") + uri
+		val host = request.getHeader("host") ?: ""
+		if (host.isNotEmpty()) {
+			return request.scheme + "://" + request.getHeader("host") + uri
+		} else {
+			return request.scheme + "://" + request.serverName + ":" + request.serverPort + uri
+		}
 	}
 
 	fun groupUri(g: KClass<*>): String {

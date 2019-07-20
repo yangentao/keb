@@ -34,7 +34,7 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 		}
 		context.setLoginAccount(username)
 
-		val back = httpParams.str(ParamConst.BACK_URL) ?: ""
+		val back = httpParams.str(KebConst.BACK_URL) ?: ""
 		if (back.isNotEmpty()) {
 			context.redirect(back)
 		} else {
@@ -43,6 +43,7 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 
 	}
 
+	@LoginAction
 	fun loginAction(username: String? = null, pwd: String? = null, errorMsg: String? = null) {
 		bootPage {
 			head {
@@ -59,9 +60,9 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 							}
 							cardBodyTitle("登录") {
 								form(::loginResultAction) {
-									val backurl = httpParams.str(ParamConst.BACK_URL)
+									val backurl = httpParams.str(KebConst.BACK_URL)
 									if (backurl != null) {
-										hidden(ParamConst.BACK_URL, backurl)
+										hidden(KebConst.BACK_URL, backurl)
 									}
 									labelEditGroup("用户名", "username") {
 									}
@@ -120,6 +121,7 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 		}
 	}
 
+	@NeedLogin
 	@Label("添加")
 	fun addAction() {
 		writePage {

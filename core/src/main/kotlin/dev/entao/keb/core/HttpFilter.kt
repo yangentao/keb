@@ -2,6 +2,7 @@
 
 package dev.entao.keb.core
 
+import dev.entao.kava.base.hasAnnotation
 import dev.entao.kava.base.ownerClass
 import dev.entao.kava.log.Yog
 import dev.entao.kava.log.YogDir
@@ -23,6 +24,8 @@ import kotlin.reflect.full.findAnnotation
 abstract class HttpFilter : Filter {
 
 	var sessionTimeoutSeconds: Int = 3600
+
+	var loginUri: String = ""
 
 	var webConfig = WebConfig()
 		private set
@@ -73,12 +76,22 @@ abstract class HttpFilter : Filter {
 
 		addSlice(timerSlice)
 		addSlice(MethodAcceptor)
+		addSlice(LoginCheckSlice)
 
 		try {
 			onInit()
 			for (hs in sliceList) {
 				hs.onConfig(this, filterConfig)
 			}
+			if (this.loginUri.isEmpty()) {
+				for ((k, v) in routeManager.routeMap) {
+					if (v.function.hasAnnotation<LoginAction>()) {
+						this.loginUri = k
+						break
+					}
+				}
+			}
+
 		} catch (ex: Exception) {
 			ex.printStackTrace()
 		} finally {
