@@ -19,7 +19,8 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 	}
 
 	fun logoutAction() {
-
+		context.clearLoginAccount()
+		context.redirect(::indexAction.uri)
 	}
 
 	fun loginResultAction(username: String = "", pwd: String = "") {
@@ -29,6 +30,13 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 				withoutMessage()
 				err("用户名或密码错误")
 			}
+			return
+		}
+		context.setLoginAccount(username)
+
+		val back = httpParams.str(ParamConst.BACK_URL) ?: ""
+		if (back.isNotEmpty()) {
+			context.redirect(back)
 		} else {
 			context.redirect(::indexAction.uri)
 		}
@@ -80,7 +88,11 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 				}
 			}
 			navbarRight {
-				navbarItemLink("登录", context.actionUri(::loginAction))
+				if (context.isLogined) {
+					navbarItemLink("注销", context.actionUri(::logoutAction))
+				} else {
+					navbarItemLink("登录", context.actionUri(::loginAction))
+				}
 			}
 		}
 	}

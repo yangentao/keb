@@ -33,7 +33,6 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 
 	val ctxMap = HashMap<String, Any>()
 
-
 	var os: String = ""
 	var token: String = ""
 	var userId: Int = 0
@@ -44,7 +43,22 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	val loginedApp: Boolean get() = userId != 0
 	val loginedWeb: Boolean get() = accountId != 0
 
+	fun setLoginAccount(account: String) {
+		putSession("account", account)
+	}
 
+	fun clearLoginAccount() {
+		removeSession("account")
+	}
+
+	val account: String
+		get() {
+			return getSession("account") ?: ""
+		}
+	val isLogined: Boolean
+		get() {
+			return account.isNotEmpty()
+		}
 
 	val rootUri: String
 		get() {
@@ -123,7 +137,6 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	fun redirect(url: String) {
 		response.sendRedirect(url)
 	}
-
 
 	fun backward(block: ReferUrl.() -> Unit): Boolean {
 		val s = request.headerReferer
