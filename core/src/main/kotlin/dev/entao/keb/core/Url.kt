@@ -64,6 +64,7 @@ class UriMake(val context: HttpContext, val action: KFunction<*>) {
 //}
 
 //http://localhost/a/b?name=yang&age=22&add=
+//数组,  k[]=1&k[]=2
 open class Url(s: String) {
 
 	//http://localhost/a/b
@@ -116,19 +117,23 @@ open class Url(s: String) {
 }
 
 class ReferUrl(val request: HttpServletRequest) : Url(request.headerReferer!!) {
-	fun withReqParam(block: (String) -> Boolean): ReferUrl {
+
+
+	init {
+		withParams()
+	}
+
+	private fun withParams(): ReferUrl {
 		val map = request.paramMap
 		map.forEach {
 			val k = it.key
 			val ar = it.value
 			this.remove(k)
-			if (block(k)) {
-				if (ar.size == 1) {
-					this.append(k, ar[0])
-				} else if (ar.size > 1) {
-					for (v in ar) {
-						this.append("$k[]", v)
-					}
+			if (ar.size == 1) {
+				this.append(k, ar[0])
+			} else if (ar.size > 1) {
+				for (v in ar) {
+					this.append("$k[]", v)
 				}
 			}
 		}
@@ -136,16 +141,17 @@ class ReferUrl(val request: HttpServletRequest) : Url(request.headerReferer!!) {
 	}
 
 	fun exclude(ks: Set<String>): ReferUrl {
-		this.withReqParam {
-			it !in ks
-		}
+		this.params.removeAll { it.first in ks }
 		return this
 	}
 
 	fun keep(ks: Set<String>): ReferUrl {
-		this.withReqParam {
-			it in ks
-		}
+		this.params.removeAll { it.first !in ks }
+		return this
+	}
+
+	fun clearParams(): ReferUrl {
+		this.params.clear()
 		return this
 	}
 

@@ -22,6 +22,8 @@ import kotlin.reflect.full.findAnnotation
 //    @WebFilter中的urlPatterns =  "/*"
 abstract class HttpFilter : Filter {
 
+	var sessionTimeoutSeconds: Int = 3600
+
 	var webConfig = WebConfig()
 		private set
 

@@ -44,6 +44,8 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	val loginedApp: Boolean get() = userId != 0
 	val loginedWeb: Boolean get() = accountId != 0
 
+
+
 	val rootUri: String
 		get() {
 			return buildPath(filter.contextPath)
@@ -151,6 +153,7 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	fun putSession(key: String, value: String) {
 		val se: HttpSession = request.getSession(true)
 		se.setAttribute(key, value)
+		se.maxInactiveInterval = filter.sessionTimeoutSeconds
 
 	}
 
