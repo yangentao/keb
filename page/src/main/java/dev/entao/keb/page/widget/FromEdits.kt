@@ -222,7 +222,7 @@ fun Tag.configEditOfProp(p: Prop) {
 		this.placeholder = ht.value
 	}
 
-	val maxLen = p.findAnnotation<dev.entao.kava.sql.Length>()?.value ?: 0
+	val maxLen = p.findAnnotation<Length>()?.value ?: 0
 	if (maxLen > 0) {
 		maxlength = maxLen.toString()
 	} else if (p.isTypeString) {

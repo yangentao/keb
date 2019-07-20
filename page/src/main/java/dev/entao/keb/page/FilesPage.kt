@@ -2,6 +2,8 @@
 
 package dev.entao.keb.page
 
+import dev.entao.keb.core.HttpContext
+import dev.entao.keb.core.HttpGroup
 import dev.entao.keb.page.ex.Upload
 import dev.entao.kava.base.Mimes
 import dev.entao.kava.sql.EQ
@@ -15,7 +17,7 @@ import javax.servlet.http.Part
  * Created by entaoyang@163.com on 2017/4/14.
  */
 
-class FilesPage(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.HttpGroup(context) {
+class FilesPage(context: HttpContext) : HttpGroup(context) {
 
 	private val resultSender = ResultRender(context)
 //	fun apkInfoAction(id: Int) {

@@ -1,6 +1,7 @@
 package dev.entao.keb.biz.model
 
 import dev.entao.kava.base.Label
+import dev.entao.kava.base.Length
 import dev.entao.kava.base.substr
 import dev.entao.kava.log.loge
 import dev.entao.kava.sql.Model
@@ -34,11 +35,11 @@ class Ip : Model() {
 	var uri: String by model
 
 	@Label("请求参数")
-	@dev.entao.kava.sql.Length(3072)
+	@Length(3072)
 	var query: String by model
 
 	@Label("请求Agent")
-	@dev.entao.kava.sql.Length(1024)
+	@Length(1024)
 	var agent: String by model
 
 	@dev.entao.kava.sql.Index

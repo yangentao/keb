@@ -1,5 +1,6 @@
 package dev.entao.keb.biz.model
 
+import dev.entao.keb.core.HttpContext
 import dev.entao.kava.base.DefaultValue
 import dev.entao.kava.base.Label
 import dev.entao.kava.sql.Model
@@ -44,7 +45,7 @@ class ResItem : Model() {
 	companion object : ModelClass<ResItem>() {
 
 
-		fun fromContext(context: dev.entao.keb.core.HttpContext): List<Parent<ResItem>> {
+		fun fromContext(context: HttpContext): List<Parent<ResItem>> {
 			val nodeList = ArrayList<Parent<ResItem>>()
 //			val ps = context.filter.allPages.filter { it.hasAnnotation<NavItem>() }.sortedBy {
 //				it.findAnnotation<NavItem>()!!.order

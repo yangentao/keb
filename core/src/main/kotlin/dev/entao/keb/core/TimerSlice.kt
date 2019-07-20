@@ -3,7 +3,6 @@ package dev.entao.keb.core
 import dev.entao.kava.base.MyDate
 import dev.entao.kava.log.Yog
 import dev.entao.kava.log.loge
-import dev.entao.kava.sql.ConnLook
 import java.util.*
 import javax.servlet.FilterConfig
 
@@ -30,7 +29,6 @@ class TimerSlice : HttpSlice {
 		timer = tm
 		this.filter = filter
 	}
-
 
 	override fun onDestory() {
 		timer?.cancel()
@@ -81,7 +79,7 @@ class TimerSlice : HttpSlice {
 				Yog.flush()
 			} catch (ex: Exception) {
 			}
-			ConnLook.removeThreadLocal()
+			filter?.cleanThreadLocals()
 		}
 	}
 

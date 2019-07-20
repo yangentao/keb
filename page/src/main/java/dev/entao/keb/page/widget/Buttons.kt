@@ -3,6 +3,7 @@ package dev.entao.keb.page.widget
 import dev.entao.kava.base.firstParamName
 import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.HttpAction
+import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.UriMake
 import dev.entao.keb.page.*
 import dev.entao.keb.page.html.Tag
@@ -14,11 +15,11 @@ import kotlin.reflect.full.findAnnotation
  * Created by entaoyang@163.com on 2018/3/23.
  */
 
-open class ATag(httpContext: dev.entao.keb.core.HttpContext) : Tag(httpContext, "a") {
+open class ATag(httpContext: HttpContext) : Tag(httpContext, "a") {
 
 }
 
-class LinkButton(httpContext: dev.entao.keb.core.HttpContext) : ATag(httpContext), ButtonLike<LinkButton> {
+class LinkButton(httpContext: HttpContext) : ATag(httpContext), ButtonLike<LinkButton> {
 
 	init {
 		this.clazz = B.btn
@@ -47,7 +48,7 @@ class LinkButton(httpContext: dev.entao.keb.core.HttpContext) : ATag(httpContext
 	}
 }
 
-class ButtonTag(httpContext: dev.entao.keb.core.HttpContext) : Tag(httpContext, "button"), ButtonLike<ButtonTag> {
+class ButtonTag(httpContext: HttpContext) : Tag(httpContext, "button"), ButtonLike<ButtonTag> {
 
 	init {
 		this.clazz = B.btn

@@ -6,10 +6,6 @@ import dev.entao.kava.base.Prop1
 import dev.entao.kava.base.isTypeInt
 import dev.entao.kava.base.isTypeLong
 import dev.entao.kava.base.isTypeString
-import dev.entao.kava.sql.*
-import dev.entao.keb.core.render.FileSender
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 import kotlin.reflect.KFunction
 
 /**

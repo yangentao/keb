@@ -2,6 +2,8 @@
 
 package dev.entao.keb.page
 
+import dev.entao.keb.core.HttpContext
+import dev.entao.keb.core.HttpGroup
 import dev.entao.kava.base.Mimes
 import dev.entao.kava.base.Thumb
 import dev.entao.kava.sql.EQ
@@ -17,7 +19,7 @@ import javax.servlet.http.Part
  * Created by entaoyang@163.com on 2017/4/14.
  */
 
-class FilesApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.HttpGroup(context) {
+class FilesApi(context: HttpContext) : HttpGroup(context) {
 
 	private val resultSender = ResultRender(context)
 	override fun indexAction() {
@@ -134,11 +136,11 @@ class FilesApi(context: dev.entao.keb.core.HttpContext) : dev.entao.keb.core.Htt
 	}
 
 	companion object {
-		fun urlOf(context: dev.entao.keb.core.HttpContext, id: Int): String {
+		fun urlOf(context: HttpContext, id: Int): String {
 			return UriMake(context, FilesApi::downloadAction).param(id).fullUrl
 		}
 
-		fun removeRes(context: dev.entao.keb.core.HttpContext, resId: Int) {
+		fun removeRes(context: HttpContext, resId: Int) {
 			val item = Upload.findOne(Upload::id EQ resId) ?: return
 			val file = item.localFile(context)
 			file.delete()

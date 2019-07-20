@@ -3,6 +3,7 @@ package dev.entao.main
 import dev.entao.kava.base.Label
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpGroup
+import dev.entao.keb.core.render.jsonResult
 import dev.entao.keb.page.ex.writeHtml
 import dev.entao.keb.page.html.p
 import dev.entao.keb.page.templates.SidebarPage
@@ -12,6 +13,10 @@ class PersonGroup(context: HttpContext) : HttpGroup(context) {
 
 	override fun indexAction() {
 		addAction()
+	}
+
+	fun jsonAction() {
+		jsonResult.ok()
 	}
 
 	@Label("添加")

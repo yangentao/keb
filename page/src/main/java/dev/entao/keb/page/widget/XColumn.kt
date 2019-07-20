@@ -5,6 +5,7 @@ import dev.entao.kava.base.*
 import dev.entao.kava.json.YsonObject
 import dev.entao.kava.sql.ModelMap
 import dev.entao.keb.core.HttpAction
+import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.UriMake
 import dev.entao.keb.core.valOf
 import dev.entao.keb.page.B
@@ -28,7 +29,7 @@ fun emWidthOfString(text: String): Double {
 }
 
 abstract class XColumn<T>(val table: XTable<T>) {
-	val httpContext: dev.entao.keb.core.HttpContext
+	val httpContext: HttpContext
 		get() {
 			return table.tableTag.httpContext
 		}

@@ -1,5 +1,6 @@
 package dev.entao.keb.biz.model
 
+import dev.entao.kava.base.Exclude
 import dev.entao.kava.base.Label
 import dev.entao.kava.sql.Model
 import dev.entao.kava.sql.ModelClass
@@ -15,12 +16,12 @@ class RoleMember : Model() {
 	@dev.entao.kava.sql.PrimaryKey
 	var accountId: Int by model
 
-	@dev.entao.kava.sql.Exclude
+	@Exclude
 	val roleName: String
 		get() {
 			return Role.findByKey(roleId)?.name ?: ""
 		}
-	@dev.entao.kava.sql.Exclude
+	@Exclude
 	val account: Account?
 		get() {
 			return Account.findByKey(accountId)

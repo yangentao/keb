@@ -1,5 +1,6 @@
 package dev.entao.keb.page.html
 
+import dev.entao.keb.core.HttpContext
 import dev.entao.kava.base.*
 import dev.entao.keb.page.*
 import dev.entao.keb.page.ex.HtmlTemplate
@@ -7,7 +8,7 @@ import java.util.*
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 
-open class Tag(val httpContext: dev.entao.keb.core.HttpContext, var tagName: String) : HtmlTemplate {
+open class Tag(val httpContext: HttpContext, var tagName: String) : HtmlTemplate {
 	private val attrs: TagMap = TagMap()
 	var parentTag: Tag? = null
 

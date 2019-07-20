@@ -54,7 +54,7 @@ class TextEscaped(httpContext: HttpContext, var text: String = "") : Tag(httpCon
 	}
 }
 
-class TextUnsafe(httpContext: dev.entao.keb.core.HttpContext, var text: String = "") : Tag(httpContext, "__textunsafe__") {
+class TextUnsafe(httpContext: HttpContext, var text: String = "") : Tag(httpContext, "__textunsafe__") {
 
 
 	override fun writeTo(buf: Appendable, level: Int) {

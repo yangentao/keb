@@ -118,7 +118,7 @@ class Router(val uri: String, val function: KFunction<*>, obj: Any? = null) {
 				is NotBlank -> if (value.trim().isEmpty()) {
 					err(p, "参数不能为空或不可见字符")
 				}
-				is dev.entao.kava.sql.Length -> if (value.length > an.value) {
+				is Length -> if (value.length > an.value) {
 					err(p, "参数长度须小于${an.value}")
 				}
 				is LengthRange -> if (value.length > an.maxValue) {

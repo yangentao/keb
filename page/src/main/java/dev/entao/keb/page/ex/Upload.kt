@@ -1,5 +1,6 @@
 package dev.entao.keb.page.ex
 
+import dev.entao.keb.core.HttpContext
 import dev.entao.kava.base.DefaultValue
 import dev.entao.kava.base.Name
 import dev.entao.kava.sql.Model
@@ -30,7 +31,7 @@ class Upload : Model() {
 	var accountId: String by model
 	var uploadTime: Long by model
 
-	fun localFile(context: dev.entao.keb.core.HttpContext): File {
+	fun localFile(context: HttpContext): File {
 		if (subdir.isEmpty()) {
 			return File(context.uploadDir, localFileName)
 		} else {
@@ -53,7 +54,7 @@ class Upload : Model() {
 			return sb.toString()
 		}
 
-		fun fromContext(context: dev.entao.keb.core.HttpContext, part: Part): Upload {
+		fun fromContext(context: HttpContext, part: Part): Upload {
 			val uuid = UUID.randomUUID().toString()
 			val ext = part.submittedFileName.substringAfterLast('.', "")
 			val localfilename = if (ext.isEmpty()) {

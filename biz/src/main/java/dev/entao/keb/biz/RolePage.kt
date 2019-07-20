@@ -2,6 +2,7 @@
 
 package dev.entao.keb.biz
 
+import dev.entao.keb.core.HttpContext
 import dev.entao.keb.biz.model.Role
 import dev.entao.kava.base.Label
 import dev.entao.kava.sql.AND
@@ -13,16 +14,16 @@ import dev.entao.keb.page.FormConfirm
 import dev.entao.keb.core.NotEmpty
 import dev.entao.keb.core.ok
 import dev.entao.keb.core.render.ResultRender
-import dev.entao.keb.core.sql.EQ
-import dev.entao.keb.core.sql.LIKE
-import dev.entao.keb.core.sql.fromRequest
+import dev.entao.keb.sqlex.EQ
+import dev.entao.keb.sqlex.LIKE
+import dev.entao.keb.sqlex.fromRequest
 import dev.entao.keb.page.*
 import dev.entao.keb.page.ex.OrderBy
 import dev.entao.keb.page.ex.orderBy
 import dev.entao.keb.page.widget.*
 
 @Label("角色管理")
-class RolePage(context: dev.entao.keb.core.HttpContext) : HttpGroup(context) {
+class RolePage(context: HttpContext) : HttpGroup(context) {
 
 	override fun indexAction() {
 		listAction()

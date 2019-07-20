@@ -19,7 +19,7 @@ interface HttpSlice {
 	fun onDestory() {}
 }
 
-typealias HttpAction = KFunction<Unit>
+typealias HttpAction = KFunction<*>
 
 class HttpActionManager {
 	val allGroups = ArrayList<KClass<out HttpGroup>>()

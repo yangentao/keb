@@ -1,5 +1,6 @@
 package dev.entao.main
 
+import dev.entao.kava.sql.ConnLook
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpFilter
 import dev.entao.keb.page.html.*
@@ -7,6 +8,10 @@ import javax.servlet.annotation.WebFilter
 
 @WebFilter(urlPatterns = ["/*"])
 class MainFilter : HttpFilter() {
+
+	override fun cleanThreadLocals() {
+		 ConnLook.cleanThreadConnections()
+	}
 
 	override fun onInit() {
 

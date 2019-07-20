@@ -1,5 +1,7 @@
 package dev.entao.keb.page.ex
 
+import dev.entao.keb.core.HttpContext
+import dev.entao.keb.core.HttpGroup
 import dev.entao.keb.page.P
 import dev.entao.kava.base.Prop1
 import dev.entao.kava.base.userName
@@ -9,7 +11,7 @@ import dev.entao.kava.sql.SQLQuery
  * Created by entaoyang@163.com on 2018/7/9.
  */
 
-class OrderParam(val context: dev.entao.keb.core.HttpContext, p: Prop1, desc: Boolean = true) {
+class OrderParam(val context: HttpContext, p: Prop1, desc: Boolean = true) {
 
 	val sortBy: String
 	val desc: Boolean
@@ -28,7 +30,7 @@ class OrderParam(val context: dev.entao.keb.core.HttpContext, p: Prop1, desc: Bo
 	}
 }
 
-fun dev.entao.keb.core.HttpGroup.OrderBy(p: Prop1, desc: Boolean = true): OrderParam {
+fun HttpGroup.OrderBy(p: Prop1, desc: Boolean = true): OrderParam {
 	return OrderParam(context, p, desc)
 }
 

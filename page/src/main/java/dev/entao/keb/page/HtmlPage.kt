@@ -10,7 +10,7 @@ import dev.entao.keb.page.html.Tag
 import dev.entao.keb.page.html.p
 import dev.entao.keb.page.widget.button
 
-fun SQLQuery.limitPage(context:HttpContext) {
+fun SQLQuery.limitPage(context: HttpContext) {
 	val n = context.httpParams.int(P.pageN) ?: 0
 	this.limit(P.pageSize, n * P.pageSize)
 }

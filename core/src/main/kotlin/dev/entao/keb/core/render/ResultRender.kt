@@ -6,6 +6,7 @@ import dev.entao.kava.json.YsonObject
 import dev.entao.kava.json.YsonObjectBuilder
 import dev.entao.kava.json.ysonArray
 import dev.entao.keb.core.HttpContext
+import dev.entao.keb.core.HttpGroup
 
 class Result {
 	val jo = YsonObject()
@@ -237,3 +238,8 @@ class ResultRender(val context: HttpContext) {
 	}
 
 }
+
+val HttpGroup.jsonResult: ResultRender
+	get() {
+		return ResultRender(this.context)
+	}

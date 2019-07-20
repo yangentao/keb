@@ -28,7 +28,7 @@ val KFunction<*>.isHttpAction: Boolean
 		if (!this.name.endsWith(HttpFilter.ACTION)) {
 			return false
 		}
-		if (this.hasAnnotation<dev.entao.kava.sql.Exclude>()) {
+		if (this.hasAnnotation<Exclude>()) {
 			return false
 		}
 		if (this.visibility != KVisibility.PUBLIC) {

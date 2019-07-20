@@ -17,10 +17,10 @@ import kotlin.reflect.full.findAnnotation
 @Retention(AnnotationRetention.RUNTIME)
 annotation class MaxRows(val value: Int)
 
-class DefaultPermAcceptor : dev.entao.keb.core.PermAcceptor {
+class DefaultPermAcceptor : PermAcceptor {
 	private val accessMap = HashMap<String, Int>()
 
-	override fun prepare(context: dev.entao.keb.core.HttpContext) {
+	override fun prepare(context: HttpContext) {
 		val aid = context.accountId
 		if (aid < 0) {
 			return
@@ -39,7 +39,7 @@ class DefaultPermAcceptor : dev.entao.keb.core.PermAcceptor {
 		}
 	}
 
-	override fun accept(context: dev.entao.keb.core.HttpContext, uri: String): Boolean {
+	override fun accept(context: HttpContext, uri: String): Boolean {
 		if (!context.filter.webConfig.allowResAccess) {
 			return true
 		}
@@ -136,7 +136,7 @@ annotation class LoginWeb
 object AuthAppAcceptor : HttpSlice {
 	override fun beforeService(context: HttpContext, router: Router): Boolean {
 		context.os = context.httpParams.str("os") ?: ""
-		context.token = context.httpParams.str(dev.entao.keb.core.HttpContext.TOKEN) ?: ""
+		context.token = context.httpParams.str(HttpContext.TOKEN) ?: ""
 		val needLoginApp: Boolean = router.function.hasAnnotation<LoginApp>() || router.cls.hasAnnotation<LoginApp>()
 		if (context.token.isNotEmpty()) {
 			val t = TokenTable.findOne((TokenTable::token EQ context.token) AND (TokenTable::type EQ context.os))

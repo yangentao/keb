@@ -6,7 +6,6 @@ import dev.entao.kava.base.ownerClass
 import dev.entao.kava.log.Yog
 import dev.entao.kava.log.YogDir
 import dev.entao.kava.log.logd
-import dev.entao.kava.sql.ConnLook
 import java.util.*
 import javax.servlet.*
 import javax.servlet.annotation.WebFilter
@@ -48,6 +47,9 @@ abstract class HttpFilter : Filter {
 	}
 
 	abstract fun onInit()
+
+	abstract fun cleanThreadLocals()
+
 	open fun onDestroy() {
 
 	}
@@ -78,7 +80,7 @@ abstract class HttpFilter : Filter {
 		} catch (ex: Exception) {
 			ex.printStackTrace()
 		} finally {
-			ConnLook.removeThreadLocal()
+			cleanThreadLocals()
 		}
 	}
 
@@ -89,7 +91,7 @@ abstract class HttpFilter : Filter {
 		}
 		onDestroy()
 		Yog.flush()
-		ConnLook.removeThreadLocal()
+		cleanThreadLocals()
 	}
 
 	fun resUri(res: String): String {
@@ -146,7 +148,7 @@ abstract class HttpFilter : Filter {
 			logd(ex)
 			throw  ex
 		} finally {
-			ConnLook.removeThreadLocal()
+			cleanThreadLocals()
 		}
 	}
 

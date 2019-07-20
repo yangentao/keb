@@ -25,7 +25,7 @@ fun Tag.enctypeMultipart() {
 	this.enctype = "multipart/form-data"
 }
 
-fun Tag.form(formAction: KFunction<Unit>, block: TagCallback): Tag {
+fun Tag.form(formAction: KFunction<*>, block: TagCallback): Tag {
 	return form {
 		action = httpContext.actionUri(formAction)
 		this.block()

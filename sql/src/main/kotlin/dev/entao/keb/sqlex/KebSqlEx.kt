@@ -1,4 +1,5 @@
-package dev.entao.keb.core.sql
+package dev.entao.keb.sqlex
+
 
 import dev.entao.kava.base.*
 import dev.entao.kava.sql.*

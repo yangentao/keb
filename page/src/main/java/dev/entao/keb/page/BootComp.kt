@@ -1,11 +1,12 @@
 package dev.entao.keb.page
 
+import dev.entao.keb.core.HttpContext
 import dev.entao.keb.page.html.*
 import dev.entao.keb.page.widget.a
 import dev.entao.keb.page.widget.button
 import kotlin.math.max
 
-class DialogBuild(context: dev.entao.keb.core.HttpContext) {
+class DialogBuild(context: HttpContext) {
 	val modal = Tag(context, "div")
 
 	var closeText: String = "关闭"
