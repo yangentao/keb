@@ -239,7 +239,3 @@ class ResultRender(val context: HttpContext) {
 
 }
 
-val HttpGroup.jsonResult: ResultRender
-	get() {
-		return ResultRender(this.context)
-	}

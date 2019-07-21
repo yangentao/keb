@@ -6,21 +6,27 @@ import dev.entao.kava.base.Prop1
 import dev.entao.kava.base.isTypeInt
 import dev.entao.kava.base.isTypeLong
 import dev.entao.kava.base.isTypeString
+import dev.entao.keb.core.render.ResultRender
 import kotlin.reflect.KFunction
 
 /**
  * Created by entaoyang@163.com on 2016/12/19.
  */
 
-abstract class HttpGroup(context: HttpContext) : HttpScope(context) {
+open class HttpGroup(context: HttpContext) : HttpScope(context) {
 
-	abstract fun indexAction()
+	open fun indexAction() {
+		context.abort(404)
+	}
 }
 
 open class HttpScope(val context: HttpContext) {
 
 
 	val httpParams: HttpParams get() = context.httpParams
+	val resultSender: ResultRender by lazy {
+		ResultRender(context)
+	}
 
 	fun HttpAction.param(value: Any): UriMake {
 		return UriMake(context, this).param(value)

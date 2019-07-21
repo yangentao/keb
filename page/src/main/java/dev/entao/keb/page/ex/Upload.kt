@@ -30,6 +30,7 @@ class Upload : Model() {
 	var userId: String by model
 	var accountId: String by model
 	var uploadTime: Long by model
+	var platform: String by model
 
 	fun localFile(context: HttpContext): File {
 		if (subdir.isEmpty()) {
@@ -41,11 +42,12 @@ class Upload : Model() {
 
 	companion object : ModelClass<Upload>() {
 		const val SUBDIR = "subdir"
+		const val PLATFORM = "platform"
 
 		fun checkSubDirParam(d: String): String {
 			val sb = StringBuilder()
 			for (c in d) {
-				if (c in 'a'..'z' || c in 'A'..'Z' || c in '0'..'9') {
+				if (c.isLetterOrDigit() || c == '_') {
 					sb.append(c)
 				} else {
 					sb.append("_")
@@ -57,20 +59,21 @@ class Upload : Model() {
 		fun fromContext(context: HttpContext, part: Part): Upload {
 			val uuid = UUID.randomUUID().toString()
 			val ext = part.submittedFileName.substringAfterLast('.', "")
-			val localfilename = if (ext.isEmpty()) {
+			val m = Upload()
+			m.localFileName = if (ext.isEmpty()) {
 				uuid
 			} else {
 				"$uuid.$ext"
 			}
-			val m = Upload()
-			m.localFileName = localfilename
+
 			m.extName = ext
 			m.dir = context.uploadDir.absolutePath
 			m.contentType = part.contentType
 			m.rawname = part.submittedFileName
 			m.size = part.size.toInt()
-			m.userId = context.userId.toString()
+			m.accountId = context.account
 			m.uploadTime = System.currentTimeMillis()
+			m.platform = context.httpParams.str(PLATFORM) ?: context.httpParams.str("os") ?: ""
 			m.subdir = checkSubDirParam(context.httpParams.str(SUBDIR)?.trim()
 					?: "")
 			if (m.subdir.isNotEmpty()) {

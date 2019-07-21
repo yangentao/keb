@@ -50,7 +50,7 @@ fun HttpScope.saveAccess() {
 		ra.condition = ""
 		ra.replace()
 	}
-	ResultRender(context).ok()
+	resultSender.ok()
 }
 
 @Label("权限", "编辑权限")

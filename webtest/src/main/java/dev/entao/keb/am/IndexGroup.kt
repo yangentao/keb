@@ -2,6 +2,7 @@ package dev.entao.keb.am
 
 import dev.entao.kava.base.Label
 import dev.entao.kava.base.userLabel
+import dev.entao.kava.base.userName
 import dev.entao.kava.sql.AND
 import dev.entao.kava.sql.EQ
 import dev.entao.keb.am.model.Account
@@ -145,11 +146,45 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 							labelEditGroup(ApkVersion::versionName).addClass("col")
 						}
 						labelEditGroup(ApkVersion::msg)
-						labelFileGroup(ApkVersion::resId)
+						val g = labelFileGroup(ApkVersion::resId)
+						val resTag = g.findChildDeep {
+							it.tagName == "input" && it.type == "hidden"
+						}
+						if (resTag != null) {
+							val fid = resTag.genId()
+							scriptBlock {
+								"""
+									Yet.onUploadOK = function(resId){
+										${'$'}.ajax({                                                                           
+											type:"GET",                                                                    
+											url:"${ApkGroup::infoAction.uri}",                                 
+											data:'id=' + resId,                                                          
+											success: function(msg){
+												console.log(msg);
+												if(msg && msg.code == 0 && msg.data){                                      
+													console.log("OKK");
+													var verCode = msg.data.versionCode;                                    
+													var verName = msg.data.versionName;                                    
+													var appName = msg.data.label;                                          
+													var pkgName = msg.data.packageName;                                    
+													${'$'}("input[name='${ApkVersion::appName.userName}']").val(appName);         
+													${'$'}("input[name='${ApkVersion::pkgName.userName}']").val(pkgName);         
+													${'$'}("input[name='${ApkVersion::versionCode.userName}']").val(verCode);     
+													${'$'}("input[name='${ApkVersion::versionName.userName}']").val(verName);     
+													${'$'}("input[name='${ApkVersion::msg.userName}']").val(verName);             
+												}else {                                                                    
+												}                                                                          
+											}                                                                              
+										});                                                                                
+									};                                                                                      
+								""".trimIndent()
+							}
+						}
 						submit()
 					}
 				}
 			}
+			ApkGroup.configRes(this)
 		}
 
 	}

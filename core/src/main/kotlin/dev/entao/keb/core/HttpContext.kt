@@ -191,6 +191,9 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	fun fileParts(): List<Part> {
 		return parts().filter { it.submittedFileName != null && it.submittedFileName.isNotEmpty() }
 	}
+	val firstFilePart:Part? get() {
+		return this.fileParts().firstOrNull()
+	}
 
 	fun abort(code: Int) {
 		response.sendError(code)

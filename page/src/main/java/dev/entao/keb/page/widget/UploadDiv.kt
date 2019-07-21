@@ -9,7 +9,7 @@ import kotlin.reflect.KProperty0
 
 fun Tag.configUpload(uploadUrl: String, viewUrl: String, viewUrlParam: String, uploadSizeLimitM: Int = 30, uploadDefaultFileImageUrl: String = "http://app800.cn/i/file.png") {
 	scriptBlock {
-		val sb = StringBuilder(256);
+		val sb = StringBuilder(256)
 		if (uploadUrl.isNotEmpty()) {
 			sb.appendln("""Yet.uploadUrl = "$uploadUrl";""")
 		}

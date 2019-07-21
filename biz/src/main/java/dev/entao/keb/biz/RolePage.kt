@@ -110,7 +110,7 @@ class RolePage(context: HttpContext) : HttpGroup(context) {
 	fun delArrAction(@NotEmpty id: String) {
 		val ls = id.split(',').map { it.toInt() }
 		Role.delete(Role::id IN ls)
-		ResultRender(context).ok()
+		resultSender.ok()
 	}
 
 	@Label("查看")

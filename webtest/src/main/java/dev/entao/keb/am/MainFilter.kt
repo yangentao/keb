@@ -8,12 +8,12 @@ import javax.servlet.annotation.WebFilter
 class MainFilter : HttpFilter() {
 
 	override fun cleanThreadLocals() {
-		 ConnLook.cleanThreadConnections()
+		ConnLook.cleanThreadConnections()
 	}
 
 	override fun onInit() {
 
-		addGroup(IndexGroup::class)
+		addGroup(IndexGroup::class, ResGroup::class, ApkGroup::class)
 	}
 
 }

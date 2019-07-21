@@ -145,7 +145,7 @@ class DeptPage(context: HttpContext) : HttpGroup(context) {
 	@FormConfirm("要删除这些记录吗?")
 	fun delArrAction(@NotEmpty id: String) {
 		Dept.delete(Dept::id IN id.intList)
-		ResultRender(context).ok()
+		resultSender.ok()
 	}
 
 	@Label("查看")

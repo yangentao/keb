@@ -91,7 +91,7 @@ class AccountPage(context: HttpContext) : HttpGroup(context) {
 		a.updateByKey {
 			a.status = Account.Disabled
 		}
-		ResultRender(context).ok()
+		resultSender.ok()
 	}
 
 	@Label("启用", "启用账号")
@@ -100,7 +100,7 @@ class AccountPage(context: HttpContext) : HttpGroup(context) {
 		a.updateByKey {
 			a.status = Account.Enabled
 		}
-		ResultRender(context).ok()
+		resultSender.ok()
 	}
 
 	//	@Label("Dialog")
@@ -164,7 +164,7 @@ class AccountPage(context: HttpContext) : HttpGroup(context) {
 	@FormConfirm("要删除这些记录吗?")
 	fun delArrAction(@NotEmpty id: String) {
 		Account.delete(Account::id IN id.intList)
-		ResultRender(context).ok()
+		resultSender.ok()
 	}
 
 	@Label("查看")

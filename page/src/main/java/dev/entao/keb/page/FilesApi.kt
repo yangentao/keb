@@ -21,7 +21,6 @@ import javax.servlet.http.Part
 
 class FilesApi(context: HttpContext) : HttpGroup(context) {
 
-	private val resultSender = ResultRender(context)
 	override fun indexAction() {
 
 	}

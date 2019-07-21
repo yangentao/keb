@@ -25,7 +25,7 @@ class AreaApi(context: HttpContext) : HttpGroup(context) {
 	}
 	fun citiesAction(provId: String) {
 		val ls = City.findAll(City::parentId EQ provId)
-		ResultRender(context).arr(ls) { a ->
+		resultSender.arr(ls) { a ->
 			ysonObject {
 				"code" to a.id
 				"label" to a.name
@@ -37,7 +37,7 @@ class AreaApi(context: HttpContext) : HttpGroup(context) {
 		val ls = Province.findAll {
 			asc(Province::id)
 		}
-		ResultRender(context).arr(ls) { p ->
+		resultSender.arr(ls) { p ->
 			ysonObject {
 				"code" to p.id
 				"label" to p.name

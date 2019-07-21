@@ -211,6 +211,9 @@ var Yet = {
     viewUrlParam: "id",
     uploadSizeLimitM: 20,
     uploadDefaultFileImageUrl: "http://app800.cn/i/file.png",
+    onUploadOK: function (data) {
+
+    },
     uplodaBindDivById: function (divId) {
         var div = document.getElementById(divId);
         Yet.uplodaBindDivElement(div);
@@ -304,6 +307,10 @@ var Yet = {
                     resultSpan.removeClass('text-danger');
                     resultSpan.addClass('text-success');
                     hiddenInput.val(data.data);
+                    if (Yet.viewUrl && Yet.viewUrlParam) {
+                        imgEle.attr("src", Yet.viewUrl + "?" + Yet.viewUrlParam + "=" + data.data);
+                    }
+                    Yet.onUploadOK(data.data);
                 } else {
                     resultSpan.html("上传失败: " + data.msg);
                     resultSpan.removeClass('text-success');

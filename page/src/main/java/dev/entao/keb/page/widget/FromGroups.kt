@@ -157,8 +157,8 @@ fun Tag.labelFileRow(p: Prop) {
 	}
 }
 
-fun Tag.labelFileGroup(p: Prop) {
-	formGroup {
+fun Tag.labelFileGroup(p: Prop):Tag {
+	return formGroup {
 		label(p.userLabel)
 		this.div {
 			uploadDiv(p)
