@@ -30,12 +30,14 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 	fun checkAction(pkg: String) {
 		val a = ApkVersion.last(pkg)
 		if (a != null) {
-			resultSender.obj(a.toJson(
+			val yo = a.toJson(
 					ApkVersion::pkgName,
 					ApkVersion::versionCode,
 					ApkVersion::versionName,
 					ApkVersion::msg,
-					ApkVersion::resId))
+					ApkVersion::resId)
+			yo.str("download", ResGroup::downloadAction.param(a.resId).fullUrl)
+			resultSender.obj(yo)
 		} else {
 			resultSender.failed(-1, "没有新版本")
 		}
