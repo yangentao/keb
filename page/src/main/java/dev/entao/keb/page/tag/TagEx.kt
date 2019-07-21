@@ -1,4 +1,4 @@
-package dev.entao.keb.page.html
+package dev.entao.keb.page.tag
 
 val Tag.rootTag: Tag
 	get() {

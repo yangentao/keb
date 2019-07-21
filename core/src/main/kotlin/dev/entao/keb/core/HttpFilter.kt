@@ -26,6 +26,7 @@ abstract class HttpFilter : Filter {
 	var sessionTimeoutSeconds: Int = 3600
 
 	var loginUri: String = ""
+	var logoutUri: String = ""
 
 	var webConfig = WebConfig()
 		private set
@@ -86,6 +87,14 @@ abstract class HttpFilter : Filter {
 				for ((k, v) in routeManager.routeMap) {
 					if (v.function.hasAnnotation<LoginAction>()) {
 						this.loginUri = k
+						break
+					}
+				}
+			}
+			if (this.logoutUri.isEmpty()) {
+				for ((k, v) in routeManager.routeMap) {
+					if (v.function.hasAnnotation<LogoutAction>()) {
+						this.logoutUri = k
 						break
 					}
 				}

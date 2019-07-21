@@ -6,8 +6,7 @@ import dev.entao.keb.core.HttpScope
 import dev.entao.keb.page.widget.card
 import dev.entao.keb.page.widget.cardBody
 import dev.entao.keb.page.widget.cardHeader
-import dev.entao.keb.page.html.Tag
-import dev.entao.keb.page.sidebarPage
+import dev.entao.keb.page.tag.Tag
 
 fun HttpScope.cardPage(block: Tag.() -> Unit) {
 	sidebarPage {

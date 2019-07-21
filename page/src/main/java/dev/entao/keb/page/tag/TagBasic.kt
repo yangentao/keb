@@ -1,14 +1,16 @@
 @file:Suppress("unused")
 
-package dev.entao.keb.page.html
+package dev.entao.keb.page.tag
 
 import dev.entao.kava.base.Prop
 import dev.entao.kava.base.userLabel
 import dev.entao.kava.base.userName
+import dev.entao.keb.core.HttpContext
 import dev.entao.keb.page.B
 
 typealias TagCallback = Tag.() -> Unit
 
+open class Html(httpContext: HttpContext) : Tag(httpContext, "html")
 
 fun Tag.head(block: TagCallback): Tag {
 	val h = this.headTag

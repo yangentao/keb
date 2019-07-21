@@ -8,7 +8,7 @@ import dev.entao.keb.page.B
 import dev.entao.keb.page.P
 import dev.entao.keb.page.S
 import dev.entao.keb.page.eleId
-import dev.entao.keb.page.html.*
+import dev.entao.keb.page.tag.*
 import kotlin.math.max
 import kotlin.reflect.KFunction
 

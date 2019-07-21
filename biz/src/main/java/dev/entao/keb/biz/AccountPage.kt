@@ -9,9 +9,7 @@ import dev.entao.kava.sql.EQ
 import dev.entao.kava.sql.IN
 import dev.entao.kava.sql.Where
 import dev.entao.keb.core.*
-import dev.entao.keb.page.ActionDanger
-import dev.entao.keb.page.FormConfirm
-import dev.entao.keb.page.ex.*
+import dev.entao.keb.page.*
 import dev.entao.keb.page.widget.*
 
 @Label("WEB账号管理")

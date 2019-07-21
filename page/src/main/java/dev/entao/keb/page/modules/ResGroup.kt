@@ -11,7 +11,7 @@ import dev.entao.kava.sql.EQ
 import dev.entao.keb.core.HttpMethod
 import dev.entao.keb.core.render.FileSender
 import dev.entao.keb.page.R
-import dev.entao.keb.page.html.Tag
+import dev.entao.keb.page.tag.Tag
 import dev.entao.keb.page.widget.configUpload
 import javax.servlet.http.Part
 

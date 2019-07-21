@@ -2,7 +2,7 @@ package dev.entao.keb.page.widget
 
 import dev.entao.kava.base.getValue
 import dev.entao.kava.base.userName
-import dev.entao.keb.page.html.*
+import dev.entao.keb.page.tag.*
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
 

@@ -1,4 +1,4 @@
-package dev.entao.keb.page.html
+package dev.entao.keb.page.tag
 
 import dev.entao.kava.base.isTypeBoolean
 import dev.entao.kava.base.isTypeInt

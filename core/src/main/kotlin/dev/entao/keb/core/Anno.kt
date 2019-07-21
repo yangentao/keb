@@ -18,6 +18,11 @@ annotation class NeedLogin
 @Retention(AnnotationRetention.RUNTIME)
 annotation class LoginAction
 
+//登录的uri
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class LogoutAction
+
 //参数或属性的最小值Int
 @Target(AnnotationTarget.PROPERTY,
 		AnnotationTarget.FIELD,

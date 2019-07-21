@@ -2,6 +2,7 @@ package dev.entao.keb.page
 
 import dev.entao.kava.base.*
 import dev.entao.kava.json.YsonValue
+import dev.entao.keb.page.widget.singleSelectDisplay
 import kotlin.reflect.full.findAnnotation
 
 /**

@@ -1,12 +1,15 @@
-package dev.entao.keb.page
+package dev.entao.keb.biz
 
 import dev.entao.kava.base.removeAllIf
 import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.HttpScope
-import dev.entao.keb.core.Keb
 import dev.entao.keb.core.isSubpath
-import dev.entao.keb.page.ex.html
-import dev.entao.keb.page.html.*
+import dev.entao.keb.page.B
+import dev.entao.keb.page.LinkItem
+import dev.entao.keb.page.R
+import dev.entao.keb.page.html
+import dev.entao.keb.page.showMessagesIfPresent
+import dev.entao.keb.page.tag.*
 import dev.entao.keb.page.widget.*
 import kotlin.reflect.KClass
 
@@ -114,7 +117,7 @@ fun HttpScope.sidebarPage(block: Tag.() -> Unit) {
 			div {
 				clazz = "container-fluid"
 				buildTopActionMenu(this)
-				checkAlertMessage(this)
+				showMessagesIfPresent()
 				this.block()
 			}
 			installDialogs(this)
@@ -130,20 +133,7 @@ fun HttpScope.sidebarPage(block: Tag.() -> Unit) {
 	}
 }
 
-
-fun HttpScope.checkAlertMessage(tag: Tag) {
-	val er = httpParams.str(Keb.ERROR) ?: ""
-	if (er.isNotEmpty()) {
-		tag.alertError { +er }
-	}
-	val m = httpParams.str(Keb.SUCCESS) ?: ""
-	if (m.isNotEmpty()) {
-		tag.alertSuccess { +m }
-	}
-}
-
 private fun HttpScope.buildUserInfoFlex(parentTag: Tag) {
-	val cfg = context.filter.webConfig
 	parentTag.flex {
 		classList += B.Flex.justifyContentBetween
 		classList += "py-4"
@@ -151,16 +141,22 @@ private fun HttpScope.buildUserInfoFlex(parentTag: Tag) {
 		classList += "w-100"
 		span {
 			classList += "mr-auto"
-			if (context.loginedWeb) {
+			if (context.isLogined) {
 				+context.accountName
 			} else {
 				+"未登录"
 			}
 		}
-		if (context.loginedWeb) {
-			a("登录", cfg.loginUri)
+		if (context.isLogined) {
+			val u = httpContext.filter.loginUri
+			if (u.isNotEmpty()) {
+				a("登录", u)
+			}
 		} else {
-			a("登出", cfg.logoutUri)
+			val u = httpContext.filter.logoutUri
+			if (u.isNotEmpty()) {
+				a("登出", u)
+			}
 		}
 	}
 }
@@ -220,7 +216,3 @@ private fun HttpScope.makeLinkItem(c: Pair<String, KClass<*>>, currUri: String):
 	return LinkItem(c.second.userLabel, s, isSubpath(currUri, s))
 }
 
-class LinkItem(val label: String, val url: String, var active: Boolean = false) {
-	val children: ArrayList<LinkItem> = ArrayList()
-
-}

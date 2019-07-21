@@ -38,7 +38,6 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	var userId: Int = 0
 	var accountId: Int = 0
 	var userName: String = ""
-	var accountName: String = ""
 
 	val loginedApp: Boolean get() = userId != 0
 	val loginedWeb: Boolean get() = accountId != 0
@@ -58,6 +57,17 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	val isLogined: Boolean
 		get() {
 			return account.isNotEmpty()
+		}
+	var accountName: String
+		get() {
+			val a = this.account
+			if (a.isEmpty()) {
+				return ""
+			}
+			return getSession(Keb.ACCOUNT_NAME) ?: a
+		}
+		set(value) {
+			putSession(Keb.ACCOUNT_NAME, value)
 		}
 
 	val rootUri: String

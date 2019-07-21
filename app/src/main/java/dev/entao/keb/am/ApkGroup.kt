@@ -11,7 +11,7 @@ import dev.entao.keb.core.render.FileSender
 import dev.entao.keb.page.R
 import dev.entao.keb.page.modules.Upload
 import dev.entao.keb.page.modules.ResGroup
-import dev.entao.keb.page.html.Tag
+import dev.entao.keb.page.tag.Tag
 import dev.entao.keb.page.widget.configUpload
 import net.dongliu.apk.parser.ApkFile
 

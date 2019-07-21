@@ -6,6 +6,7 @@ import kotlin.reflect.KProperty
 object Keb {
 	const val BACK_URL = "backurl"
 	const val ACCOUNT = "account"
+	const val ACCOUNT_NAME = "account_name"
 
 	const val ERROR = "errorMsg"
 	const val SUCCESS = "successMsg"

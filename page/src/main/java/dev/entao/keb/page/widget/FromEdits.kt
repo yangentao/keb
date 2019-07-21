@@ -4,10 +4,10 @@ import dev.entao.keb.page.*
 import dev.entao.kava.base.*
 import dev.entao.keb.core.*
 import dev.entao.keb.page.B
-import dev.entao.keb.page.html.Tag
-import dev.entao.keb.page.html.TagCallback
-import dev.entao.keb.page.html.div
-import dev.entao.keb.page.html.label
+import dev.entao.keb.page.tag.Tag
+import dev.entao.keb.page.tag.TagCallback
+import dev.entao.keb.page.tag.div
+import dev.entao.keb.page.tag.label
 import kotlin.reflect.KProperty0
 import kotlin.reflect.full.findAnnotation
 

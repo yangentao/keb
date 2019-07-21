@@ -1,10 +1,10 @@
 package dev.entao.keb.page.widget
 
 import dev.entao.keb.page.*
-import dev.entao.keb.page.html.Tag
-import dev.entao.keb.page.html.TagCallback
-import dev.entao.keb.page.html.div
-import dev.entao.keb.page.html.scriptBlock
+import dev.entao.keb.page.tag.Tag
+import dev.entao.keb.page.tag.TagCallback
+import dev.entao.keb.page.tag.div
+import dev.entao.keb.page.tag.scriptBlock
 
 //window.yetQueryCond = q;
 fun Tag.queryForm(block: TagCallback) {

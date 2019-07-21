@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName", "unused")
 
-package dev.entao.keb.page.ex
+package dev.entao.keb.page
 
 import dev.entao.kava.base.*
 import dev.entao.kava.sql.*
@@ -8,7 +8,6 @@ import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpScope
 import dev.entao.keb.core.param
 import dev.entao.keb.core.paramNameSet
-import dev.entao.keb.page.P
 import javax.servlet.http.HttpServletRequest
 
 fun SQLQuery.limitPage(context: HttpContext) {

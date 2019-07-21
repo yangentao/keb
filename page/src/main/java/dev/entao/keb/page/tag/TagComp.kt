@@ -1,4 +1,4 @@
-package dev.entao.keb.page.html
+package dev.entao.keb.page.tag
 
 import dev.entao.kava.base.escapeHtml
 import dev.entao.kava.base.trimColumns

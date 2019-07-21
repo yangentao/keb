@@ -3,7 +3,6 @@ package dev.entao.keb.biz
 import dev.entao.keb.biz.model.Access
 import dev.entao.keb.biz.model.ResAccess
 import dev.entao.keb.biz.model.ResItem
-import dev.entao.keb.page.*
 import dev.entao.keb.page.widget.*
 import dev.entao.kava.base.Label
 import dev.entao.kava.log.logd
@@ -12,7 +11,7 @@ import dev.entao.kava.sql.EQ
 import dev.entao.keb.core.HttpAction
 import dev.entao.keb.core.HttpGroup
 import dev.entao.keb.core.HttpScope
-import dev.entao.keb.page.html.*
+import dev.entao.keb.page.tag.*
 
 @Label("保存", "保存权限")
 fun HttpGroup.saveAccess() {

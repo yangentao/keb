@@ -2,7 +2,7 @@ package dev.entao.keb.page.widget
 
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.page.B
-import dev.entao.keb.page.html.*
+import dev.entao.keb.page.tag.*
 
 fun installDialogs(tag: Tag) {
 	tag.apply {

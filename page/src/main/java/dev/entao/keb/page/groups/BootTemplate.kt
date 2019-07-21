@@ -3,8 +3,8 @@ package dev.entao.keb.page.groups
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpScope
 import dev.entao.keb.page.R
-import dev.entao.keb.page.ex.HtmlTemplate
-import dev.entao.keb.page.html.*
+import dev.entao.keb.page.HtmlTemplate
+import dev.entao.keb.page.tag.*
 
 open class BootTemplate(final override val context: HttpContext) : HttpScope, HtmlTemplate {
 	val html = HtmlDoc(context)

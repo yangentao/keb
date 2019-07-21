@@ -6,13 +6,14 @@ import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpGroup
 import dev.entao.keb.core.HttpScope
 import dev.entao.keb.page.*
-import dev.entao.keb.page.ex.HtmlTemplate
-import dev.entao.keb.page.html.*
+import dev.entao.keb.page.HtmlTemplate
+import dev.entao.keb.page.showMessagesIfPresent
+import dev.entao.keb.page.tag.*
 import dev.entao.keb.page.widget.*
 import kotlin.reflect.KClass
 
-class SidebarPage(override val context: HttpContext) : HttpScope, HtmlTemplate {
-
+class SidebarTemplate(override val context: HttpContext) : HttpScope, HtmlTemplate {
+	val html = HtmlDoc(context)
 	var title: String = context.filter.webConfig.appName
 
 	var navItems: List<LinkItem> = emptyList()
@@ -20,7 +21,7 @@ class SidebarPage(override val context: HttpContext) : HttpScope, HtmlTemplate {
 
 	var pageBlock: Tag.() -> Unit = {}
 
-	private fun build(html: HtmlDoc) {
+	private fun build() {
 		val config = context.filter.webConfig
 		html.head {
 			metaCharset("UTF-8")
@@ -134,7 +135,7 @@ class SidebarPage(override val context: HttpContext) : HttpScope, HtmlTemplate {
 						}
 					}
 				}
-				checkAlertMessage(this)
+				showMessagesIfPresent()
 				this.pageBlock()
 			}
 			installDialogs(this)
@@ -149,7 +150,6 @@ class SidebarPage(override val context: HttpContext) : HttpScope, HtmlTemplate {
 	}
 
 	private fun buildUserInfoFlex(parentTag: Tag) {
-		val cfg = context.filter.webConfig
 		parentTag.flex {
 			classList += B.Flex.justifyContentBetween
 			classList += "py-4"
@@ -157,16 +157,22 @@ class SidebarPage(override val context: HttpContext) : HttpScope, HtmlTemplate {
 			classList += "w-100"
 			span {
 				classList += "mr-auto"
-				if (context.loginedWeb) {
+				if (context.isLogined) {
 					+context.accountName
 				} else {
 					+"未登录"
 				}
 			}
-			if (context.loginedWeb) {
-				a("登录", cfg.loginUri)
+			if (context.isLogined) {
+				val u = httpContext.filter.loginUri
+				if (u.isNotEmpty()) {
+					a("登录", u)
+				}
 			} else {
-				a("登出", cfg.logoutUri)
+				val u = httpContext.filter.logoutUri
+				if (u.isNotEmpty()) {
+					a("登出", u)
+				}
 			}
 		}
 	}
@@ -188,8 +194,7 @@ class SidebarPage(override val context: HttpContext) : HttpScope, HtmlTemplate {
 	}
 
 	override fun toHtml(): String {
-		val html = HtmlDoc(context)
-		build(html)
+		build()
 		return html.toHtml()
 	}
 

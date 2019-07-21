@@ -6,10 +6,10 @@ import dev.entao.keb.core.HttpAction
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.UriMake
 import dev.entao.keb.page.*
-import dev.entao.keb.page.html.Tag
-import dev.entao.keb.page.html.TagCallback
-import dev.entao.keb.page.html.rootTag
-import dev.entao.keb.page.html.scriptBlock
+import dev.entao.keb.page.tag.Tag
+import dev.entao.keb.page.tag.TagCallback
+import dev.entao.keb.page.tag.rootTag
+import dev.entao.keb.page.tag.scriptBlock
 import kotlin.reflect.full.findAnnotation
 
 /**
