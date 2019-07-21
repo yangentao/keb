@@ -57,7 +57,7 @@ object LoginCheckSlice : HttpSlice {
 				if (context.filter.loginUri.isNotEmpty()) {
 					if (context.acceptHtml) {
 						val u = Url(context.filter.loginUri)
-						u.replace(KebConst.BACK_URL, context.fullUrlOf(router.uri))
+						u.replace(Keb.BACK_URL, context.fullUrlOf(router.uri))
 						context.redirect(u.build())
 						return false
 					}

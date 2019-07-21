@@ -58,7 +58,7 @@ class Router(val uri: String, val function: KFunction<*>, obj: Any? = null) {
 				if (context.acceptJson) {
 					ResultRender(context).failed("参数错误:${ex.message}")
 				} else {
-					context.backward { err(ex.message ?: "参数错误") }
+					context.backward { error(ex.message ?: "参数错误") }
 				}
 				return
 			}

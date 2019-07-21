@@ -6,7 +6,7 @@ import dev.entao.keb.page.R
 import dev.entao.keb.page.ex.HtmlTemplate
 import dev.entao.keb.page.html.*
 
-open class BootTemplate(context: HttpContext) : HttpScope(context), HtmlTemplate {
+open class BootTemplate(final override val context: HttpContext) : HttpScope, HtmlTemplate {
 	val html = HtmlDoc(context)
 
 	init {
@@ -32,8 +32,6 @@ open class BootTemplate(context: HttpContext) : HttpScope(context), HtmlTemplate
 			scriptLink(resUri(R.myJS))
 		}
 	}
-
-
 
 	override fun toHtml(): String {
 		return html.toHtml()

@@ -54,13 +54,13 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 		if (a == null) {
 			context.backward {
 				withoutMessage()
-				err("用户名或密码错误")
+				error("用户名或密码错误")
 			}
 			return
 		}
 		context.setLoginAccount(username)
 
-		val back = httpParams.str(KebConst.BACK_URL) ?: ""
+		val back = httpParams.str(Keb.BACK_URL) ?: ""
 		if (back.isNotEmpty()) {
 			context.redirect(back)
 		} else {
@@ -84,9 +84,9 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 							showMessagesIfPresent()
 							cardBodyTitle("登录") {
 								form(::loginResultAction) {
-									val backurl = httpParams.str(KebConst.BACK_URL)
+									val backurl = httpParams.str(Keb.BACK_URL)
 									if (backurl != null) {
-										hidden(KebConst.BACK_URL, backurl)
+										hidden(Keb.BACK_URL, backurl)
 									}
 									labelEditGroup("用户名", "username") {
 									}
@@ -309,7 +309,7 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 		m.account = context.account
 		m.insert()
 		redirect(::listAction) {
-			ok("保存成功")
+			success("保存成功")
 		}
 	}
 

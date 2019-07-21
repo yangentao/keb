@@ -1,7 +1,6 @@
 package dev.entao.keb.page
 
 import dev.entao.keb.core.HttpScope
-import dev.entao.keb.core.ParamConst
 import dev.entao.keb.core.isSubpath
 import dev.entao.kava.base.firstParamName
 import dev.entao.kava.base.removeAllIf
@@ -180,11 +179,11 @@ private fun installDialogs(tag: Tag) {
 }
 
 fun HttpScope.checkAlertMessage(tag: Tag) {
-	val er = httpParams.str(ParamConst.ERROR) ?: ""
+	val er = httpParams.str(Keb.ERROR) ?: ""
 	if (er.isNotEmpty()) {
 		tag.alertError { +er }
 	}
-	val m = httpParams.str(ParamConst.SUCCESS) ?: ""
+	val m = httpParams.str(Keb.SUCCESS) ?: ""
 	if (m.isNotEmpty()) {
 		tag.alertSuccess { +m }
 	}

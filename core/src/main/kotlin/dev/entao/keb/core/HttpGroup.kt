@@ -13,20 +13,21 @@ import kotlin.reflect.KFunction
  * Created by entaoyang@163.com on 2016/12/19.
  */
 
-open class HttpGroup(context: HttpContext) : HttpScope(context) {
+open class HttpGroup(final override val context: HttpContext) : HttpScope {
+
+	val resultSender: ResultRender by lazy {
+		ResultRender(context)
+	}
 
 	open fun indexAction() {
 		context.abort(404)
 	}
 }
 
-open class HttpScope(val context: HttpContext) {
-
+interface HttpScope {
+	val context: HttpContext
 
 	val httpParams: HttpParams get() = context.httpParams
-	val resultSender: ResultRender by lazy {
-		ResultRender(context)
-	}
 
 	fun HttpAction.param(value: Any): UriMake {
 		return UriMake(context, this).param(value)

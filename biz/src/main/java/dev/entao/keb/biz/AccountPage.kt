@@ -11,7 +11,6 @@ import dev.entao.kava.sql.Where
 import dev.entao.keb.core.*
 import dev.entao.keb.page.ActionDanger
 import dev.entao.keb.page.FormConfirm
-import dev.entao.keb.core.render.ResultRender
 import dev.entao.keb.page.ex.EQ
 import dev.entao.keb.page.ex.LIKE
 import dev.entao.keb.page.ex.fromRequest
@@ -155,7 +154,7 @@ class AccountPage(context: HttpContext) : HttpGroup(context) {
 	fun delAction(id: Int) {
 		Account.delete(Account::id EQ id)
 		redirect(::listAction) {
-			ok("已删除")
+			success("已删除")
 		}
 	}
 

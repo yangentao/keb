@@ -15,7 +15,7 @@ import dev.entao.keb.page.widget.button
 import dev.entao.keb.page.widget.configUpload
 import kotlin.reflect.KClass
 
-class SidebarPage(context: HttpContext) : HttpScope(context), HtmlTemplate {
+class SidebarPage(override val context: HttpContext) : HttpScope, HtmlTemplate {
 
 	var title: String = context.filter.webConfig.appName
 

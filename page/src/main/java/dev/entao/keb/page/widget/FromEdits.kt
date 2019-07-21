@@ -2,10 +2,7 @@ package dev.entao.keb.page.widget
 
 import dev.entao.keb.page.*
 import dev.entao.kava.base.*
-import dev.entao.keb.core.MaxValue
-import dev.entao.keb.core.MinValue
-import dev.entao.keb.core.ParamConst
-import dev.entao.keb.core.ValueRange
+import dev.entao.keb.core.*
 import dev.entao.keb.page.B
 import dev.entao.keb.page.html.Tag
 import dev.entao.keb.page.html.div
@@ -89,7 +86,7 @@ fun Tag.labelEdit(p: Prop, editBlock: Tag.() -> Unit = {}) {
 fun Tag.labelTextAreaRow(p: Prop, editBlock: Tag.() -> Unit = {}) {
 	formGroupRow {
 		val pname = p.userName
-		val er = httpContext.httpParams.str(ParamConst.errField(pname)) ?: ""
+		val er = httpContext.httpParams.str(Keb.errField(pname)) ?: ""
 		val lb = this.label { +p.userLabel }
 		this.div {
 			val ed = this.textarea {
@@ -140,7 +137,7 @@ fun labelConfig(lb: Tag, ed: Tag) {
 
 fun editConfig(editTag: Tag, p: Prop) {
 	val pname = p.userName
-	val er = editTag.httpContext.httpParams.str(ParamConst.errField(pname)) ?: ""
+	val er = editTag.httpContext.httpParams.str(Keb.errField(pname)) ?: ""
 	editTag.apply {
 		if (er.isNotEmpty()) {
 			addClass(B.isInValid)
@@ -239,7 +236,7 @@ fun Tag.configEditOfProp(p: Prop) {
 fun editConfig(editTag: Tag, editName: String) {
 	editTag.name = editName
 	editTag.value = editTag.httpContext.httpParams.str(editName) ?: ""
-	val er = editTag.httpContext.httpParams.str(ParamConst.errField(editName)) ?: ""
+	val er = editTag.httpContext.httpParams.str(Keb.errField(editName)) ?: ""
 	if (er.isNotEmpty()) {
 		editTag.addClass(B.isInValid)
 		editTag.parentTag?.feedbackInvalid(er)
