@@ -6,8 +6,7 @@ import dev.entao.keb.core.HttpScope
 import dev.entao.keb.core.Keb
 import dev.entao.keb.core.isSubpath
 import dev.entao.keb.page.html.*
-import dev.entao.keb.page.widget.a
-import dev.entao.keb.page.widget.button
+import dev.entao.keb.page.widget.*
 import kotlin.reflect.KClass
 
 fun HttpScope.sidebarPage(block: Tag.() -> Unit) {
@@ -130,45 +129,6 @@ fun HttpScope.sidebarPage(block: Tag.() -> Unit) {
 	}
 }
 
-private fun installDialogs(tag: Tag) {
-	tag.apply {
-		div {
-			id = "dialogPanel"
-		}
-		div {
-			id = "confirmDlgPanel"
-			val b = DialogBuild(httpContext)
-			b.title("确认")
-			b.bodyBlock = {
-				it.p {
-					+"确认内容"
-				}
-			}
-			b.closeText = "取消"
-			b.buttonsBlock = {
-				it.button {
-					btnPrimary()
-					+"确定"
-				}
-			}
-			b.build()
-			addTag(b.modal)
-		}
-		div {
-			id = "alertDlgPanel"
-			val b = DialogBuild(httpContext)
-			b.title("提示")
-			b.bodyBlock = {
-				it.p {
-					+"提示内容"
-				}
-			}
-			b.closeText = "关闭"
-			b.build()
-			addTag(b.modal)
-		}
-	}
-}
 
 fun HttpScope.checkAlertMessage(tag: Tag) {
 	val er = httpParams.str(Keb.ERROR) ?: ""

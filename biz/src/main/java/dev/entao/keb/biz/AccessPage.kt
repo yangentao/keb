@@ -12,7 +12,6 @@ import dev.entao.kava.sql.EQ
 import dev.entao.keb.core.HttpAction
 import dev.entao.keb.core.HttpGroup
 import dev.entao.keb.core.HttpScope
-import dev.entao.keb.core.render.ResultRender
 import dev.entao.keb.page.html.*
 
 @Label("保存", "保存权限")

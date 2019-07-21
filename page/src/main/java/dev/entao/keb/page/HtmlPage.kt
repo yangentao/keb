@@ -6,6 +6,7 @@ import dev.entao.kava.sql.SQLQuery
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpScope
 import dev.entao.keb.page.html.*
+import dev.entao.keb.page.widget.DialogBuild
 import dev.entao.keb.page.widget.button
 
 fun SQLQuery.limitPage(context: HttpContext) {

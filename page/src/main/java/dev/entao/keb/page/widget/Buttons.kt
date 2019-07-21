@@ -8,6 +8,7 @@ import dev.entao.keb.core.UriMake
 import dev.entao.keb.page.*
 import dev.entao.keb.page.html.Tag
 import dev.entao.keb.page.html.TagCallback
+import dev.entao.keb.page.html.rootTag
 import dev.entao.keb.page.html.scriptBlock
 import kotlin.reflect.full.findAnnotation
 
@@ -104,7 +105,7 @@ class ButtonTag(httpContext: HttpContext) : Tag(httpContext, "button"), ButtonLi
 
 fun Tag.a(block: ATag.() -> Unit): ATag {
 	val a = ATag(this.httpContext)
-	this.addTag(a)
+	this.tag(a)
 	a.block()
 	return a
 }
@@ -128,14 +129,14 @@ fun Tag.submit(block: TagCallback): ButtonTag {
 	val b = ButtonTag(this.httpContext)
 	b.typeSubmit()
 	b.btnPrimary()
-	addTag(b)
+	tag(b)
 	b.block()
 	return b
 }
 
 fun Tag.button(block: ButtonTag.() -> Unit): ButtonTag {
 	val b = ButtonTag(this.httpContext)
-	addTag(b)
+	tag(b)
 	b.block()
 	return b
 }
@@ -157,14 +158,14 @@ fun Tag.linkButton(text: String, href: String): LinkButton {
 //link 用于跳转
 fun Tag.linkButton(action: HttpAction, block: UriMake.() -> Unit): LinkButton {
 	val b = LinkButton(this.httpContext)
-	addTag(b)
+	tag(b)
 	b.fromAction(action, block)
 	return b
 }
 
 fun Tag.linkButton(action: HttpAction, paramValue: Any?): LinkButton {
 	val b = LinkButton(this.httpContext)
-	addTag(b)
+	tag(b)
 	b.fromAction(action) {
 		this.param(paramValue)
 	}
@@ -211,6 +212,7 @@ interface ButtonLike<T : Tag> {
 
 	fun openDialog() {
 		self.onclick = "Yet.openDialogPanel(this); return false;"
+		self.rootTag.needDialogs = true
 	}
 
 	fun btnTheme(theme: String): T {

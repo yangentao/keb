@@ -5,14 +5,14 @@ import dev.entao.kava.base.*
 import dev.entao.keb.page.*
 import dev.entao.keb.page.ex.HtmlTemplate
 import java.util.*
-import kotlin.reflect.KFunction
-import kotlin.reflect.KProperty
 
 open class Tag(val httpContext: HttpContext, var tagName: String) : HtmlTemplate {
 	private val attrs: TagMap = TagMap()
 	var parentTag: Tag? = null
-
 	var outputScript = tagName == "body"
+
+	var needDialogs = false
+	var needUploads = false
 
 	val children = ArrayList<Tag>(32)
 	val classList: ArrayList<String> = ArrayList()
@@ -137,13 +137,6 @@ open class Tag(val httpContext: HttpContext, var tagName: String) : HtmlTemplate
 		}
 	}
 
-	val htmlTag: Tag?
-		get() {
-			return this.findParent {
-				it.tagName == "html"
-			}
-		}
-
 	fun idName(idname: String) {
 		id = idname
 		name = idname
@@ -169,11 +162,6 @@ open class Tag(val httpContext: HttpContext, var tagName: String) : HtmlTemplate
 		} else {
 			this.id = tagName + "_" + this.type + "_$eleId"
 		}
-	}
-
-	fun valueOf(p: KProperty<*>): Tag {
-		value = p.strValue ?: ""
-		return this
 	}
 
 	operator fun get(key: String): String {
@@ -285,25 +273,25 @@ open class Tag(val httpContext: HttpContext, var tagName: String) : HtmlTemplate
 		children.removeIf { it.tagName == tagname }
 	}
 
-	fun addTag(tagname: String): Tag {
+	fun tag(tagname: String): Tag {
 		val t = Tag(httpContext, tagname)
-		addTag(t)
+		tag(t)
 		return t
 	}
 
-	fun addTag(tagname: String, block: Tag.() -> Unit): Tag {
-		val t = addTag(tagname)
+	fun tag(tagname: String, block: Tag.() -> Unit): Tag {
+		val t = tag(tagname)
 		t.block()
 		return t
 	}
 
-	fun addTag(tag: Tag): Tag {
+	fun tag(tag: Tag): Tag {
 		tag.parentTag = this
 		children.add(tag)
 		return tag
 	}
 
-	//==addText
+	//==textEscaped
 	operator fun String?.unaryPlus() {
 		textEscaped(this)
 	}
@@ -313,7 +301,7 @@ open class Tag(val httpContext: HttpContext, var tagName: String) : HtmlTemplate
 	}
 
 	fun textUnsafe(text: String?) {
-		addTag(TextUnsafe(httpContext, text ?: ""))
+		tag(TextUnsafe(httpContext, text ?: ""))
 	}
 
 	fun textEscaped(block: () -> String?): TextEscaped {
@@ -322,10 +310,9 @@ open class Tag(val httpContext: HttpContext, var tagName: String) : HtmlTemplate
 
 	fun textEscaped(text: String?): TextEscaped {
 		val c = TextEscaped(httpContext, text ?: "")
-		addTag(c)
+		tag(c)
 		return c
 	}
-
 
 	private fun writeChildren2(singleLine: Boolean, buf: Appendable, level: Int) {
 		val ls = children.filter { it.tagName != "script" }

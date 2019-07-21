@@ -1,8 +1,8 @@
 package dev.entao.keb.page.ex
 
 import dev.entao.keb.core.Keb
-import dev.entao.keb.page.alertError
-import dev.entao.keb.page.alertSuccess
+import dev.entao.keb.page.widget.alertError
+import dev.entao.keb.page.widget.alertSuccess
 import dev.entao.keb.page.html.Tag
 
 fun Tag.showMessagesIfPresent() {

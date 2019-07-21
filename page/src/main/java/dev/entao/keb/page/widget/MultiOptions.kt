@@ -11,28 +11,28 @@ import dev.entao.keb.page.selectOptionsTable
 import kotlin.reflect.full.findAnnotation
 
 fun Tag.datalist(id: String, block: TagCallback): Tag {
-	val t = addTag("datalist")
+	val t = tag("datalist")
 	t.id = id
 	t.block()
 	return t
 }
 
 fun Tag.listOption(label: String, value: String): Tag {
-	val t = addTag("option")
+	val t = tag("option")
 	t.label = label
 	t.value = value
 	return t
 }
 
 fun Tag.select(block: TagCallback): Tag {
-	val t = addTag("select")
+	val t = tag("select")
 	t.block()
 	t.needId()
 	return t
 }
 
 fun Tag.option(block: TagCallback): Tag {
-	val t = addTag("option")
+	val t = tag("option")
 	t.block()
 	return t
 }

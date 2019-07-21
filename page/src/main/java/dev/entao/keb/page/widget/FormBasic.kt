@@ -7,6 +7,7 @@ import dev.entao.keb.page.html.TagCallback
 import dev.entao.keb.page.html.div
 import dev.entao.kava.base.*
 import dev.entao.keb.core.UriMake
+import dev.entao.keb.page.html.rootTag
 import kotlin.reflect.KFunction
 
 /**
@@ -40,7 +41,7 @@ fun Tag.form(formAction: UriMake, block: TagCallback): Tag {
 }
 
 fun Tag.form(block: TagCallback): Tag {
-	return addTag("form") {
+	return tag("form") {
 		methodPost()
 		block()
 		val fileTag = findChildDeep {
@@ -48,6 +49,7 @@ fun Tag.form(block: TagCallback): Tag {
 		}
 		if (fileTag != null) {
 			enctypeMultipart()
+			this.rootTag.needUploads = true
 		}
 	}
 }
@@ -59,8 +61,6 @@ fun Tag.submitRow(text: String = "提交") {
 		}
 	}
 }
-
-
 
 fun Tag.feedbackValid(text: String) {
 	div {
@@ -76,36 +76,15 @@ fun Tag.feedbackInvalid(text: String) {
 	}
 }
 
-fun Tag.textarea(block: TagCallback): Tag {
-	val t = addTag("textarea")
-	t.rows = "3"
-	t.block()
-	t.needId()
-	return t
-}
+
 
 fun Tag.input(block: TagCallback): Tag {
-	val t = addTag("input")
+	val t = tag("input")
 	t.block()
 	t.needId()
 	return t
 }
 
-fun Tag.edit(p: Prop): Tag {
-	return this.edit {
-		name = p.userName
-		if (p is Prop0) {
-			value = p.getValue()?.toString() ?: ""
-		}
-	}
-}
-
-fun Tag.edit(block: TagCallback): Tag {
-	return input {
-		type = "text"
-		this.block()
-	}
-}
 
 fun Tag.hidden(p: Prop0) {
 	this.hidden {
@@ -254,7 +233,7 @@ fun Tag.typeText() {
 }
 
 fun Tag.formTextMuted(block: TagCallback): Tag {
-	val t = addTag("small")
+	val t = tag("small")
 	t.clazz = "form-text text-muted"
 	t.block()
 	return t

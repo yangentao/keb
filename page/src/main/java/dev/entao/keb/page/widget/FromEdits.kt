@@ -5,6 +5,7 @@ import dev.entao.kava.base.*
 import dev.entao.keb.core.*
 import dev.entao.keb.page.B
 import dev.entao.keb.page.html.Tag
+import dev.entao.keb.page.html.TagCallback
 import dev.entao.keb.page.html.div
 import dev.entao.keb.page.html.label
 import kotlin.reflect.KProperty0
@@ -13,6 +14,30 @@ import kotlin.reflect.full.findAnnotation
 /**
  * Created by entaoyang@163.com on 2018/7/18.
  */
+
+fun Tag.textarea(block: TagCallback): Tag {
+	val t = tag("textarea")
+	t.rows = "3"
+	t.block()
+	t.needId()
+	return t
+}
+
+fun Tag.edit(p: Prop): Tag {
+	return this.edit {
+		name = p.userName
+		if (p is Prop0) {
+			value = p.getValue()?.toString() ?: ""
+		}
+	}
+}
+
+fun Tag.edit(block: TagCallback): Tag {
+	return input {
+		type = "text"
+		this.block()
+	}
+}
 
 fun Tag.labelDateRow(labelText: String, nameValue: String, editBlock: Tag.() -> Unit = {}) {
 	formGroupRow {
@@ -69,7 +94,7 @@ fun Tag.labelEditGroup(labelText: String, editName: String, editBlock: Tag.() ->
 	}
 }
 
-fun Tag.labelEditGroup(p: Prop, editBlock: Tag.() -> Unit = {}):Tag {
+fun Tag.labelEditGroup(p: Prop, editBlock: Tag.() -> Unit = {}): Tag {
 	return formGroup {
 		labelEdit(p, editBlock)
 	}
@@ -81,6 +106,37 @@ fun Tag.labelEdit(p: Prop, editBlock: Tag.() -> Unit = {}) {
 	editConfig(ed, p)
 	ed.editBlock()
 	labelConfig(lb, ed)
+}
+
+fun Tag.labelTextAreaGroup(p: Prop, editBlock: Tag.() -> Unit = {}) {
+	formGroup {
+		val pname = p.userName
+		val er = httpContext.httpParams.str(Keb.errField(pname)) ?: ""
+		val lb = this.label { +p.userLabel }
+		val ed = this.textarea {
+			if (er.isNotEmpty()) {
+				addClass(dev.entao.keb.page.B.isInValid)
+			}
+			name = pname
+			rows = (p.findAnnotation<EditRows>()?.value ?: 3).toString()
+			val v = if (p is KProperty0) {
+				p.getValue()?.toString() ?: ""
+			} else {
+				httpContext.httpParams.str(pname) ?: ""
+			}
+			this.textEscaped(v)
+			this.configEditOfProp(p)
+		}
+		if (er.isNotEmpty()) {
+			this.feedbackInvalid(er)
+		}
+		val hb = p.findAnnotation<FormHelpBlock>()?.value
+		if (hb != null && hb.isNotEmpty()) {
+			formTextMuted(hb)
+		}
+		ed.editBlock()
+		labelConfig(lb, ed)
+	}
 }
 
 fun Tag.labelTextAreaRow(p: Prop, editBlock: Tag.() -> Unit = {}) {

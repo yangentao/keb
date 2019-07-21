@@ -3,9 +3,9 @@
 package dev.entao.keb.biz
 
 import dev.entao.keb.core.HttpScope
-import dev.entao.keb.page.card
-import dev.entao.keb.page.cardBody
-import dev.entao.keb.page.cardHeader
+import dev.entao.keb.page.widget.card
+import dev.entao.keb.page.widget.cardBody
+import dev.entao.keb.page.widget.cardHeader
 import dev.entao.keb.page.html.Tag
 import dev.entao.keb.page.sidebarPage
 
