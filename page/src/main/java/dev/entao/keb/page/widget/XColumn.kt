@@ -56,6 +56,8 @@ open class XTextColumn<T>(table: XTable<T>) : XColumn<T>(table) {
 	private var linkProp1: Prop1? = null
 	private var renderButton = false
 
+	var linkTarget: String = ""
+
 	var onCellTextValue: (T) -> String = { "$it" }
 
 	var onCellRenderText: (Tag, String, T) -> Unit = { tag, v, _ ->
@@ -146,12 +148,16 @@ open class XTextColumn<T>(table: XTable<T>) : XColumn<T>(table) {
 
 		if (renderButton) {
 			tdTag.linkButton(ac) { param(v2) }.btnSmall().apply {
-				targetBlank()
+				if (linkTarget.isNotEmpty()) {
+					this.target = linkTarget
+				}
 			}
 		} else {
 			val p = httpContext.actionUri(ac, v2)
 			tdTag.a(v, p).apply {
-				targetBlank()
+				if (linkTarget.isNotEmpty()) {
+					this.target = linkTarget
+				}
 			}
 		}
 	}
@@ -179,8 +185,9 @@ class XPropColumn<T>(table: XTable<T>, val prop: Prop1) : XTextColumn<T>(table) 
 		}
 	}
 
-	fun linkTo(action: KFunction<Unit>) {
+	fun linkTo(action: KFunction<Unit>): XPropColumn<T> {
 		super.linkTo(action, prop)
+		return this
 	}
 }
 

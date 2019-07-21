@@ -5,7 +5,7 @@ import javax.servlet.FilterConfig
 
 class WebDir {
 	//war解压后的目录,  WEB-INF和META-INF所在的目录
-	private lateinit var webRootFile: File
+	  lateinit var webRootFile: File
 	private  var contextPath:String = ""
 
 	@Suppress("UNUSED_PARAMETER")

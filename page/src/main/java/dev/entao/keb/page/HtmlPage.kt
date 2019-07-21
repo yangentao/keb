@@ -103,13 +103,7 @@ fun HttpScope.bootPage(block: HtmlDoc.() -> Unit) {
 			scriptLink("https://buttons.github.io/buttons.js")
 			scriptLink(resUri(R.myJS))
 
-			if (FilesPage::class in httpContext.filter.routeManager.allGroups) {
-				val uploadUri = httpContext.actionUri(FilesPage::uploadAction)
-				val viewUri = httpContext.actionUri(FilesPage::imgAction)
-				val viewParam = FilesPage::imgAction.firstParamName ?: "id"
-				val missImg = httpContext.resUri(R.fileImageDefault)
-				configUpload(uploadUri, viewUri, viewParam, 30, missImg)
-			}
+
 		}
 		this.block()
 	}
