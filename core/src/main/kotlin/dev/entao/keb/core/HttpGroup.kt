@@ -45,6 +45,10 @@ open class HttpScope(val context: HttpContext) {
 		return context.resUri(file)
 	}
 
+	fun redirect(action: KFunction<*>) {
+		context.redirect(context.actionUri(action))
+	}
+
 	fun redirect(action: KFunction<*>, param: Any?) {
 		context.redirect(context.actionUri(action, param))
 	}

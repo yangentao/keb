@@ -1,5 +1,6 @@
 package dev.entao.keb.am.model
 
+import dev.entao.kava.base.Length
 import dev.entao.kava.sql.*
 
 class Account : Model() {

@@ -1,6 +1,7 @@
 package dev.entao.keb.am
 
 import dev.entao.kava.base.Label
+import dev.entao.kava.base.MyDate
 import dev.entao.kava.base.userLabel
 import dev.entao.kava.base.userName
 import dev.entao.kava.sql.AND
@@ -9,6 +10,7 @@ import dev.entao.keb.am.model.Account
 import dev.entao.keb.am.model.ApkVersion
 import dev.entao.keb.core.*
 import dev.entao.keb.page.*
+import dev.entao.keb.page.ex.fromRequest
 import dev.entao.keb.page.ex.showMessagesIfPresent
 import dev.entao.keb.page.ex.writeHtml
 import dev.entao.keb.page.html.*
@@ -18,7 +20,7 @@ import dev.entao.keb.page.widget.*
 class IndexGroup(context: HttpContext) : HttpGroup(context) {
 
 	override fun indexAction() {
-		addAction()
+		listAction()
 	}
 
 	fun logoutAction() {
@@ -119,15 +121,53 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 
 	@Label("列表")
 	fun listAction() {
+		val items = ApkVersion.latest()
 		writePage {
-			p {
-				+" List  "
+			card {
+				cardBody {
+					tableX(items) {
+						column(ApkVersion::id)
+						column(ApkVersion::appName)
+						column(ApkVersion::pkgName)
+						column(ApkVersion::versionCode)
+						column(ApkVersion::versionName)
+						column(ApkVersion::msg)
+						column(ApkVersion::pub_date)
+						columnActionGroup {
+							actionLinkProp(ResGroup::downloadAction, ApkVersion::id)
+							if (context.isLogined) {
+								actionLinkProp(::delpkgAction, ApkVersion::pkgName).reloadPage()
+							}
+						}
+					}
+				}
 			}
 		}
 	}
 
-	fun addResultAction() {
+	@FormConfirm("要删除此项吗? ")
+	@Label("删除")
+	fun delpkgAction(pkg: String) {
+		val ls = ApkVersion.byPkg(pkg)
+		for (a in ls) {
+			ResGroup.deleteRes(context, a.resId)
+		}
+		ApkVersion.delete(ApkVersion::pkgName EQ pkg)
+		resultSender.ok()
+	}
 
+	fun addResultAction() {
+		val m = ApkVersion()
+		m.fromRequest(context)
+		val d = MyDate()
+		m.pub_date = d.sqlDate
+		m.pub_time = d.sqlTime
+		m.pub_datetime = d.time
+		m.account = context.account
+		m.insert()
+		redirect(::listAction) {
+			ok("保存成功")
+		}
 	}
 
 	@NeedLogin
@@ -151,7 +191,6 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 							it.tagName == "input" && it.type == "hidden"
 						}
 						if (resTag != null) {
-							val fid = resTag.genId()
 							scriptBlock {
 								"""
 									Yet.onUploadOK = function(resId){

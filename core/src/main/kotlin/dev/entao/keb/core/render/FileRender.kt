@@ -17,7 +17,7 @@ open class FileSender(val context: HttpContext) {
 	}
 
 	fun attach(file: File, contentType: String = Mimes.ofFile(file.name), filename: String = file.name) {
-		sendFile(true, file, filename, contentType)
+		sendFile(true, file, contentType, filename)
 	}
 
 	private fun sendFile(isAttach: Boolean, file: File, contentType: String, filename: String) {

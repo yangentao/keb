@@ -135,6 +135,7 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 			return Mimes.HTML in request.header("Accept") ?: ""
 		}
 
+	@Suppress("UNUSED_PARAMETER")
 	fun allow(uri: String): Boolean {
 		return true
 	}

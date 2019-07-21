@@ -8,6 +8,7 @@ class WebDir {
 	private lateinit var webRootFile: File
 	private  var contextPath:String = ""
 
+	@Suppress("UNUSED_PARAMETER")
 	fun onConfig(filter: HttpFilter, filterConfig: FilterConfig) {
 		webRootFile = File(filterConfig.servletContext.getRealPath("/"))
 		this.contextPath = filterConfig.servletContext.contextPath

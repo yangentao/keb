@@ -45,6 +45,7 @@ class ResItem : Model() {
 	companion object : ModelClass<ResItem>() {
 
 
+		@Suppress("UNUSED_PARAMETER")
 		fun fromContext(context: HttpContext): List<Parent<ResItem>> {
 			val nodeList = ArrayList<Parent<ResItem>>()
 //			val ps = context.filter.allPages.filter { it.hasAnnotation<NavItem>() }.sortedBy {

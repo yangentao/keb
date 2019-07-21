@@ -26,6 +26,7 @@ class HttpActionManager {
 	val routeMap = HashMap<String, Router>(32)
 	private lateinit var filter: HttpFilter
 
+	@Suppress("UNUSED_PARAMETER")
 	fun onConfig(filter: HttpFilter, config: FilterConfig) {
 		this.filter = filter
 	}

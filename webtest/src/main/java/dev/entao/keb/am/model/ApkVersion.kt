@@ -3,6 +3,7 @@ package dev.entao.keb.am.model
 import dev.entao.kava.base.Label
 import dev.entao.kava.base.Name
 import dev.entao.kava.sql.*
+import dev.entao.keb.page.FormRequired
 import java.sql.Date
 import java.sql.Time
 
@@ -13,15 +14,19 @@ class ApkVersion : Model() {
 	@AutoInc
 	var id: Int  by model
 
+	@FormRequired
 	@Label("APP名称")
 	var appName: String by model
 
+	@FormRequired
 	@Label("包名")
 	var pkgName: String by model
 
+	@FormRequired
 	@Label("VersionCode")
 	var versionCode: Int   by model
 
+	@FormRequired
 	@Label("VersionName")
 	var versionName: String   by model
 
@@ -44,6 +49,8 @@ class ApkVersion : Model() {
 	var pub_date: Date by model
 	@Label("上传时间")
 	var pub_time: Time by model
+
+	var account:String by model
 
 	companion object : ModelClass<ApkVersion>() {
 

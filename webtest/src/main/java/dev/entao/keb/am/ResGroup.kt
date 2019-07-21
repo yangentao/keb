@@ -2,6 +2,7 @@
 
 package dev.entao.keb.am
 
+import dev.entao.kava.base.Label
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpGroup
 import dev.entao.keb.page.ex.Upload
@@ -22,7 +23,6 @@ import javax.servlet.http.Part
  */
 
 class ResGroup(context: HttpContext) : HttpGroup(context) {
-
 
 
 	override fun indexAction() {
@@ -58,6 +58,7 @@ class ResGroup(context: HttpContext) : HttpGroup(context) {
 		}
 	}
 
+	@Label("下载")
 	fun downloadAction(id: Int) {
 		sendFile(id, false)
 	}
@@ -109,6 +110,13 @@ class ResGroup(context: HttpContext) : HttpGroup(context) {
 	}
 
 	companion object {
+
+		fun deleteRes(context: HttpContext, id: Int) {
+			val item = Upload.findOne(Upload::id EQ id) ?: return
+			val file = item.localFile(context)
+			file.delete()
+			item.deleteByKey()
+		}
 
 		fun configRes(tag: Tag) {
 			if (ResGroup::class in tag.httpContext.filter.routeManager.allGroups) {
