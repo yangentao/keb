@@ -72,6 +72,7 @@ abstract class HttpFilter : Filter {
 		Yog.setPrinter(YogDir(webDir.logDir, 15))
 		logd("Server Start!")
 
+		routeManager.filter = this
 		addSlice(routeManager)
 		addSlice(timerSlice)
 		addSlice(MethodAcceptor)

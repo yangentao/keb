@@ -49,6 +49,7 @@ object MethodAcceptor : HttpSlice {
 	}
 
 }
+
 object LoginCheckSlice : HttpSlice {
 
 	override fun beforeService(context: HttpContext, router: Router): Boolean {
@@ -69,7 +70,6 @@ object LoginCheckSlice : HttpSlice {
 		return true
 	}
 }
-
 
 class TimerSlice : HttpSlice {
 
@@ -150,16 +150,11 @@ class TimerSlice : HttpSlice {
 
 }
 
-
-class HttpActionManager: HttpSlice {
+class HttpActionManager : HttpSlice {
 	val allGroups = ArrayList<KClass<out HttpGroup>>()
 	val routeMap = HashMap<String, Router>(32)
-	private lateinit var filter: HttpFilter
 
-	@Suppress("UNUSED_PARAMETER")
-	override fun onConfig(filter: HttpFilter, config: FilterConfig) {
-		this.filter = filter
-	}
+	lateinit var filter: HttpFilter
 
 	override fun onDestory() {
 		routeMap.clear()
