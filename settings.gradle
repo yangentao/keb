@@ -1,4 +1,4 @@
-include ':webtest'
+include ':app'
 include ':biz'
 include ':core'
 include ':page'
