@@ -1,6 +1,6 @@
 package dev.entao.keb.page.widget
 
-import dev.entao.keb.page.*
+import dev.entao.keb.page.P
 import dev.entao.keb.page.tag.Tag
 import dev.entao.keb.page.tag.TagCallback
 import dev.entao.keb.page.tag.div

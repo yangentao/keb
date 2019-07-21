@@ -4,13 +4,12 @@ import dev.entao.kava.base.removeAllIf
 import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.HttpScope
 import dev.entao.keb.core.isSubpath
-import dev.entao.keb.page.B
-import dev.entao.keb.page.LinkItem
-import dev.entao.keb.page.R
-import dev.entao.keb.page.html
-import dev.entao.keb.page.showMessagesIfPresent
+import dev.entao.keb.page.*
 import dev.entao.keb.page.tag.*
-import dev.entao.keb.page.widget.*
+import dev.entao.keb.page.widget.a
+import dev.entao.keb.page.widget.button
+import dev.entao.keb.page.widget.flex
+import dev.entao.keb.page.widget.installDialogs
 import kotlin.reflect.KClass
 
 fun HttpScope.sidebarPage(block: Tag.() -> Unit) {

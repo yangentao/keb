@@ -1,9 +1,11 @@
 package dev.entao.keb.page.tag
 
+import dev.entao.kava.base.Name
+import dev.entao.kava.base.notEmpty
 import dev.entao.keb.core.HttpContext
-import dev.entao.kava.base.*
-import dev.entao.keb.page.*
 import dev.entao.keb.page.HtmlTemplate
+import dev.entao.keb.page.attrVal
+import dev.entao.keb.page.ident
 import java.util.*
 
 open class Tag(val httpContext: HttpContext, var tagName: String) : HtmlTemplate {

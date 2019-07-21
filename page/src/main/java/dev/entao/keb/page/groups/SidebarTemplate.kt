@@ -6,8 +6,6 @@ import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpGroup
 import dev.entao.keb.core.HttpScope
 import dev.entao.keb.page.*
-import dev.entao.keb.page.HtmlTemplate
-import dev.entao.keb.page.showMessagesIfPresent
 import dev.entao.keb.page.tag.*
 import dev.entao.keb.page.widget.*
 import kotlin.reflect.KClass

@@ -1,7 +1,6 @@
 package dev.entao.keb.am.model
 
 import dev.entao.kava.base.Label
-import dev.entao.kava.base.Name
 import dev.entao.kava.sql.*
 import dev.entao.keb.page.FormRequired
 import java.sql.Date

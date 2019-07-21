@@ -4,7 +4,7 @@ import dev.entao.kava.base.isTypeBoolean
 import dev.entao.kava.base.isTypeInt
 import dev.entao.kava.base.isTypeString
 import dev.entao.kava.base.userName
-import java.util.HashMap
+import java.util.*
 import kotlin.reflect.KProperty
 
 @Suppress("UNCHECKED_CAST")

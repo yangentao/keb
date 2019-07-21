@@ -1,9 +1,11 @@
 package dev.entao.keb.page.widget
 
-import dev.entao.keb.page.*
 import dev.entao.kava.base.*
-import dev.entao.keb.core.*
-import dev.entao.keb.page.B
+import dev.entao.keb.core.Keb
+import dev.entao.keb.core.MaxValue
+import dev.entao.keb.core.MinValue
+import dev.entao.keb.core.ValueRange
+import dev.entao.keb.page.*
 import dev.entao.keb.page.tag.Tag
 import dev.entao.keb.page.tag.TagCallback
 import dev.entao.keb.page.tag.div
