@@ -1,9 +1,53 @@
+@file:Suppress("FunctionName", "unused")
+
 package dev.entao.keb.page.ex
 
 import dev.entao.kava.base.*
 import dev.entao.kava.sql.*
-import dev.entao.keb.core.*
+import dev.entao.keb.core.HttpContext
+import dev.entao.keb.core.HttpScope
+import dev.entao.keb.core.param
+import dev.entao.keb.core.paramNameSet
+import dev.entao.keb.page.P
 import javax.servlet.http.HttpServletRequest
+
+fun SQLQuery.limitPage(context: HttpContext) {
+	val n = context.httpParams.int(P.pageN) ?: 0
+	this.limit(P.pageSize, n * P.pageSize)
+}
+
+class OrderParam(val context: HttpContext, p: Prop1, desc: Boolean = true) {
+
+	val sortBy: String
+	val desc: Boolean
+
+	init {
+		val ascKey = context.httpParams.str(P.ascKey)
+		val descKey = context.httpParams.str(P.descKey)
+
+		this.sortBy = ascKey ?: descKey ?: p.userName
+		this.desc = if (ascKey == null && descKey == null) {
+			desc
+		} else {
+			descKey != null
+		}
+
+	}
+}
+
+fun HttpScope.OrderBy(p: Prop1, desc: Boolean = true): OrderParam {
+	return OrderParam(context, p, desc)
+}
+
+fun SQLQuery.orderBy(sp: OrderParam) {
+	if (sp.sortBy.isNotEmpty()) {
+		if (sp.desc) {
+			desc(sp.sortBy)
+		} else {
+			asc(sp.sortBy)
+		}
+	}
+}
 
 fun HttpScope.EQ(vararg ps: Prop1): Where? {
 	var w: Where? = null
@@ -92,3 +136,5 @@ fun Model.fromRequest(req: HttpServletRequest) {
 		}
 	}
 }
+
+

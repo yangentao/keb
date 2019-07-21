@@ -1,4 +1,4 @@
-package dev.entao.keb.page.ex
+package dev.entao.keb.page.modules
 
 import dev.entao.keb.core.HttpContext
 import dev.entao.kava.base.DefaultValue

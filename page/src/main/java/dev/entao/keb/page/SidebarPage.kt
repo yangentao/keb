@@ -5,6 +5,7 @@ import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.HttpScope
 import dev.entao.keb.core.Keb
 import dev.entao.keb.core.isSubpath
+import dev.entao.keb.page.ex.html
 import dev.entao.keb.page.html.*
 import dev.entao.keb.page.widget.*
 import kotlin.reflect.KClass

@@ -1,20 +1,14 @@
 @file:Suppress("unused")
 
-package dev.entao.keb.page
+package dev.entao.keb.page.ex
 
-import dev.entao.kava.sql.SQLQuery
-import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpScope
+import dev.entao.keb.page.R
 import dev.entao.keb.page.html.*
 import dev.entao.keb.page.widget.DialogBuild
 import dev.entao.keb.page.widget.button
 
-fun SQLQuery.limitPage(context: HttpContext) {
-	val n = context.httpParams.int(P.pageN) ?: 0
-	this.limit(P.pageSize, n * P.pageSize)
-}
-
-fun HttpScope.formError(title: String, msg: String) {
+fun HttpScope.formErrorDialog(title: String, msg: String) {
 	val d = DialogBuild(context)
 	d.modal.outputScript = true
 	d.title(title)

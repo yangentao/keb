@@ -1,11 +1,10 @@
 @file:Suppress("unused")
 
-package dev.entao.keb.page.groups
+package dev.entao.keb.page.modules
 
 import dev.entao.kava.base.Label
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpGroup
-import dev.entao.keb.page.ex.Upload
 import dev.entao.kava.base.Mimes
 import dev.entao.kava.base.firstParamName
 import dev.entao.kava.sql.EQ

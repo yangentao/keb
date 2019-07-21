@@ -3,7 +3,7 @@ package dev.entao.keb.page.widget
 import dev.entao.kava.base.*
 import dev.entao.kava.json.YsonObject
 import dev.entao.kava.sql.ModelMap
-import dev.entao.keb.page.ex.Upload
+import dev.entao.keb.page.modules.Upload
 import dev.entao.keb.core.HttpAction
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.UriMake
