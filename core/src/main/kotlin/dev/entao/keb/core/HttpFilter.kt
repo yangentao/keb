@@ -38,9 +38,9 @@ abstract class HttpFilter : Filter {
 		private set
 
 	val webDir = WebDir()
-	val routeManager = HttpActionManager()
 
 	private val sliceList = ArrayList<HttpSlice>()
+	val routeManager = HttpActionManager()
 	val timerSlice = TimerSlice()
 
 	val allGroups: ArrayList<KClass<out HttpGroup>> get() = routeManager.allGroups
@@ -71,12 +71,11 @@ abstract class HttpFilter : Filter {
 		Yog.setPrinter(YogDir(webDir.logDir, 15))
 		logd("Server Start!")
 
-		routeManager.onConfig(this, filterConfig)
-		addRouterOfThis()
-
+		addSlice(routeManager)
 		addSlice(timerSlice)
 		addSlice(MethodAcceptor)
 		addSlice(LoginCheckSlice)
+		addRouterOfThis()
 
 		try {
 			onInit()
@@ -100,7 +99,6 @@ abstract class HttpFilter : Filter {
 	}
 
 	final override fun destroy() {
-		routeManager.onDestory()
 		for (hs in sliceList) {
 			hs.onDestory()
 		}
