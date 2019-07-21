@@ -73,7 +73,7 @@ class XTable<T>(tableParent: Tag, val items: List<T>) {
 		return c
 	}
 
-	fun columnRes(p: Prop1) {
+	fun columnRes(p: Prop1, downAction: HttpAction) {
 		this.column(p).apply {
 			this.onCellTextValue = { item ->
 				val v: Int? = p.getValue(item as Any) as? Int
@@ -83,7 +83,7 @@ class XTable<T>(tableParent: Tag, val items: List<T>) {
 					Upload.findByKey(v)?.rawname ?: ""
 				}
 			}
-			this.linkTo(FilesPage::downloadAction, p)
+			this.linkTo(downAction, p)
 		}
 	}
 

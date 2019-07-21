@@ -78,12 +78,12 @@ open class XTextColumn<T>(table: XTable<T>) : XColumn<T>(table) {
 		}
 	}
 
-	fun linkTo(action: KFunction<Unit>, p1: Prop1?) {
+	fun linkTo(action: HttpAction, p1: Prop1?) {
 		linkAction = action
 		this.linkProp1 = p1
 	}
 
-	fun buttonTo(action: KFunction<Unit>, p1: Prop1?) {
+	fun buttonTo(action: HttpAction, p1: Prop1?) {
 		linkAction = action
 		this.linkProp1 = p1
 		renderButton = true

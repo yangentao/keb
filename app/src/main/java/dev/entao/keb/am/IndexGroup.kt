@@ -15,6 +15,8 @@ import dev.entao.keb.page.ex.Upload
 import dev.entao.keb.page.ex.fromRequest
 import dev.entao.keb.page.ex.showMessagesIfPresent
 import dev.entao.keb.page.ex.writeHtml
+import dev.entao.keb.page.groups.BootTemplate
+import dev.entao.keb.page.groups.ResGroup
 import dev.entao.keb.page.html.*
 import dev.entao.keb.page.widget.*
 import net.dongliu.apk.parser.ApkFile

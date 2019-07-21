@@ -63,3 +63,18 @@ annotation class ActionPrimary
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ActionTheme(val value: String)
+
+//step属性
+@Target(AnnotationTarget.PROPERTY,
+		AnnotationTarget.FIELD,
+		AnnotationTarget.VALUE_PARAMETER
+)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class StepValue(val value: String)
+
+
+//@ColumnWidth("50px");,
+//@ColumnWidth("30%");,
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class ColumnWidth(val value: String)

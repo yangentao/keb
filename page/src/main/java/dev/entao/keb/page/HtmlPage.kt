@@ -2,13 +2,11 @@
 
 package dev.entao.keb.page
 
-import dev.entao.kava.base.firstParamName
 import dev.entao.kava.sql.SQLQuery
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpScope
 import dev.entao.keb.page.html.*
 import dev.entao.keb.page.widget.button
-import dev.entao.keb.page.widget.configUpload
 
 fun SQLQuery.limitPage(context: HttpContext) {
 	val n = context.httpParams.int(P.pageN) ?: 0

@@ -1,4 +1,4 @@
-package dev.entao.keb.am
+package dev.entao.keb.page.groups
 
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpScope

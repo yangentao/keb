@@ -1,7 +1,5 @@
-package dev.entao.keb.page.templates
+package dev.entao.keb.page.groups
 
-import dev.entao.kava.base.firstParamName
-import dev.entao.kava.base.ownerClass
 import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.HttpAction
 import dev.entao.keb.core.HttpContext
@@ -12,7 +10,6 @@ import dev.entao.keb.page.ex.HtmlTemplate
 import dev.entao.keb.page.html.*
 import dev.entao.keb.page.widget.a
 import dev.entao.keb.page.widget.button
-import dev.entao.keb.page.widget.configUpload
 import kotlin.reflect.KClass
 
 class SidebarPage(override val context: HttpContext) : HttpScope, HtmlTemplate {
@@ -148,13 +145,7 @@ class SidebarPage(override val context: HttpContext) : HttpScope, HtmlTemplate {
 			scriptLink(R.JS.boot)
 			scriptLink("https://buttons.github.io/buttons.js")
 			scriptLink(resUri(R.myJS))
-			if (FilesPage::class in httpContext.filter.routeManager.allGroups) {
-				val uploadUri = httpContext.actionUri(FilesPage::uploadAction)
-				val viewUri = httpContext.actionUri(FilesPage::imgAction)
-				val viewParam = FilesPage::imgAction.firstParamName ?: "id"
-				val missImg = httpContext.resUri(R.fileImageDefault)
-				configUpload(uploadUri, viewUri, viewParam, 30, missImg)
-			}
+
 		}
 	}
 

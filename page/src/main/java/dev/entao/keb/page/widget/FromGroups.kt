@@ -3,7 +3,6 @@ package dev.entao.keb.page.widget
 import dev.entao.kava.base.*
 import dev.entao.keb.page.FormHelpBlock
 import dev.entao.keb.page.*
-import dev.entao.keb.page.TConst.class_
 import dev.entao.keb.page.html.*
 import kotlin.reflect.KProperty0
 import kotlin.reflect.full.findAnnotation
