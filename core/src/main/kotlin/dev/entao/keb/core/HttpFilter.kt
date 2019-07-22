@@ -152,6 +152,7 @@ abstract class HttpFilter : Filter {
 				request.characterEncoding = "UTF-8"
 				response.characterEncoding = "UTF-8"
 				val c = HttpContext(this, request, response, chain)
+
 				for (hs in sliceList) {
 					hs.beforeAll(c)
 				}

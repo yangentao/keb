@@ -21,11 +21,11 @@ class DefaultPermAcceptor : PermAcceptor {
 	private val accessMap = HashMap<String, Int>()
 
 	override fun prepare(context: HttpContext) {
-		val aid = context.accountId
-		if (aid < 0) {
+		val aid = context.account
+		if (aid.isEmpty()) {
 			return
 		}
-		val ac = Account.findByKey(aid)
+		val ac = Account.findByPhone(aid)
 		if (ac != null) {
 			ResAccess.findAll(ResAccess::objId to ac.deptId, ResAccess::objType to ResAccess.TDept).forEach {
 				accessMap[it.uri] = it.judge
@@ -44,7 +44,7 @@ class DefaultPermAcceptor : PermAcceptor {
 			return true
 		}
 		val uu = uri.substringBefore('?')
-		if (context.accountId == 0) {
+		if (context.account.isEmpty()) {
 			return true
 		}
 		val n = accessMap[uu] ?: return true
@@ -123,56 +123,6 @@ class TableLimitTimer(private val cls: KClass<out Model>, limitValue: Int = 0) :
 
 }
 
-//需要登录后请求
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.VALUE_PARAMETER)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class LoginApp
 
-//需要登录后请求
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.VALUE_PARAMETER)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class LoginWeb
-
-object AuthAppAcceptor : HttpSlice {
-	override fun beforeService(context: HttpContext, router: Router): Boolean {
-		context.os = context.httpParams.str("os") ?: ""
-		context.token = context.httpParams.str(HttpContext.TOKEN) ?: ""
-		val needLoginApp: Boolean = router.function.hasAnnotation<LoginApp>() || router.cls.hasAnnotation<LoginApp>()
-		if (context.token.isNotEmpty()) {
-			val t = TokenTable.findOne((TokenTable::token EQ context.token) AND (TokenTable::type EQ context.os))
-			if (t != null && !t.isExpired) {
-				context.userId = t.userId.toInt()
-			}
-		}
-		if (needLoginApp && context.userId == 0) {
-			ResultRender(context).failed("未登录")
-			return false
-		}
-		return true
-	}
-}
-
-object AuthWebAcceptor : HttpSlice {
-	override fun beforeService(context: HttpContext, router: Router): Boolean {
-		context.accountId = context.getSession(HttpContext.ACCOUNT_ID)?.toIntOrNull() ?: 0
-
-		val needLoginWeb: Boolean = router.function.hasAnnotation<LoginWeb>() || router.cls.hasAnnotation<LoginWeb>()
-
-		if (needLoginWeb && context.accountId == 0) {
-			val url = Url(context.filter.webConfig.loginUri)
-			val q = context.request.queryString
-			val burl = if (q != null && q.isNotEmpty()) {
-				context.request.requestURL.toString() + "?" + q
-			} else {
-				context.request.requestURL.toString()
-			}
-			url.replace(Keb.BACK_URL, burl.base64Encoded)
-			context.redirect(url.build())
-			return false
-		}
-
-		return true
-	}
-}
 
 

@@ -56,7 +56,7 @@ class Router(val uri: String, val function: KFunction<*>, obj: Any? = null) {
 			is ParamError -> {
 				ex.printStackTrace()
 				if (context.acceptJson) {
-					ResultRender(context).failed("参数错误:${ex.message}")
+					context.resultSender.failed("参数错误:${ex.message}")
 				} else {
 					context.backward { error(ex.message ?: "参数错误") }
 				}

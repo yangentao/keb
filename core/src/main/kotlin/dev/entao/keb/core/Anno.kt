@@ -85,3 +85,12 @@ val HttpAction.isNeedLogin: Boolean
 		return this.hasAnnotation<NeedLogin>() || this.ownerClass!!.hasAnnotation<NeedLogin>()
 	}
 
+//需要token验证
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class NeedToken
+
+val HttpAction.isNeedToken: Boolean
+	get() {
+		return this.hasAnnotation<NeedToken>() || this.ownerClass!!.hasAnnotation<NeedToken>()
+	}

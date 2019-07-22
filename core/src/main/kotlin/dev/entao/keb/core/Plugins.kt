@@ -8,6 +8,7 @@ import dev.entao.kava.log.Yog
 import dev.entao.kava.log.fatal
 import dev.entao.kava.log.logd
 import dev.entao.kava.log.loge
+import dev.entao.keb.core.util.JWT
 import java.util.*
 import javax.servlet.FilterConfig
 import kotlin.reflect.KClass
@@ -187,4 +188,40 @@ class HttpActionManager : HttpSlice {
 		logd("Add Router: ", u)
 	}
 
+}
+
+//override fun onInit() {
+//	addSlice(TokenSlice("99665588"))
+//}
+class TokenSlice(private val pwd: String) : HttpSlice {
+
+	override fun beforeAll(context: HttpContext) {
+		val a = context.request.header("Authorization") ?: return
+		val b = a.substringAfter("Bearer ", "").trim()
+		val token = if (b.isEmpty()) {
+			context.request.param("access_token") ?: return
+		} else {
+			b
+		}
+		if (token.isEmpty()) {
+			return
+		}
+		val j = JWT(pwd, token)
+		context.tokenOK = j.OK
+		context.accessToken = token
+		if (j.OK) {
+			context.tokenHeader = j.header
+			context.tokenBody = j.body
+		}
+	}
+
+	override fun beforeService(context: HttpContext, router: Router): Boolean {
+		if (router.function.isNeedToken) {
+			if (!context.tokenOK) {
+				context.abort(401)
+				return false
+			}
+		}
+		return true
+	}
 }

@@ -15,9 +15,7 @@ import kotlin.reflect.KFunction
 
 open class HttpGroup(final override val context: HttpContext) : HttpScope {
 
-	val resultSender: ResultRender by lazy {
-		ResultRender(context)
-	}
+	val resultSender: ResultRender get() = context.resultSender
 
 	open fun indexAction() {
 		context.abort(404)

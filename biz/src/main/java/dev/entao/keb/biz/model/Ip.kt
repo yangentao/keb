@@ -71,8 +71,7 @@ class Ip : Model() {
 			}
 
 			ip.agent = req.headerUserAgent ?: ""
-			ip.appUserId = context.userId.toString()
-			ip.accountId = context.accountId.toString()
+			ip.accountId = context.account
 			val d = System.currentTimeMillis()
 			ip.reqDate = java.sql.Date(d)
 			ip.reqTime = java.sql.Time(d)

@@ -5,9 +5,10 @@ package dev.entao.keb.core
 import dev.entao.kava.base.Mimes
 import dev.entao.kava.base.firstParamName
 import dev.entao.keb.core.render.FileSender
+import dev.entao.keb.core.render.ResultRender
+import dev.entao.keb.core.util.AnyMap
 import java.io.File
 import java.net.URLEncoder
-import java.util.*
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -25,38 +26,37 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	val fileSender: FileSender by lazy {
 		FileSender(this)
 	}
+	val resultSender: ResultRender by lazy {
+		ResultRender(this)
+	}
 	val httpParams: HttpParams  by lazy {
 		HttpParams(this)
 	}
 
 	val currentUri: String = request.requestURI.trimEnd('/').toLowerCase()
 
-	val ctxMap = HashMap<String, Any>()
+	val propMap = AnyMap()
 
-	var os: String = ""
-	var token: String = ""
-	var userId: Int = 0
-	var accountId: Int = 0
-	var userName: String = ""
+	//解析后的app传来的access_token
+	var accessToken: String by propMap
+	var tokenBody: String by propMap
+	var tokenHeader: String by propMap
+	var tokenOK: Boolean by propMap
 
-	val loginedApp: Boolean get() = userId != 0
-	val loginedWeb: Boolean get() = accountId != 0
-
+	//web登录成功后, 设置account和accountName
 	fun setLoginAccount(account: String) {
 		putSession(Keb.ACCOUNT, account)
 	}
 
+	//登出后调用, 清除session
 	fun clearLoginAccount() {
 		removeSession(Keb.ACCOUNT)
 	}
 
+	//web登录成功后, 设置account和accountName
 	val account: String
 		get() {
 			return getSession(Keb.ACCOUNT) ?: ""
-		}
-	val isLogined: Boolean
-		get() {
-			return account.isNotEmpty()
 		}
 	var accountName: String
 		get() {
@@ -68,6 +68,10 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 		}
 		set(value) {
 			putSession(Keb.ACCOUNT_NAME, value)
+		}
+	val isLogined: Boolean
+		get() {
+			return account.isNotEmpty()
 		}
 
 	val rootUri: String
@@ -120,15 +124,6 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	fun writeJSON(s: String) {
 		this.response.contentType = Mimes.JSON
 		this.response.writer.write(s)
-	}
-
-	fun loginWeb(accountId: Int) {
-		putSession(ACCOUNT_ID, accountId.toString())
-	}
-
-	fun logoutWeb() {
-		removeSession(ACCOUNT_ID)
-		accountId = 0
 	}
 
 	val acceptJson: Boolean
@@ -214,8 +209,4 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	val uploadDir: File get() = filter.webDir.uploadDir
 	val tmpDir: File get() = filter.webDir.tmpDir
 
-	companion object {
-		const val ACCOUNT_ID = "accountId"
-		const val TOKEN = "token"
-	}
 }
