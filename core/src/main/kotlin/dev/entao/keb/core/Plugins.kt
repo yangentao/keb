@@ -224,4 +224,12 @@ class TokenSlice(private val pwd: String) : HttpSlice {
 		}
 		return true
 	}
+
+	fun makeToken(body: String): String {
+		return makeToken(body, """{"alg":"HS256","typ":"JWT"}""")
+	}
+
+	fun makeToken(body: String, header: String): String {
+		return JWT.make(pwd, body, header)
+	}
 }
