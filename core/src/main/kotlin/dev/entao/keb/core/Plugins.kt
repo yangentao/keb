@@ -193,13 +193,13 @@ class HttpActionManager : HttpSlice {
 }
 
 class TokenModel(val yo: YsonObject = YsonObject()) {
-	var userId: String by yo
+	var userId: Long by yo
 	var userName: String by yo
 	var expireTime: Long by yo
 
 	val expired: Boolean
 		get() {
-			if (expireTime != 0L && expireTime != -1L) {
+			if (expireTime != 0L) {
 				return System.currentTimeMillis() >= expireTime
 			}
 			return false
@@ -215,8 +215,9 @@ val HttpContext.tokenModel: TokenModel?
 		return null
 	}
 
-fun HttpContext.makeToken(userId: String, userName: String, expireTime: Long): String? {
-	val ts = this.filter.sliceList.find { it is TokenSlice } as? TokenSlice ?: return null
+fun HttpContext.makeToken(userId: Long, userName: String, expireTime: Long): String {
+	val ts = this.filter.sliceList.find { it is TokenSlice } as? TokenSlice
+			?: throw IllegalAccessError("没有找到TokenSlice")
 	val m = TokenModel()
 	m.userId = userId
 	m.userName = userName
@@ -246,8 +247,13 @@ class TokenSlice(val pwd: String) : HttpSlice {
 
 	override fun beforeService(context: HttpContext, router: Router): Boolean {
 		if (router.function.isNeedToken) {
-			val ok = context.jwtValue?.OK ?: false
-			if (!ok) {
+//			val ok = context.jwtValue?.OK ?: false
+//			if (!ok) {
+//				context.abort(401)
+//				return false
+//			}
+			val ex = context.tokenModel?.expired ?: true
+			if (ex) {
 				context.abort(401)
 				return false
 			}

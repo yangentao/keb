@@ -8,7 +8,7 @@ import javax.servlet.annotation.MultipartConfig
 import javax.servlet.annotation.WebFilter
 
 @MultipartConfig
-@WebFilter(urlPatterns = ["/s/*"])
+@WebFilter(urlPatterns = ["/*"])
 class MainFilter : HttpFilter() {
 
 	override fun cleanThreadLocals() {
@@ -17,7 +17,7 @@ class MainFilter : HttpFilter() {
 
 	override fun onInit() {
 		addSlice(TokenSlice("speak123"))
-		addGroup(IndexGroup::class, ResGroup::class, ApkGroup::class)
+		addGroup(ResGroup::class, AppGroup::class)
 	}
 
 }

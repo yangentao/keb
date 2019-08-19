@@ -7,8 +7,9 @@ class Account : Model() {
 
 	@PrimaryKey
 	@AutoInc
-	var id: Int by model
+	var id: Long by model
 
+	@Unique
 	@Index
 	@Length(32)
 	var phone: String by model
