@@ -40,7 +40,7 @@ abstract class HttpFilter : Filter {
 
 	val webDir = WebDir()
 
-	private val sliceList = ArrayList<HttpSlice>()
+	val sliceList = ArrayList<HttpSlice>()
 	val routeManager = HttpActionManager()
 	val timerSlice = TimerSlice()
 

@@ -1,4 +1,4 @@
-package dev.entao.keb.am
+package dev.entao.speak
 
 import dev.entao.kava.apk.apkInfo
 import dev.entao.kava.base.Hex

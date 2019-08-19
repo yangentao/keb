@@ -1,4 +1,4 @@
-package dev.entao.keb.am
+package dev.entao.speak
 
 import dev.entao.kava.base.Label
 import dev.entao.kava.base.MyDate
@@ -7,8 +7,8 @@ import dev.entao.kava.base.userName
 import dev.entao.kava.qr.QRImage
 import dev.entao.kava.sql.AND
 import dev.entao.kava.sql.EQ
-import dev.entao.keb.am.model.Account
-import dev.entao.keb.am.model.ApkVersion
+import dev.entao.speak.model.Account
+import dev.entao.speak.model.ApkVersion
 import dev.entao.keb.core.*
 import dev.entao.keb.page.*
 import dev.entao.keb.page.groups.BootTemplate
@@ -44,7 +44,7 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 	}
 
 	fun logoutAction() {
-		context.clearLoginAccount()
+		context.account = ""
 		context.redirect(::indexAction.uri)
 	}
 
@@ -57,7 +57,7 @@ class IndexGroup(context: HttpContext) : HttpGroup(context) {
 			}
 			return
 		}
-		context.setLoginAccount(username)
+		context.account = username
 
 		val back = httpParams.str(Keb.BACK_URL) ?: ""
 		if (back.isNotEmpty()) {

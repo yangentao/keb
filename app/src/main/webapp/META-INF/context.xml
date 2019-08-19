@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/test" allowCasualMultipartParsing="true">
-    <Resource name="jdbc/test"
-              username="test"
-              password="test"
-              url="jdbc:mysql://app800.cn:3306/test?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=Hongkong"
+<Context path="/speak" allowCasualMultipartParsing="true">
+    <Resource name="jdbc/speak"
+              username="speak"
+              password="speak"
+              url="jdbc:mysql://app800.cn:3306/speak?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=Hongkong"
               auth="Container"
               type="javax.sql.DataSource"
               maxIdle="3"

@@ -1,4 +1,4 @@
-package dev.entao.keb.am
+package dev.entao.speak
 
 import dev.entao.kava.sql.ConnLook
 import dev.entao.keb.core.HttpFilter
@@ -8,7 +8,7 @@ import javax.servlet.annotation.MultipartConfig
 import javax.servlet.annotation.WebFilter
 
 @MultipartConfig
-@WebFilter(urlPatterns = ["/*"])
+@WebFilter(urlPatterns = ["/s/*"])
 class MainFilter : HttpFilter() {
 
 	override fun cleanThreadLocals() {
@@ -16,10 +16,8 @@ class MainFilter : HttpFilter() {
 	}
 
 	override fun onInit() {
-
+		addSlice(TokenSlice("speak123"))
 		addGroup(IndexGroup::class, ResGroup::class, ApkGroup::class)
-		val a = TokenSlice("99665588")
-		addSlice(a)
 	}
 
 }

@@ -7,6 +7,7 @@ import dev.entao.kava.base.firstParamName
 import dev.entao.keb.core.render.FileSender
 import dev.entao.keb.core.render.ResultRender
 import dev.entao.keb.core.util.AnyMap
+import dev.entao.keb.core.util.JWT
 import java.io.File
 import java.net.URLEncoder
 import javax.servlet.FilterChain
@@ -38,25 +39,19 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	val propMap = AnyMap()
 
 	//解析后的app传来的access_token
-	var accessToken: String by propMap
-	var tokenBody: String by propMap
-	var tokenHeader: String by propMap
-	var tokenOK: Boolean by propMap
+	var jwtValue: JWT? = null
 
 	//web登录成功后, 设置account和accountName
-	fun setLoginAccount(account: String) {
-		putSession(Keb.ACCOUNT, account)
-	}
-
-	//登出后调用, 清除session
-	fun clearLoginAccount() {
-		removeSession(Keb.ACCOUNT)
-	}
-
-	//web登录成功后, 设置account和accountName
-	val account: String
+	var account: String
 		get() {
 			return getSession(Keb.ACCOUNT) ?: ""
+		}
+		set(value) {
+			if (value.isEmpty()) {
+				this.removeSession(Keb.ACCOUNT)
+			} else {
+				putSession(Keb.ACCOUNT, value)
+			}
 		}
 	var accountName: String
 		get() {

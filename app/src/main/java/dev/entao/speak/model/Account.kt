@@ -1,4 +1,4 @@
-package dev.entao.keb.am.model
+package dev.entao.speak.model
 
 import dev.entao.kava.base.Length
 import dev.entao.kava.sql.*
