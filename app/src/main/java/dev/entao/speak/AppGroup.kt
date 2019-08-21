@@ -4,9 +4,21 @@ import dev.entao.kava.sql.AND
 import dev.entao.kava.sql.EQ
 import dev.entao.keb.core.*
 import dev.entao.speak.model.Account
+import dev.entao.speak.model.Speaker
 import dev.entao.speak.model.UserDir
 
 class AppGroup(context: HttpContext) : HttpGroup(context) {
+
+	@NeedToken
+	fun speakerListAction() {
+		val w = (Speaker::flag EQ 0) AND (Speaker::userId EQ context.userId)
+		val ls = Speaker.findAll(w) {
+			asc(Speaker::id)
+		}
+		context.resultSender.arr(ls) {
+			it.toJsonClient()
+		}
+	}
 
 	fun loginAction(user: String, pwd: String) {
 		val a = Account.findOne((Account::phone EQ user) AND (Account::pwd EQ pwd))

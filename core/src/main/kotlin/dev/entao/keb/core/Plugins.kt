@@ -206,6 +206,11 @@ class TokenModel(val yo: YsonObject = YsonObject()) {
 		}
 }
 
+val HttpContext.userId: Long
+	get() {
+		return this.tokenModel?.userId ?: 0L
+	}
+
 val HttpContext.tokenModel: TokenModel?
 	get() {
 		val j = this.jwtValue ?: return null
