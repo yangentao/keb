@@ -236,10 +236,10 @@ fun HttpContext.makeToken(userId: Long, userName: String, expireTime: Long): Str
 class TokenSlice(val pwd: String) : HttpSlice {
 
 	override fun beforeAll(context: HttpContext) {
-		val a = context.request.header("Authorization") ?: return
-		val b = a.substringAfter("Bearer ", "").trim()
+		val a = context.request.header("Authorization")
+		val b = a?.substringAfter("Bearer ", "")?.trim() ?: ""
 		val token = if (b.isEmpty()) {
-			context.request.param("access_token") ?: return
+			context.request.param("access_token") ?: context.request.param("token") ?: return
 		} else {
 			b
 		}
@@ -252,13 +252,8 @@ class TokenSlice(val pwd: String) : HttpSlice {
 
 	override fun beforeService(context: HttpContext, router: Router): Boolean {
 		if (router.function.isNeedToken) {
-//			val ok = context.jwtValue?.OK ?: false
-//			if (!ok) {
-//				context.abort(401)
-//				return false
-//			}
-			val ex = context.tokenModel?.expired ?: true
-			if (ex) {
+			val m = context.tokenModel
+			if (m == null || m.expired) {
 				context.abort(401)
 				return false
 			}
