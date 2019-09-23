@@ -40,9 +40,9 @@ class DefaultPermAcceptor : PermAcceptor {
 	}
 
 	override fun accept(context: HttpContext, uri: String): Boolean {
-		if (!context.filter.webConfig.allowResAccess) {
-			return true
-		}
+//		if (!context.filter.webConfig.allowResAccess) {
+//			return true
+//		}
 		val uu = uri.substringBefore('?')
 		if (context.account.isEmpty()) {
 			return true
