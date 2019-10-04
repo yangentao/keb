@@ -114,6 +114,7 @@ abstract class HttpFilter : Filter {
 		}
 		onDestroy()
 		Yog.flush()
+		Yog.uninstall()
 		cleanThreadLocals()
 	}
 
