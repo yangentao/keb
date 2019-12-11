@@ -1,3 +1,5 @@
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
+
 package dev.entao.keb.core
 
 import dev.entao.kava.base.MyDate

@@ -7,7 +7,7 @@ import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
 
 fun Tag.configUpload(uploadUrl: String, viewUrl: String, viewUrlParam: String, uploadSizeLimitM: Int = 30, uploadDefaultFileImageUrl: String = "http://app800.cn/i/file.png") {
-	scriptBlock {
+	script {
 		val sb = StringBuilder(256)
 		if (uploadUrl.isNotEmpty()) {
 			sb.appendln("""Yet.uploadUrl = "$uploadUrl";""")
@@ -37,31 +37,22 @@ fun Tag.uploadDiv(p: KProperty<*>) {
 }
 
 fun Tag.uploadDiv(hiddenName: String, hiddenValue: String) {
-	this.div {
-		clazz = "form-control drag-upload-div"
-		style = "height: 8em;"
-		input {
-			typeHidden()
-			name = hiddenName
-			value = hiddenValue
+	this.div(class_ to "form-control drag-upload-div", style_ to "height: 8em;") {
+		hidden(name_ to hiddenName, value_ to hiddenValue) {
 		}
-		img {
-			style = "height:5em;margin:4px;"
+		img(style_ to "height:5em;margin:4px;") {
 		}
-		progress {
-			style = "height:0.2em"
+		progress(style_ to "height:0.2em") {
 			progressBar {
 			}
 		}
-		span {
-			style = "font-size:50%"
+		span(style_ to "font-size:50%") {
 			+"将文件拖拽到此区域"
 		}
-		span {
-			style = "font-size:50%"
+		span(style_ to "font-size:50%") {
 		}
 		val myDivId = needId()
-		scriptBlock {
+		script {
 			"""
 				Yet.uplodaBindDivById("$myDivId");
 			"""

@@ -3,20 +3,15 @@
 package dev.entao.keb.core
 
 import dev.entao.kava.base.Mimes
-import dev.entao.kava.base.firstParamName
 import dev.entao.keb.core.render.FileSender
 import dev.entao.keb.core.render.ResultRender
 import dev.entao.keb.core.util.AnyMap
-import dev.entao.keb.core.util.JWT
 import java.io.File
-import java.net.URLEncoder
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession
 import javax.servlet.http.Part
-import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
 
 /**
  * Created by entaoyang@163.com on 2016/12/18.
@@ -30,44 +25,17 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	val resultSender: ResultRender by lazy {
 		ResultRender(this)
 	}
-	val httpParams: HttpParams  by lazy {
+	val httpParams: HttpParams by lazy {
 		HttpParams(this)
 	}
-
-	val currentUri: String = request.requestURI.trimEnd('/').toLowerCase()
+	val params: HttpParams get() = this.httpParams
+	val currentUri: String by lazy { request.requestURI.trimEnd('/').toLowerCase() }
 
 	val propMap = AnyMap()
 
-	//解析后的app传来的access_token
-	var jwtValue: JWT? = null
-
-	//web登录成功后, 设置account和accountName
-	var account: String
-		get() {
-			return getSession(Keb.ACCOUNT) ?: ""
-		}
-		set(value) {
-			if (value.isEmpty()) {
-				this.removeSession(Keb.ACCOUNT)
-			} else {
-				putSession(Keb.ACCOUNT, value)
-			}
-		}
-	var accountName: String
-		get() {
-			val a = this.account
-			if (a.isEmpty()) {
-				return ""
-			}
-			return getSession(Keb.ACCOUNT_NAME) ?: a
-		}
-		set(value) {
-			putSession(Keb.ACCOUNT_NAME, value)
-		}
-	val isLogined: Boolean
-		get() {
-			return account.isNotEmpty()
-		}
+	//TODO dirs
+	val uploadDir: File get() = filter.webDir.uploadDir
+	val tmpDir: File get() = filter.webDir.tmpDir
 
 	val rootUri: String
 		get() {
@@ -78,27 +46,16 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 		return request.scheme + "://" + request.getHeader("host") + uri
 	}
 
-	fun groupUri(g: KClass<*>): String {
-		return filter.groupUri(g)
-	}
-
-	fun actionUri(a: KFunction<*>): String {
-		return filter.actionUri(a)
-	}
-
-	fun actionUri(a: KFunction<*>, paramValue: Any?): String {
-		val s = filter.actionUri(a)
-		if (paramValue != null) {
-			val k = a.firstParamName
-			if (k != null) {
-				return s + "?" + k + "=" + URLEncoder.encode(paramValue.toString(), Charsets.UTF_8.name())
-			}
-		}
-		return s
+	fun fullURL(action: HttpAction): String {
+		return this.fullUrlOf(actionUri(action))
 	}
 
 	fun resUri(res: String): String {
 		return filter.resUri(res)
+	}
+
+	fun actionUri(action: HttpAction): String {
+		return this.filter.actionUri(action)
 	}
 
 	fun writeHtml(s: String) {
@@ -130,26 +87,11 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 			return Mimes.HTML in request.header("Accept") ?: ""
 		}
 
-	@Suppress("UNUSED_PARAMETER")
-	fun allow(uri: String): Boolean {
-		return true
-	}
 
 	fun redirect(url: String) {
 		response.sendRedirect(url)
 	}
 
-	fun backward(block: ReferUrl.() -> Unit): Boolean {
-		val s = request.headerReferer
-		if (s == null || s.isEmpty()) {
-			return false
-		}
-		val u = ReferUrl(request)
-		u.block()
-		val url = u.build()
-		response.sendRedirect(url)
-		return true
-	}
 
 	fun respHeader(key: String, value: String) {
 		response.addHeader(key, value)
@@ -201,7 +143,45 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 		response.sendError(code, msg)
 	}
 
-	val uploadDir: File get() = filter.webDir.uploadDir
-	val tmpDir: File get() = filter.webDir.tmpDir
+	fun backSuccess(msg: String): Boolean {
+		val s = request.headerReferer
+		if (s == null || s.isEmpty()) {
+			return false
+		}
+		val url = Url(s)
+		url.remove(Keb.ERROR)
+		url.replace(Keb.SUCCESS, msg)
+		response.sendRedirect(url.build())
+		return true
+	}
+
+	fun backError(msg: String, errorField: String = ""): Boolean {
+		val s = request.headerReferer
+		if (s == null || s.isEmpty()) {
+			return false
+		}
+		val url = Url(s)
+		val map = request.paramMap
+		map.forEach {
+			val k = it.key
+			val ar = it.value
+			url.remove(k)
+			if (ar.size == 1) {
+				url.append(k, ar[0])
+			} else if (ar.size > 1) {
+				for (v in ar) {
+					url.append("$k[]", v)
+				}
+			}
+		}
+		if (errorField.isNotEmpty()) {
+			url.replace(Keb.errField(errorField), msg)
+		}
+		url.remove(Keb.SUCCESS)
+		url.replace(Keb.ERROR, msg)
+		response.sendRedirect(url.build())
+		return true
+	}
+
 
 }

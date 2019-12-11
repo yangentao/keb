@@ -1,26 +1,16 @@
 package dev.entao.keb.page.widget
 
 import dev.entao.keb.page.P
-import dev.entao.keb.page.tag.Tag
-import dev.entao.keb.page.tag.TagCallback
-import dev.entao.keb.page.tag.div
-import dev.entao.keb.page.tag.scriptBlock
+import dev.entao.keb.page.bootstrap.submitPrimary
+import dev.entao.keb.page.tag.*
 
 //window.yetQueryCond = q;
 fun Tag.queryForm(block: TagCallback) {
-	this.form {
-		method = dev.entao.keb.page.B.GET
-		id = P.QUERY_FORM
+	this.form(id_ to P.QUERY_FORM, method_ to V.GET) {
 		this.block()
-		val formId = this.id
-		formGroupRow {
-			div {
-				submit {
-					+"查询"
-				}
-			}
-		}
-		scriptBlock {
+		val formId = this[id_]
+		submitPrimary("查询")
+		script {
 			"""
 			Yet.queryFormId = '$formId';
 
@@ -34,13 +24,11 @@ fun Tag.queryForm(block: TagCallback) {
 }
 
 fun Tag.queryFormEmpty(block: TagCallback) {
-	this.form {
-		method = dev.entao.keb.page.B.GET
-		id = P.QUERY_FORM
+	this.form(id_ to P.QUERY_FORM, method_ to V.GET) {
 		this.block()
-		val formId = this.id
+		val formId = this[id_]
 
-		scriptBlock {
+		script {
 			"""
 			Yet.queryFormId = '$formId';
 

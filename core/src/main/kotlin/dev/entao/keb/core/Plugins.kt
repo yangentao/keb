@@ -2,46 +2,25 @@
 
 package dev.entao.keb.core
 
-import com.sun.org.apache.xpath.internal.operations.Bool
+import dev.entao.kava.base.MIN
 import dev.entao.kava.base.MyDate
-import dev.entao.kava.base.hasAnnotation
-import dev.entao.kava.json.YsonObject
 import dev.entao.kava.log.Yog
 import dev.entao.kava.log.fatal
 import dev.entao.kava.log.logd
 import dev.entao.kava.log.loge
-import dev.entao.keb.core.util.JWT
 import java.util.*
 import javax.servlet.FilterConfig
 import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
 
-typealias HttpAction = KFunction<*>
-
-interface HttpSlice {
-	fun onConfig(filter: HttpFilter, config: FilterConfig) {}
-	fun beforeAll(context: HttpContext) {}
-	fun afterAll(context: HttpContext) {}
-	fun beforeService(context: HttpContext, router: Router): Boolean {
-		return true
-	}
-
-	fun afterService(context: HttpContext) {}
-	fun onDestory() {}
-}
-
-interface PermAcceptor {
-	fun prepare(context: HttpContext)
-	fun accept(context: HttpContext, uri: String): Boolean
-}
 
 interface HttpTimer {
 	fun onHour(h: Int) {}
 	fun onMinute(m: Int) {}
+	fun onHttpTimer(dayOfMonth: Int, hour: Int, minute: Int)
 }
 
 object MethodAcceptor : HttpSlice {
-	override fun beforeService(context: HttpContext, router: Router): Boolean {
+	override fun acceptRouter(context: HttpContext, router: Router): Boolean {
 		if (router.methods.isNotEmpty()) {
 			if (context.request.method.toUpperCase() !in router.methods) {
 				context.abort(400, "Method Error")
@@ -53,26 +32,6 @@ object MethodAcceptor : HttpSlice {
 
 }
 
-object LoginCheckSlice : HttpSlice {
-
-	override fun beforeService(context: HttpContext, router: Router): Boolean {
-		if (router.function.hasAnnotation<NeedLogin>() || router.cls.hasAnnotation<NeedLogin>()) {
-			if (!context.isLogined) {
-				if (context.filter.loginUri.isNotEmpty()) {
-					if (context.acceptHtml) {
-						val u = Url(context.filter.loginUri)
-						u.replace(Keb.BACK_URL, context.fullUrlOf(router.uri))
-						context.redirect(u.build())
-						return false
-					}
-				}
-				context.abort(401)
-				return false
-			}
-		}
-		return true
-	}
-}
 
 class TimerSlice : HttpSlice {
 
@@ -87,15 +46,14 @@ class TimerSlice : HttpSlice {
 		}
 	}
 
-	override fun onConfig(filter: HttpFilter, config: FilterConfig) {
+	override fun onInit(filter: HttpFilter, config: FilterConfig) {
+		this.filter = filter
 		timer?.cancel()
 		timer = null
-
 		val tm = Timer("everyMinute", true)
-		val delay: Long = 1000 * 60
+		val delay: Long = 1.MIN
 		tm.scheduleAtFixedRate(tmtask, delay, delay)
 		timer = tm
-		this.filter = filter
 	}
 
 	override fun onDestory() {
@@ -111,8 +69,20 @@ class TimerSlice : HttpSlice {
 		private var preHour = -1
 
 		override fun run() {
+			val date = MyDate()
+			val day = date.day
+			val h = date.hour
+			val minute = date.minute
 			val timers = ArrayList<HttpTimer>(timerList)
-			val h = MyDate().hour
+			timers.forEach {
+				try {
+					filter?.onHttpTimer(day, h, minute)
+					it.onHttpTimer(day, h, minute)
+				} catch (ex: Exception) {
+					ex.printStackTrace()
+				}
+			}
+
 			if (h != preHour) {
 				preHour = h
 				try {
@@ -156,13 +126,13 @@ class TimerSlice : HttpSlice {
 class HttpActionManager : HttpSlice {
 	val allGroups = ArrayList<KClass<out HttpGroup>>()
 	val routeMap = HashMap<String, Router>(32)
-
 	lateinit var filter: HttpFilter
 
 	override fun onDestory() {
 		routeMap.clear()
 		allGroups.clear()
 	}
+
 
 	fun find(context: HttpContext): Router? {
 		return routeMap[context.currentUri]
@@ -173,7 +143,7 @@ class HttpActionManager : HttpSlice {
 		clses.forEach { cls ->
 			for (f in cls.actionList) {
 				val uri = filter.actionUri(f)
-				val info = Router(uri, f)
+				val info = Router(uri, cls, f)
 				addRouter(info)
 			}
 		}
@@ -183,89 +153,10 @@ class HttpActionManager : HttpSlice {
 		val u = router.uri.toLowerCase()
 		if (routeMap.containsKey(u)) {
 			val old = routeMap[u]
-			logd("AddRouter: ", u)
 			fatal("已经存在对应的Route: ${old?.function} ", u, old.toString())
 		}
 		routeMap[u] = router
 		logd("Add Router: ", u)
 	}
 
-}
-
-class TokenModel(val yo: YsonObject = YsonObject()) {
-	var userId: Long by yo
-	var userName: String by yo
-	var expireTime: Long by yo
-
-	val expired: Boolean
-		get() {
-			if (expireTime != 0L) {
-				return System.currentTimeMillis() >= expireTime
-			}
-			return false
-		}
-}
-
-val HttpContext.userId: Long
-	get() {
-		return this.tokenModel?.userId ?: 0L
-	}
-
-val HttpContext.tokenModel: TokenModel?
-	get() {
-		val j = this.jwtValue ?: return null
-		if (j.OK) {
-			return TokenModel(YsonObject(j.body))
-		}
-		return null
-	}
-
-fun HttpContext.makeToken(userId: Long, userName: String, expireTime: Long): String {
-	val ts = this.filter.sliceList.find { it is TokenSlice } as? TokenSlice
-			?: throw IllegalAccessError("没有找到TokenSlice")
-	val m = TokenModel()
-	m.userId = userId
-	m.userName = userName
-	m.expireTime = expireTime
-	return ts.makeToken(m.yo.toString())
-}
-
-//override fun onInit() {
-//	addSlice(TokenSlice("99665588"))
-//}
-class TokenSlice(val pwd: String) : HttpSlice {
-
-	override fun beforeAll(context: HttpContext) {
-		val a = context.request.header("Authorization")
-		val b = a?.substringAfter("Bearer ", "")?.trim() ?: ""
-		val token = if (b.isEmpty()) {
-			context.request.param("access_token") ?: context.request.param("token") ?: return
-		} else {
-			b
-		}
-		if (token.isEmpty()) {
-			return
-		}
-		val j = JWT(pwd, token)
-		context.jwtValue = j
-	}
-
-	override fun beforeService(context: HttpContext, router: Router): Boolean {
-		if (router.function.isNeedToken) {
-			val m = context.tokenModel
-			if (m == null || m.expired) {
-				context.abort(401)
-				return false
-			}
-		}
-		return true
-	}
-
-	fun makeToken(body: String): String {
-		return makeToken(body, """{"alg":"HS256","typ":"JWT"}""")
-	}
-
-	fun makeToken(body: String, header: String): String {
-		return JWT.make(pwd, body, header)
-	}
 }

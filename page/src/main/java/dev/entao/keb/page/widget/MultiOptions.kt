@@ -6,10 +6,12 @@ import dev.entao.kava.base.*
 import dev.entao.kava.log.loge
 import dev.entao.kava.sql.*
 import dev.entao.keb.core.HttpAction
+import dev.entao.keb.core.HttpContext
 import dev.entao.keb.page.FormHelpBlock
 import dev.entao.keb.page.FormOptions
 import dev.entao.keb.page.FormSelectFromTable
 import dev.entao.keb.page.S
+import dev.entao.keb.page.bootstrap.*
 import dev.entao.keb.page.tag.*
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
@@ -18,6 +20,11 @@ import kotlin.reflect.full.findAnnotation
  * Created by entaoyang@163.com on 2017/4/6.
  */
 
+class OptionTag(context: HttpContext) : Tag(context, "option") {
+
+	var label: String by attrs
+	var value: String by attrs
+}
 
 val KProperty<*>.formOptionsMap: Map<String, String>
 	get() {
@@ -103,6 +110,7 @@ private fun findLableOfKey(tableName: String, keyCol: String, labelCol: String, 
 	val a: Any? = ConnLook.first.query(q).anyValue
 	return a?.toString() ?: ""
 }
+
 fun Tag.datalist(id: String, block: TagCallback): Tag {
 	val t = tag("datalist")
 	t.id = id
@@ -111,10 +119,7 @@ fun Tag.datalist(id: String, block: TagCallback): Tag {
 }
 
 fun Tag.listOption(label: String, value: String): Tag {
-	val t = tag("option")
-	t.label = label
-	t.value = value
-	return t
+	return option(label, value, false)
 }
 
 fun Tag.select(block: TagCallback): Tag {
@@ -124,11 +129,6 @@ fun Tag.select(block: TagCallback): Tag {
 	return t
 }
 
-fun Tag.option(block: TagCallback): Tag {
-	val t = tag("option")
-	t.block()
-	return t
-}
 
 fun Tag.optionAll(label: String = "全部"): Tag {
 	val h = option("", label, false)
@@ -143,24 +143,19 @@ fun Tag.optionNone(label: String = "无"): Tag {
 }
 
 fun Tag.option(value: String, label: String, selState: Boolean): Tag {
-	return option {
-		this.value = value
-		+label
-		if (selState) {
-			this.selected = true
-		}
+	return if (selState) {
+		option(value_ to value, selected_ to "true ") { +label }
+	} else {
+		option(value_ to value) { +label }
 	}
 }
 
 fun Tag.option(value: String, label: String): Tag {
-	return option {
-		this.value = value
-		+label
-		val v = parentTag?.dataSelectValue == value
-		if (v) {
-			this.selected = true
-		}
+	val t = option(value_ to value) { +label }
+	if (parent?.get(data_select_value_) == value) {
+		this[selected_] = "true"
 	}
+	return t
 }
 
 class LinkageOption(val fromId: String, val targetId: String, val action: HttpAction) {
@@ -188,9 +183,9 @@ fun Tag.selectLinkage(opt: LinkageOption) {
 	} else {
 		""
 	}
-	val uri = httpContext.actionUri(opt.action)
+	val uri = httpContext.filter.actionUri(opt.action)
 	val argName = opt.action.firstParamName ?: "id"
-	scriptBlock {
+	script {
 		"""
 		function $updateFunName(){
 			var aVal = $("#${opt.fromId}").val();
@@ -228,9 +223,9 @@ fun Tag.selectLinkage(opt: LinkageOption) {
 	}
 }
 
-fun Tag.labelSelectRowFromTable(p: Prop, w: Where? = null, dontRetrive: Boolean = false, selectBlock: Tag.() -> Unit = {}): Tag {
+fun Tag.formGroupSelectTable(p: Prop, w: Where? = null, dontRetrive: Boolean = false, selectBlock: Tag.() -> Unit = {}): Tag {
 	var selTag: Tag? = null
-	formGroupRow {
+	formGroup {
 		val pname = p.userName
 		val selVal: String = if (p is Prop0) {
 			p.getValue()?.toString() ?: ""
@@ -239,92 +234,21 @@ fun Tag.labelSelectRowFromTable(p: Prop, w: Where? = null, dontRetrive: Boolean 
 		}
 
 		this.label { +p.userLabel }
-		this.div {
-			selTag = select {
-				idName(pname)
-				this.dataSelectValue = selVal
-				if (!dontRetrive) {
-					val ls = p.selectOptionsTable(w)
-					for (kv in ls) {
-						option(kv.key, kv.value)
-					}
-				}
-				this.selectBlock()
-			}
-			val hb = p.findAnnotation<FormHelpBlock>()?.value
-			if (hb != null && hb.isNotEmpty()) {
-				formTextMuted(hb)
-			}
-		}
-	}
-	return selTag!!
-}
-
-fun Tag.labelSelectRowStatic(p: Prop, selectedValue: String? = null, selectBlock: Tag.() -> Unit = {}): Tag {
-	var selTag: Tag? = null
-	formGroupRow {
-		val pname = p.userName
-		val selVal = if (p is Prop0) {
-			p.getValue()?.toString() ?: selectedValue
-		} else {
-			selectedValue
-		} ?: httpContext.httpParams.str(p.userName)
-
-		this.label { +p.userLabel }
-		this.div {
-			selTag = select {
-				idName(pname)
-				this.dataSelectValue = selVal ?: ""
-				val ls = p.formOptionsMap
+		selTag = select {
+			idName(pname)
+			this[data_select_value_] = selVal
+			if (!dontRetrive) {
+				val ls = p.selectOptionsTable(w)
 				for (kv in ls) {
 					option(kv.key, kv.value)
 				}
-				this.selectBlock()
 			}
-			val hb = p.findAnnotation<FormHelpBlock>()?.value
-			if (hb != null && hb.isNotEmpty()) {
-				formTextMuted(hb)
-			}
+			this.selectBlock()
 		}
+		this.processHelpText(p)
 	}
 	return selTag!!
 }
 
-fun Tag.labelRadioRowStatic(p: Prop, selectedValue: String? = null) {
-	formGroupRow {
-		val pname = p.userName
-		var selVal: String? = if (p is Prop0) {
-			p.getValue()?.toString() ?: selectedValue
-		} else {
-			selectedValue
-		} ?: httpContext.httpParams.str(p.userName)
-
-		this.label { +p.userLabel }
-		this.div {
-			val ls = p.formOptionsMap
-			ls.forEach { opt ->
-				formCheck {
-					addClass("form-check-inline")
-					val r = radio {
-						name = pname
-						value = opt.key
-						if (selVal == null) {
-							checked = true
-							selVal = this.value
-						} else if (selVal == opt.key) {
-							checked = true
-						}
-					}
-					label(opt.value).forId = r.needId()
-				}
-			}
-
-			val hb = p.findAnnotation<FormHelpBlock>()?.value
-			if (hb != null && hb.isNotEmpty()) {
-				formTextMuted(hb)
-			}
-		}
-	}
-}
 
 

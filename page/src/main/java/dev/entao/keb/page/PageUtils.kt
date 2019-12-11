@@ -2,6 +2,10 @@ package dev.entao.keb.page
 
 import dev.entao.kava.base.*
 import dev.entao.kava.json.YsonValue
+import dev.entao.keb.core.Keb
+import dev.entao.keb.page.tag.Tag
+import dev.entao.keb.page.bootstrap.alertError
+import dev.entao.keb.page.bootstrap.alertSuccess
 import dev.entao.keb.page.widget.singleSelectDisplay
 import kotlin.reflect.full.findAnnotation
 
@@ -9,17 +13,29 @@ import kotlin.reflect.full.findAnnotation
  * Created by entaoyang@163.com on 2017/4/8.
  */
 
+class LinkItem(val label: String, val url: String, var active: Boolean = false) {
+	val children: ArrayList<LinkItem> = ArrayList()
+}
 
+fun Tag.showMessagesIfPresent() {
+	val s = this.httpContext.httpParams.str(Keb.ERROR) ?: ""
+	if (s.isNotEmpty()) {
+		this.alertError(s)
+	}
+	val ss = this.httpContext.httpParams.str(Keb.SUCCESS) ?: ""
+	if (ss.isNotEmpty()) {
+		this.alertSuccess(ss)
+	}
+}
 
-
-//TOD escape attr, value, text
 private val IDENT = "    "
-private val CRLF = "\n"
-private val QUOT = "\""
+val QUOT = "\""
 
-fun ident(buf: Appendable, level: Int) {
-	for (i in 0..level - 1) {
-		buf.append(IDENT)
+fun Appendable.ident(n: Int) {
+	if (n > 0) {
+		for (i in 0 until n) {
+			this.append(IDENT)
+		}
 	}
 }
 
@@ -35,7 +51,6 @@ fun eleId(prefix: String = ""): String {
 	++idInc
 	return prefix + "_$idInc"
 }
-
 
 fun displayOf(p0: Prop0): String {
 	return displayOf(p0, p0.getValue())

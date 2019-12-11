@@ -4,6 +4,11 @@ package dev.entao.keb.page
  * Created by entaoyang@163.com on 2017/6/20.
  */
 
+
+@Target(AnnotationTarget.PROPERTY)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class MinLength(val value: Int)
+
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class EditRows(val value: Int)
@@ -20,6 +25,9 @@ annotation class FormPattern(val value: String)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class FormPassword
 
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class FormEmail
 
 
 //	@FormSelect("0:男", "1:女")

@@ -6,7 +6,10 @@ import dev.entao.kava.base.hasAnnotation
 import dev.entao.kava.base.ownerClass
 import dev.entao.kava.log.Yog
 import dev.entao.kava.log.YogDir
+import dev.entao.kava.log.YogPrinter
 import dev.entao.kava.log.logd
+import dev.entao.keb.core.account.LoginCheckSlice
+import dev.entao.keb.core.account.TokenSlice
 import java.util.*
 import javax.servlet.*
 import javax.servlet.annotation.WebFilter
@@ -20,16 +23,21 @@ import kotlin.reflect.full.findAnnotation
 /**
  * Created by entaoyang@163.com on 2016/12/21.
  */
+
+
+typealias HttpAction = KFunction<*>
+
+
 //    @WebFilter中的urlPatterns =  "/*"
 abstract class HttpFilter : Filter {
 
-	var sessionTimeoutSeconds: Int = 3600
+	open var sessionTimeoutSeconds: Int = 3600
 
-	var loginUri: String = ""
-	var logoutUri: String = ""
+	open var loginUri: String = ""
+	open var logoutUri: String = ""
+	open var accountInfoUri: String = ""
 
-	var webConfig = WebConfig()
-		private set
+	open var appName: String = "主页"
 
 	private lateinit var filterConfig: FilterConfig
 	var contextPath: String = ""
@@ -40,9 +48,9 @@ abstract class HttpFilter : Filter {
 
 	val webDir = WebDir()
 
-	val sliceList = ArrayList<HttpSlice>()
 	val routeManager = HttpActionManager()
 	val timerSlice = TimerSlice()
+	val sliceList: ArrayList<HttpSlice> = ArrayList()
 
 	val allGroups: ArrayList<KClass<out HttpGroup>> get() = routeManager.allGroups
 
@@ -55,6 +63,14 @@ abstract class HttpFilter : Filter {
 	abstract fun onInit()
 
 	abstract fun cleanThreadLocals()
+
+	open fun createTokenPassword(): String {
+		return System.currentTimeMillis().toString()
+	}
+
+	open fun createLogPrinter(): YogPrinter {
+		return YogDir(webDir.logDir, 15)
+	}
 
 	open fun onDestroy() {
 
@@ -69,38 +85,32 @@ abstract class HttpFilter : Filter {
 		patternPath = pat.filter { it.isLetterOrDigit() || it == '_' }
 
 		webDir.onConfig(this, filterConfig)
-		Yog.setPrinter(YogDir(webDir.logDir, 15))
+		Yog.setPrinter(createLogPrinter())
 		logd("Server Start!")
-
+		this.sliceList.clear()
 		routeManager.filter = this
-		addSlice(routeManager)
-		addSlice(timerSlice)
+		addSlice(this.routeManager)
+		addSlice(this.timerSlice)
 		addSlice(MethodAcceptor)
 		addSlice(LoginCheckSlice)
-		addRouterOfThis()
+		addSlice(TokenSlice(createTokenPassword()))
 
 		try {
+			addRouterOfThis()
 			onInit()
 			for (hs in sliceList) {
-				hs.onConfig(this, filterConfig)
-			}
-			if (this.loginUri.isEmpty()) {
-				for ((k, v) in routeManager.routeMap) {
-					if (v.function.hasAnnotation<LoginAction>()) {
-						this.loginUri = k
-						break
-					}
-				}
-			}
-			if (this.logoutUri.isEmpty()) {
-				for ((k, v) in routeManager.routeMap) {
-					if (v.function.hasAnnotation<LogoutAction>()) {
-						this.logoutUri = k
-						break
-					}
-				}
+				hs.onInit(this, filterConfig)
 			}
 
+			if (this.loginUri.isEmpty()) {
+				this.loginUri = findRouter { it.function.hasAnnotation<LoginAction>() }?.uri?.toLowerCase() ?: ""
+			}
+			if (this.logoutUri.isEmpty()) {
+				this.logoutUri = findRouter { it.function.hasAnnotation<LogoutAction>() }?.uri?.toLowerCase() ?: ""
+			}
+			if (this.accountInfoUri.isEmpty()) {
+				this.accountInfoUri = findRouter { it.function.hasAnnotation<AccountInfoAction>() }?.uri?.toLowerCase() ?: ""
+			}
 		} catch (ex: Exception) {
 			ex.printStackTrace()
 		} finally {
@@ -108,13 +118,18 @@ abstract class HttpFilter : Filter {
 		}
 	}
 
+	fun findRouter(block: (Router) -> Boolean): Router? {
+		return routeManager.routeMap.values.firstOrNull(block)
+	}
+
 	final override fun destroy() {
 		for (hs in sliceList) {
 			hs.onDestory()
 		}
+		sliceList.clear()
 		onDestroy()
 		Yog.flush()
-		Yog.uninstall()
+		Yog.clearPrinter()
 		cleanThreadLocals()
 	}
 
@@ -138,10 +153,11 @@ abstract class HttpFilter : Filter {
 		val ls = this::class.actionList
 		for (f in ls) {
 			val uri = actionUri(f)
-			val info = Router(uri, f, this)
+			val info = Router(uri, this::class, f, this)
 			routeManager.addRouter(info)
 		}
 	}
+
 
 	fun addGroup(vararg clses: KClass<out HttpGroup>) {
 		this.routeManager.addGroup(*clses)
@@ -155,7 +171,7 @@ abstract class HttpFilter : Filter {
 				val c = HttpContext(this, request, response, chain)
 
 				for (hs in sliceList) {
-					hs.beforeAll(c)
+					hs.beforeRequest(c)
 				}
 				val r = routeManager.find(c)
 				if (r == null) {
@@ -164,7 +180,7 @@ abstract class HttpFilter : Filter {
 					doHttpFilter(c, r)
 				}
 				for (hs in sliceList) {
-					hs.afterAll(c)
+					hs.afterRequest(c)
 				}
 			} else {
 				chain.doFilter(request, response)
@@ -179,14 +195,25 @@ abstract class HttpFilter : Filter {
 
 	fun doHttpFilter(c: HttpContext, r: Router) {
 		for (hs in sliceList) {
-			if (!hs.beforeService(c, r)) {
+			if (!hs.acceptRouter(c, r)) {
 				return
 			}
 		}
 		r.dispatch(c)
 		for (hs in sliceList) {
-			hs.afterService(c)
+			hs.afterRouter(c, r)
 		}
+	}
+
+	fun addTimer(t: HttpTimer) {
+		this.timerSlice.addTimer(t)
+	}
+
+	//dayOfMonth [0-31]
+	//hour [0-23]
+	//minute [0-59]
+	open fun onHttpTimer(dayOfMonth: Int, hour: Int, minute: Int) {
+
 	}
 
 	//hour [0-23]

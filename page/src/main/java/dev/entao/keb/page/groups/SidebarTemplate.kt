@@ -4,15 +4,18 @@ import dev.entao.kava.base.userLabel
 import dev.entao.keb.core.HttpAction
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpGroup
-import dev.entao.keb.core.HttpScope
-import dev.entao.keb.page.*
+import dev.entao.keb.core.account.accountName
+import dev.entao.keb.core.account.isAccountLogined
+import dev.entao.keb.page.LinkItem
+import dev.entao.keb.page.R
+import dev.entao.keb.page.bootstrap.buttonB
+import dev.entao.keb.page.showMessagesIfPresent
 import dev.entao.keb.page.tag.*
 import dev.entao.keb.page.widget.*
 import kotlin.reflect.KClass
 
-class SidebarTemplate(override val context: HttpContext) : HttpScope, HtmlTemplate {
-	val html = HtmlDoc(context)
-	var title: String = context.filter.webConfig.appName
+class SidebarTemplate(context: HttpContext) : HtmlPage(context) {
+	var title: String = context.filter.appName
 
 	var navItems: List<LinkItem> = emptyList()
 	var topItems: List<LinkItem> = emptyList()
@@ -20,91 +23,49 @@ class SidebarTemplate(override val context: HttpContext) : HttpScope, HtmlTempla
 	var pageBlock: Tag.() -> Unit = {}
 
 	private fun build() {
-		val config = context.filter.webConfig
-		html.head {
-			metaCharset("UTF-8")
-			meta {
-				httpEquiv = "X-UA-Compatible"
-				content = "IE=edge"
-			}
-			meta {
-				name = "viewport"
-				content = "width=device-width, initial-scale=1, shrink-to-fit=no"
-			}
+		setupBootstrap()
+		this.head.link(rel_ to "stylesheet", href_ to context.resUri(R.navbarLeft))
+		setupMyCssJs()
+		head {
 			title(title)
-			linkStylesheet(R.CSS.boot)
-			linkStylesheet(R.CSS.awesome)
-			linkStylesheet(resUri(R.navbarLeft))
-			linkStylesheet(resUri(R.myCSS))
-			val icon = config.favicon
-			if (icon.isNotEmpty()) {
-				link {
-					rel = "shortcut icon"
-					type = if (icon.toLowerCase().endsWith(".png")) {
-						"image/png"
-					} else {
-						"image/jpeg"
-					}
-					href = icon
-				}
-			}
 		}
-		html.body {
-			nav {
-				clazz = "navbar navbar-expand-md navbar-dark fixed-left"
-				a {
-					clazz = "navbar-brand"
-					href = context.rootUri
-					+config.appName
+		body {
+			nav(class_ to _navbar.._navbar_expand_md.._navbar_dark.."fixed-left") {
+				a(id_ to _navbar_brand, href_ to context.rootUri) {
+					+context.filter.appName
 				}
-				button {
-					clazz = "navbar-toggler"
-					type = "button"
-					dataToggle = "collapse"
-					dataTarget = "#navbarsExampleDefault"
-					ariaControls = "navbarsExampleDefault"
-					ariaExpanded = "false"
-					ariaLabel = "展开"
-					span {
-						clazz = "navbar-toggler-icon"
+				buttonB(class_ to "navbar-toggler", aria_expanded_ to "false", aria_label_ to "展开", aria_controls_ to "navbarsExampleDefault",
+						data_toggle_ to "collapse", data_target_ to "#navbarsExampleDefault") {
+					span(class_ to _navbar_toggler_icon) {
+
 					}
 				}
-				div {
-					id = "navbarsExampleDefault"
-					clazz = "collapse navbar-collapse"
+				div(id_ to "navbarsExampleDefault", class_ to _collapse.._navbar_collapse) {
 					buildUserInfoFlex(this)
-					ul {
-						clazz = "navbar-nav"
+					ul(class_ to _navbar_nav) {
 						for (item in navItems) {
-							li {
-								clazz = "nav-item"
+							li(class_ to _nav_item) {
 								if (item.active) {
-									classList += "active"
+									this += _active
 								}
-								val itemA = a {
-									clazz = "nav-link"
-									href = item.url
+								val itemA = a(class_ to _nav_link, href_ to item.url) {
 									+item.label
 								}
 								if (item.children.isNotEmpty()) {
-									itemA.dataToggle = "collapse"
-									ul {
-										clazz = "collapse"
+									itemA[data_toggle_] = "collapse"
+									ul(class_ to _collapse) {
 										if (item.active) {
-											classList += "show"
+											this += _show
 										}
 										this.needId()
-										itemA.href = "#${this.id}"
+										itemA[href_] = "#${this[id_]}"
 
 										for (X in item.children) {
-											li {
-												clazz = "nav-item"
+											li(class_ to _nav_item) {
 												if (X.active) {
-													classList += "active"
+													this += _active
 												}
-												a {
-													clazz = "nav-link"
-													href = X.url
+												a(class_ to _nav_link, href_ to X.url) {
 													+X.label
 												}
 											}
@@ -117,17 +78,14 @@ class SidebarTemplate(override val context: HttpContext) : HttpScope, HtmlTempla
 					}
 				}
 			}
-			div {
-				clazz = "container-fluid"
+			div(class_ to _container_fluid) {
 				if (topItems.isNotEmpty()) {
 					navPills {
 						for (ti in topItems) {
-							a {
-								addClass("nav-link")
+							a(class_ to _nav_link, href_ to ti.url) {
 								if (ti.active) {
-									addClass("active")
+									this += _active
 								}
-								href = ti.url
 								+ti.label
 							}
 						}
@@ -137,31 +95,19 @@ class SidebarTemplate(override val context: HttpContext) : HttpScope, HtmlTempla
 				this.pageBlock()
 			}
 			installDialogs(this)
-
-			scriptLink(resUri(R.jquery))
-			scriptLink(R.JS.popper)
-			scriptLink(R.JS.boot)
-			scriptLink("https://buttons.github.io/buttons.js")
-			scriptLink(resUri(R.myJS))
-
 		}
 	}
 
 	private fun buildUserInfoFlex(parentTag: Tag) {
-		parentTag.flex {
-			classList += B.Flex.justifyContentBetween
-			classList += "py-4"
-			classList += "text-white"
-			classList += "w-100"
-			span {
-				classList += "mr-auto"
-				if (context.isLogined) {
+		parentTag.flex(class_ to _justify_content_between.._py_4.._text_white.._w_100) {
+			span(class_ to _mr_auto) {
+				if (context.isAccountLogined) {
 					+context.accountName
 				} else {
 					+"未登录"
 				}
 			}
-			if (context.isLogined) {
+			if (context.isAccountLogined) {
 				val u = httpContext.filter.loginUri
 				if (u.isNotEmpty()) {
 					a("登录", u)
@@ -178,7 +124,7 @@ class SidebarTemplate(override val context: HttpContext) : HttpScope, HtmlTempla
 	fun buildTopMenu(actionList: List<HttpAction>) {
 		val c = context.currentUri
 		this.topItems = actionList.map {
-			val a = context.actionUri(it)
+			val a = context.filter.actionUri(it)
 			LinkItem(it.userLabel, a, c == a)
 		}
 	}
@@ -186,14 +132,9 @@ class SidebarTemplate(override val context: HttpContext) : HttpScope, HtmlTempla
 	fun buildLeftMenu(ls: List<KClass<out HttpGroup>>) {
 		val c = context.currentUri
 		this.navItems = ls.map {
-			val a = context.groupUri(it)
+			val a = context.filter.groupUri(it)
 			LinkItem(it.userLabel, a, c.startsWith(a))
 		}
-	}
-
-	override fun toHtml(): String {
-		build()
-		return html.toHtml()
 	}
 
 }

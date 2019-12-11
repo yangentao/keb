@@ -23,6 +23,11 @@ annotation class LoginAction
 @Retention(AnnotationRetention.RUNTIME)
 annotation class LogoutAction
 
+//当前登录账号用户信息的uri
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class AccountInfoAction
+
 //参数或属性的最小值Int
 @Target(AnnotationTarget.PROPERTY,
 		AnnotationTarget.FIELD,

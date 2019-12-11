@@ -1,5 +1,11 @@
 include ':app'
-include ':biz'
+// include ':biz'
 include ':core'
 include ':page'
+include ':apk'
+include ':base'
+include ':json'
+include ':log'
+include ':sql'
+include ':qr'
 

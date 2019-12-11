@@ -5,8 +5,8 @@ import javax.servlet.FilterConfig
 
 class WebDir {
 	//war解压后的目录,  WEB-INF和META-INF所在的目录
-	  lateinit var webRootFile: File
-	private  var contextPath:String = ""
+	lateinit var webRootFile: File
+	private var contextPath: String = ""
 
 	@Suppress("UNUSED_PARAMETER")
 	fun onConfig(filter: HttpFilter, filterConfig: FilterConfig) {

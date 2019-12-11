@@ -4,21 +4,22 @@ import dev.entao.kava.base.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KVisibility
-import kotlin.reflect.full.memberFunctions
+import kotlin.reflect.full.declaredMemberFunctions
 
 /**
  * Created by entaoyang@163.com on 2017/5/7.
  */
 
-
-
 fun Prop1.valOf(item: Any): String {
 	return this.getValue(item)?.toString() ?: ""
 }
 
+//不支持继承, 不支持扩展函数
+//不能列举所有的扩展函数,  declaredMemberExtensionFunctions 只返回在该类内部定义的扩展函数.
+//继承, 父类函数的ownerClass 返回的是父类, 类名与子类不同, 生成的uri也不同 , 这容易造成问题
 val KClass<*>.actionList: List<KFunction<*>>
 	get() {
-		return this.memberFunctions.filter { it.isHttpAction }
+		return this.declaredMemberFunctions.filter { it.isHttpAction }
 	}
 
 //fun loginAction()
@@ -50,7 +51,6 @@ val KClass<*>.pageName: String
 		return gname
 	}
 
-
 val String.intList: List<Int>
 	get() {
 		return this.split(',').map { it.toInt() }
@@ -76,5 +76,5 @@ fun buildPath(vararg ps: String): String {
 			}
 		}
 	}
-	return sb.toString()
+	return sb.toString().toLowerCase()
 }

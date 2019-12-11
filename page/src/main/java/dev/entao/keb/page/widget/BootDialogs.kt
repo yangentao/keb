@@ -1,16 +1,16 @@
 package dev.entao.keb.page.widget
 
 import dev.entao.keb.core.HttpContext
-import dev.entao.keb.page.B
+import dev.entao.keb.page.bootstrap.buttonB
+import dev.entao.keb.page.bootstrap.buttonPrimary
 import dev.entao.keb.page.tag.*
 
 fun installDialogs(tag: Tag) {
 	tag.apply {
-		div {
-			id = "dialogPanel"
+		div(id_ to "dialogPanel") {
+
 		}
-		div {
-			id = "confirmDlgPanel"
+		div(id_ to "confirmDlgPanel") {
 			val b = DialogBuild(httpContext)
 			b.title("确认")
 			b.bodyBlock = {
@@ -20,16 +20,14 @@ fun installDialogs(tag: Tag) {
 			}
 			b.closeText = "取消"
 			b.buttonsBlock = {
-				it.button {
-					btnPrimary()
+				it.buttonPrimary {
 					+"确定"
 				}
 			}
 			b.build()
-			tag(b.modal)
+			add(b.modal)
 		}
-		div {
-			id = "alertDlgPanel"
+		div(id_ to "alertDlgPanel") {
 			val b = DialogBuild(httpContext)
 			b.title("提示")
 			b.bodyBlock = {
@@ -39,7 +37,7 @@ fun installDialogs(tag: Tag) {
 			}
 			b.closeText = "关闭"
 			b.build()
-			tag(b.modal)
+			add(b.modal)
 		}
 	}
 }
@@ -60,38 +58,26 @@ class DialogBuild(context: HttpContext) {
 
 	fun build(): Tag {
 		modal.apply {
-			classList += "modal"
-			tabindex = "-1"
-			role = "dialog"
-			div {
-				classList += "modal-dialog"
-				role = "document"
-				div {
-					classList += "modal-content"
-					div {
-						classList += "modal-header"
-						h5 {
-							classList += "modal-title"
+			this += "modal"
+			this[tabindex_] = "-1"
+			this[role_] = "dialog"
+			div(class_ to _modal_dialog, role_ to V.document) {
+				div(class_ to _modal_content) {
+					div(class_ to _modal_header) {
+						h5(class_ to _modal_title) {
 							titleBlock(this)
 						}
-						button {
-							classList += "close"
-							dataDismiss = "modal"
+						buttonB(class_ to _close, data_dismiss_ to "modal") {
 							span {
 								textUnsafe("&times;")
 							}
 						}
 					}
-					div {
-						classList += "modal-body"
-						//body here
+					div(class_ to "modal-body") {
 						bodyBlock(this)
 					}
-					div {
-						classList += "modal-footer"
-						button {
-							classList += B.btnSecondary
-							dataDismiss = "modal"
+					div(class_ to "modal-footer") {
+						buttonB(class_ to _btn_secondary, data_dismiss_ to "modal") {
 							+closeText
 						}
 						buttonsBlock(this)

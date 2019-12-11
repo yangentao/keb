@@ -1,257 +1,53 @@
+@file:Suppress("FunctionName", "MemberVisibilityCanBePrivate", "unused")
+
 package dev.entao.keb.page.tag
 
-import dev.entao.kava.base.Name
-import dev.entao.kava.base.notEmpty
+import dev.entao.kava.base.userLabel
+import dev.entao.keb.core.ActionURL
+import dev.entao.keb.core.HttpAction
 import dev.entao.keb.core.HttpContext
-import dev.entao.keb.page.HtmlTemplate
-import dev.entao.keb.page.attrVal
-import dev.entao.keb.page.ident
+import dev.entao.keb.page.bootstrap.confirm
 import java.util.*
 
-open class Tag(val httpContext: HttpContext, var tagName: String) : HtmlTemplate {
-	private val attrs: TagMap = TagMap()
-	var parentTag: Tag? = null
-	var outputScript = tagName == "body"
+typealias TagCallback = Tag.() -> Unit
+typealias HKeyValue = Pair<String, String>
 
-	var needDialogs = false
-	var needUploads = false
+
+//TODO 将tag的toString单独拿出来.
+open class Tag(val httpContext: HttpContext, var tagName: String) {
 
 	val children = ArrayList<Tag>(32)
-	val classList: ArrayList<String> = ArrayList()
-
+	val attrs: TagMap = TagMap()
+	var parent: Tag? = null
 	var id: String by attrs
-
 	var name: String by attrs
-	var clazz: String
-		get() {
-			return classList.joinToString(" ")
-		}
-		set(value) {
-			classList.clear()
-			val ls = value.split(" ").map { it.trim() }.filter { it.isNotEmpty() }
-			for (s in ls) {
-				classList.add(s)
-			}
-		}
-	var type: String by attrs
-	var style: String by attrs
-	var method: String by attrs
-	var action: String by attrs
-	var enctype: String by attrs
-	var target: String by attrs
-	var content: String by attrs
-	var charset: String by attrs
-	var lang: String by attrs
-	var viewport: String by attrs
-	@Name("http-equiv")
-	var httpEquiv: String by attrs
-
-	var tabindex: String by attrs
-	var width: String by attrs
-	var height: String by attrs
-	var rows: String by attrs
-	var cols: String by attrs
-	var placeholder: String by attrs
-	var max: String by attrs
-	var min: String by attrs
-	var maxlength: String by attrs
-	var pattern: String by attrs
-	var step: String by attrs
-	var accept: String by attrs
-	var scope: String by attrs
-
-	var size: Int by attrs
-	var color: String by attrs
-
-	var list: String by attrs
-	var label: String by attrs
-	var value: String by attrs
-	var role: String by attrs
-	var align: String by attrs
-	var src: String by attrs
-	@Name("data-src")
-	var dataSrc: String by attrs
-	var alt: String by attrs
-	var rel: String by attrs
-	var href: String by attrs
 	var onclick: String by attrs
-	@Name("for")
-	var forId: String by attrs
 
-	var disabled: Boolean by attrs
-	var readonly: Boolean by attrs
-	var checked: Boolean by attrs
-	var required: Boolean by attrs
-	var selected: Boolean by attrs
-	var multiple: Boolean by attrs
+	constructor(parent: Tag, name: String) : this(parent.httpContext, name) {
+		this.parent = parent
+	}
 
-	@Name("aria-label")
-	var ariaLabel: String by attrs
+	val root: Tag get() = this.parent?.root ?: this
 
-	@Name("aria-hidden")
-	var ariaHidden: String by attrs
-	@Name("aria-current")
-	var ariaCurrent: String by attrs
-	@Name("aria-controls")
-	var ariaControls: String by attrs
-	@Name("aria-expanded")
-	var ariaExpanded: String by attrs
-	@Name("aria-haspopup")
-	var ariaHaspopup: String by attrs
-
-	@Name("data-dismiss")
-	var dataDismiss: String by attrs
-	@Name("data-toggle")
-	var dataToggle: String by attrs
-	@Name("data-ride")
-	var dataRide: String by attrs
-	@Name("data-target")
-	var dataTarget: String by attrs
-	@Name("data-slide")
-	var dataSlide: String by attrs
-	@Name("data-slide-to")
-	var dataSlideTo: String by attrs
-
-	@Name("data-confirm")
-	var dataConfirm: String by attrs
-
-	@Name("data-url")
-	var dataUrl: String by attrs
-
-	@Name("data-param-name")
-	var dataParamName: String by attrs
-
-	@Name("aria-valuemin")
-	var ariaValueMin: String by attrs
-
-	@Name("aria-valuemax")
-	var ariaValueMax: String by attrs
-
-	var autocomplete: String by attrs
-	var onchange: String by attrs
-
-	@Name("data-select-value")
-	var dataSelectValue: String by attrs
-
-	init {
-		if (tagName == "script") {
-			this.type = "text/javascript"
+	fun parent(block: (Tag) -> Boolean): Tag? {
+		val p = this.parent ?: return null
+		if (block(p)) {
+			return p
 		}
+		return p.parent(block)
 	}
 
-	fun idName(idname: String) {
-		id = idname
-		name = idname
+	fun first(block: (Tag) -> Boolean): Tag? {
+		return children.find(block)
 	}
 
-	fun needFor(controlTag: Tag?) {
-		if (controlTag != null && this.forId.isEmpty()) {
-			this.forId = controlTag.needId()
-		}
-	}
-
-	fun needId(): String {
-		if (this.id.isEmpty()) {
-			genId()
-		}
-		return this.id
-	}
-
-	fun genId() {
-		++eleId
-		if (this.type.isEmpty()) {
-			this.id = tagName + "_$eleId"
-		} else {
-			this.id = tagName + "_" + this.type + "_$eleId"
-		}
-	}
-
-	operator fun get(key: String): String {
-		return attrs[key] ?: ""
-	}
-
-	operator fun set(key: String, value: String) {
-		attr(key, value)
-	}
-
-	fun attr(pair: Pair<String, String>) {
-		attr(pair.first, pair.second)
-	}
-
-	fun attr(key: String, value: String) {
-		attrs.put(key, value)
-	}
-
-	fun removeAttr(key: String) {
-		attrs.remove(key)
-	}
-
-	val noClass: Boolean get() = classList.isEmpty()
-
-	fun addClassFirst(cls: String) {
-		val ls: List<String> = cls.trim().splitToSequence(' ').map { it.trim() }.filter { it.notEmpty() }.toList().reversed()
-		for (s in ls) {
-			classList.remove(s)
-			classList.add(0, s)
-		}
-	}
-
-	fun addClass(vararg classes: String) {
-		val ls = classes.flatMap { s -> s.trim().splitToSequence(' ').map { it.trim() }.filter { it.notEmpty() }.toList() }
-		for (s in ls) {
-			if (s !in classList) {
-				classList += s
-			}
-		}
-	}
-
-	fun removeClass(vararg classes: String) {
-		val ls = classes.flatMap { s -> s.trim().splitToSequence(' ').map { it.trim() }.filter { it.notEmpty() }.toList() }
-		this.classList.removeAll(ls)
-	}
-
-	fun replaceClass(clsDel: String, clsAdd: String) {
-		for (i in classList.indices) {
-			if (classList[i] == clsDel) {
-				classList[i] = clsAdd
-				return
-			}
-		}
-		classList.add(clsAdd)
-	}
-
-	fun removeFromParent() {
-		parentTag?.children?.remove(this)
-	}
-
-	fun bringToFirst() {
-		val ls = parentTag?.children ?: return
-		ls.remove(this)
-		ls.add(0, this)
-	}
-
-	fun filterDeep(block: (Tag) -> Boolean): ArrayList<Tag> {
-		val ls = ArrayList<Tag>()
-		this.filterDeep(ls, block)
-		return ls
-	}
-
-	private fun filterDeep(ls: ArrayList<Tag>, block: (Tag) -> Boolean) {
-		for (c in this.children) {
-			if (block(c)) {
-				ls += c
-			}
-			c.filterDeep(ls, block)
-		}
-	}
-
-	fun findChildDeep(acceptor: (Tag) -> Boolean): Tag? {
+	fun firstDeep(acceptor: (Tag) -> Boolean): Tag? {
 		val t = children.find(acceptor)
 		if (t != null) {
 			return t
 		}
 		children.forEach {
-			val tt = it.findChildDeep(acceptor)
+			val tt = it.firstDeep(acceptor)
 			if (tt != null) {
 				return tt
 			}
@@ -259,43 +55,170 @@ open class Tag(val httpContext: HttpContext, var tagName: String) : HtmlTemplate
 		return null
 	}
 
-	fun findChild(block: (Tag) -> Boolean): Tag? {
-		return children.find(block)
-	}
 
-	fun findParent(block: (Tag) -> Boolean): Tag? {
-		val p = this.parentTag ?: return null
-		if (block(p)) {
-			return p
+	fun list(attr: HKeyValue, vararg vs: HKeyValue): List<Tag> {
+		return this.children.filter {
+			it.match(attr, *vs)
 		}
-		return p.findParent(block)
 	}
 
-	fun removeTag(tagname: String) {
-		children.removeIf { it.tagName == tagname }
+	fun listDeep(attr: HKeyValue, vararg vs: HKeyValue): List<Tag> {
+		val ls = ArrayList<Tag>()
+		for (c in this.children) {
+			if (c.match(attr, *vs)) {
+				ls += c
+			}
+			ls += c.listDeep(attr, *vs)
+		}
+		return ls
 	}
 
-	fun tag(tagname: String): Tag {
-		val t = Tag(httpContext, tagname)
-		tag(t)
+	fun first(attr: HKeyValue, vararg vs: HKeyValue): Tag? {
+		for (c in this.children) {
+			if (c.match(attr, *vs)) {
+				return c
+			}
+		}
+		return null
+	}
+
+	fun firstDeep(attr: HKeyValue, vararg vs: HKeyValue): Tag? {
+		for (c in this.children) {
+			if (c.match(attr, *vs)) {
+				return c
+			}
+			val t = c.firstDeep(attr, *vs)
+			if (t != null) {
+				return t
+			}
+		}
+		return null
+	}
+
+	fun single(tagname: String): Tag {
+		return this.first(tagname_ to tagname) ?: this.tag(tagname)
+	}
+
+
+	private fun match(vararg vs: HKeyValue): Boolean {
+		for (a in vs) {
+			val c = when {
+				a.first == tagname_.value -> this.tagName == a.second
+				a.first == class_.value -> this.hasClass(a.second)
+				else -> this[a.first] == a.second
+			}
+			if (!c) {
+				return false
+			}
+		}
+		return true
+	}
+
+	fun hasClass(c: HClass): Boolean {
+		return hasClass(c.value)
+	}
+
+	fun hasClass(c: String): Boolean {
+		val v = this[class_]
+		if (v == c) {
+			return true
+		}
+		return if (' ' in v) {
+			v.startsWith("$c ") || v.endsWith(" $c") || v.contains(" $c ")
+		} else {
+			c == v
+		}
+	}
+
+
+	fun idName(idname: String) {
+		this[id_] = idname
+		this[name_] = idname
+	}
+
+	fun needFor(controlTag: Tag?) {
+		if (controlTag != null && this[for_].isEmpty()) {
+			this[for_] = controlTag.needId()
+		}
+	}
+
+	fun needId(): String {
+		if (this[id_].isEmpty()) {
+			++eleId
+			this[id_] = tagName + "_$eleId"
+		}
+		return this[id_]
+	}
+
+	fun addClassFirst(cls: String) {
+		this[class_] = cls..this[class_]
+	}
+
+
+	fun bringToFirst() {
+		val ls = parent?.children ?: return
+		ls.remove(this)
+		ls.add(0, this)
+	}
+
+
+	operator fun get(key: String): String {
+		return attrs[key] ?: ""
+	}
+
+	operator fun get(attr: HAttr): String {
+		return attrs[attr.value] ?: ""
+	}
+
+	operator fun set(key: String, value: String) {
+		attrs[key] = value
+	}
+
+	operator fun set(attr: HAttr, value: String) {
+		attrs[attr.value] = value
+	}
+
+	operator fun get(attr: HKeyValue, vararg vs: HKeyValue): List<Tag> {
+		return this.list(attr, *vs)
+	}
+
+	infix operator fun plusAssign(tag: Tag) {
+		add(tag)
+	}
+
+
+	fun add(tag: Tag) {
+		tag.parent = this
+		this.children += tag
+	}
+
+	fun tag(tagname: String, vararg kv: HKeyValue): Tag {
+		val t = Tag(this, tagname)
+		for (p in kv) {
+			if (p.first == "class") {
+				t += p.second
+			} else {
+				t[p.first] = p.second
+			}
+		}
+		this += t
 		return t
 	}
 
-	fun tag(tagname: String, block: Tag.() -> Unit): Tag {
-		val t = tag(tagname)
+	fun tag(tagname: String, vararg kv: HKeyValue, block: TagCallback): Tag {
+		val t = this.tag(tagname, *kv)
 		t.block()
 		return t
 	}
 
-	fun tag(tag: Tag): Tag {
-		tag.parentTag = this
-		children.add(tag)
-		return tag
-	}
 
 	//==textEscaped
 	operator fun String?.unaryPlus() {
 		textEscaped(this)
+	}
+
+	operator fun String?.not() {
+		textUnsafe(this)
 	}
 
 	fun textUnsafe(block: () -> String?) {
@@ -303,117 +226,94 @@ open class Tag(val httpContext: HttpContext, var tagName: String) : HtmlTemplate
 	}
 
 	fun textUnsafe(text: String?) {
-		tag(TextUnsafe(httpContext, text ?: ""))
-	}
-
-	fun textEscaped(block: () -> String?): TextEscaped {
-		return textEscaped(block())
-	}
-
-	fun textEscaped(text: String?): TextEscaped {
-		val c = TextEscaped(httpContext, text ?: "")
-		tag(c)
-		return c
-	}
-
-	private fun writeChildren2(singleLine: Boolean, buf: Appendable, level: Int) {
-		val ls = children.filter { it.tagName != "script" }
-		if (singleLine) {
-			for (c in ls) {
-				c.writeTo(buf, 0)
-			}
-		} else {
-			for (c in ls) {
-				buf.appendln()
-				c.writeTo(buf, level + 1)
-			}
+		if (text != null) {
+			this += TextUnsafe(httpContext, text)
 		}
 	}
 
-	open fun writeChildren(singleLine: Boolean, buf: Appendable, level: Int) {
-		writeChildren2(singleLine, buf, level)
-		if (outputScript) {
-			this.filterDeep { it.tagName == "script" && it.src.isNotEmpty() }.forEach {
-				buf.appendln()
-				it.writeTo(buf, level)
-			}
-			this.children.filter { it is ScriptBlock }.forEach {
-				buf.appendln()
-				it.writeTo(buf, level)
-			}
-			val ls = ArrayList<Tag>(16)
-			this.children.forEach { c ->
-				c.filterDeep(ls) { t ->
-					t is ScriptBlock
-				}
-			}
-			ls.forEach {
-				buf.appendln()
-				it.writeTo(buf, level)
-			}
-			buf.appendln()
+	fun textEscaped(block: () -> String?) {
+		textEscaped(block())
+	}
+
+	fun textEscaped(text: String?): TextEscaped? {
+		if (text != null) {
+			val a = TextEscaped(httpContext, text)
+			this += a
+			return a
 		}
-	}
-
-	open fun writeTo(buf: Appendable, level: Int) {
-		val singleLine = tagName in singleLineTags
-		ident(buf, level)
-		buf.append("<").append(tagName)
-		attrs.put("class", clazz)
-		for ((k, v) in attrs) {
-			if (v.isEmpty()) {
-				if (!isKeepAttr(k)) {
-					continue
-				}
-			}
-			buf.append(" ").append(k).append("=").append(attrVal(v))
-		}
-		if (children.isEmpty()) {
-			if (tagName in selfEndTags) {
-				buf.append("/>")
-			} else {
-				buf.append("></").append(tagName).append(">")
-			}
-			return
-		} else {
-			buf.append(">")
-			writeChildren(singleLine, buf, level)
-			if (!singleLine) {
-				buf.appendln()
-				ident(buf, level)
-			}
-			buf.append("</").append(tagName).append(">")
-		}
-
-	}
-
-	override fun toHtml(): String {
-		return this.toString()
-	}
-
-	override fun toString(): String {
-		val n = preferBufferSize()
-		val sb = StringBuilder(n)
-		writeTo(sb, 0)
-		return sb.toString()
-	}
-
-	open fun preferBufferSize(): Int {
-		return tagName.length * 2 + attrs.size * 36 + 4 + 4 + children.sumBy { it.preferBufferSize() }
-	}
-
-	private fun isKeepAttr(key: String): Boolean {
-		return "$tagName.$key" in keepAttrs
+		return null
 	}
 
 	companion object {
 		private var eleId: Int = 1
-
-		//		val Null = HTag("null")
-		//允许 <xxx  />
-		val selfEndTags = setOf("meta", "link", "input", "img", "hr")
-		val singleLineTags = setOf("span", "textarea", "label", "button", "title", "td", "th", "input", "option", "a", "h1", "h2", "h3", "h4", "h5", "h6")
-		val keepAttrs = setOf("col.width", "option.value")
 	}
+}
 
+infix operator fun Tag?.plusAssign(clazz: String) {
+	if (this != null) {
+		this[class_] = this[class_]..clazz
+	}
+}
+
+infix operator fun Tag?.plusAssign(clazz: HClass) {
+	if (this != null) {
+		this[class_] = this[class_]..clazz.value
+	}
+}
+
+infix operator fun Tag?.plusAssign(kv: HKeyValue) {
+	if (this != null) {
+		this[kv.first] = kv.second
+	}
+}
+
+
+infix operator fun Tag?.minusAssign(clazz: HClass) {
+	if (this != null) {
+		val s = this[class_]
+		val ls = s.split(' ').map { it.trim() }.toMutableList()
+		ls.remove(clazz.value)
+		this[class_] = ls.joinToString(" ") { it.trim() }
+	}
+}
+
+
+infix operator fun Tag?.plusAssign(action: HttpAction) {
+	if (this != null) {
+		val url = this.httpContext.filter.actionUri(action)
+		this.setActionUrl(url)
+		this.confirm(action)
+		if (this.tagName == "button" || this.tagName == "a") {
+			if (this.children.isEmpty()) {
+				this.textEscaped(action.userLabel)
+			}
+		}
+	}
+}
+
+infix operator fun Tag?.plusAssign(action: ActionURL) {
+	if (this != null) {
+		val url = action.toURL(this.httpContext)
+		this.setActionUrl(url)
+		this.confirm(action.action)
+		if (this.tagName == "button" || this.tagName == "a") {
+			if (this.children.isEmpty()) {
+				this.textEscaped(action.action.userLabel)
+			}
+		}
+	}
+}
+
+fun Tag.setActionUrl(url: String) {
+	if (this.tagName == "form") {
+		this[action_] = url
+	} else if (this.tagName == "a") {
+		this[href_] = url
+	} else if (this.tagName == "button") {
+		this[data_url_] = url
+	} else if (this.tagName == "input" && this[type_] == "button") {
+		this[data_url_] = url
+	} else {
+		throw IllegalArgumentException("该tag不支持action属性")
+	}
 }

@@ -23,7 +23,7 @@ import javax.servlet.http.Part
 class ResGroup(context: HttpContext) : HttpGroup(context) {
 
 
-	override fun indexAction() {
+	fun indexAction() {
 		context.abort(404)
 	}
 
@@ -118,8 +118,8 @@ class ResGroup(context: HttpContext) : HttpGroup(context) {
 
 		fun configRes(tag: Tag) {
 			if (ResGroup::class in tag.httpContext.filter.routeManager.allGroups) {
-				val uploadUri = tag.httpContext.actionUri(ResGroup::uploadAction)
-				val viewUri = tag.httpContext.actionUri(ResGroup::imgAction)
+				val uploadUri = tag.httpContext.filter.actionUri(ResGroup::uploadAction)
+				val viewUri = tag.httpContext.filter.actionUri(ResGroup::imgAction)
 				val viewParam = ResGroup::imgAction.firstParamName ?: "id"
 				val missImg = tag.httpContext.resUri(R.fileImageDefault)
 				tag.configUpload(uploadUri, viewUri, viewParam, 30, missImg)

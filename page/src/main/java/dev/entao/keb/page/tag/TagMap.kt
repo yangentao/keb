@@ -4,15 +4,13 @@ import dev.entao.kava.base.isTypeBoolean
 import dev.entao.kava.base.isTypeInt
 import dev.entao.kava.base.isTypeString
 import dev.entao.kava.base.userName
-import java.util.*
+import java.util.HashMap
 import kotlin.reflect.KProperty
+
 
 @Suppress("UNCHECKED_CAST")
 class TagMap : HashMap<String, String>(16) {
 
-	fun removeProperty(p: KProperty<*>) {
-		this.remove(p.userName)
-	}
 
 	operator fun <T> setValue(thisRef: Any?, property: KProperty<*>, value: T) {
 		val k = property.userName
@@ -50,3 +48,5 @@ class TagMap : HashMap<String, String>(16) {
 	}
 
 }
+
+

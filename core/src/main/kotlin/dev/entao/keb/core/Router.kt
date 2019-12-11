@@ -3,7 +3,6 @@ package dev.entao.keb.core
 import dev.entao.kava.base.*
 import dev.entao.kava.json.YsonArray
 import dev.entao.kava.json.YsonObject
-import dev.entao.keb.core.render.ResultRender
 import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
@@ -15,16 +14,16 @@ import kotlin.reflect.full.primaryConstructor
  * Created by entaoyang@163.com on 2018/4/2.
  */
 
-class ParamError(val function: KFunction<*>, val param: KParameter, msg: String) : RuntimeException("$function : $param $msg")
+class ParamError(val function: KFunction<*>, val param: KParameter, val msg: String) : RuntimeException("$function : $param $msg")
 
 //function 必须是类的成员, 不能是全局函数
-class Router(val uri: String, val function: KFunction<*>, obj: Any? = null) {
+class Router(val uri: String, val cls: KClass<*>, val function: KFunction<*>, obj: Any? = null) {
 
-	val cls: KClass<*> = function.ownerClass!!
+	//	val cls: KClass<*> = function.ownerClass!!
 	private val inst: Any? = obj ?: function.ownerObject
 	private val paramList = function.parameters
 
-	val methods: Set<String>  by lazy {
+	val methods: Set<String> by lazy {
 		val a = HashSet<String>()
 		val b = function.findAnnotation<HttpMethod>()?.value?.map { it.toUpperCase() }?.toSet()
 		if (b != null) {
@@ -58,7 +57,7 @@ class Router(val uri: String, val function: KFunction<*>, obj: Any? = null) {
 				if (context.acceptJson) {
 					context.resultSender.failed("参数错误:${ex.message}")
 				} else {
-					context.backward { error(ex.message ?: "参数错误") }
+					context.backError("错误: ${ex.msg}${ex.param.name}")
 				}
 				return
 			}
@@ -78,7 +77,7 @@ class Router(val uri: String, val function: KFunction<*>, obj: Any? = null) {
 		val map = HashMap<KParameter, Any?>()
 		for (p in paramList) {
 			if (p.kind == KParameter.Kind.EXTENSION_RECEIVER) {
-				throw IllegalArgumentException("不支持扩展函数$function : $p")
+				map[p] = inst
 			} else if (p.kind == KParameter.Kind.INSTANCE) {
 				map[p] = inst
 			} else if (p.type.isClass(HttpContext::class)) {

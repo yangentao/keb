@@ -3,13 +3,13 @@ package dev.entao.keb.page.widget
 import dev.entao.kava.base.*
 import dev.entao.kava.json.YsonObject
 import dev.entao.kava.sql.ModelMap
-import dev.entao.keb.core.HttpAction
-import dev.entao.keb.core.HttpContext
-import dev.entao.keb.core.UriMake
-import dev.entao.keb.core.valOf
-import dev.entao.keb.page.B
+import dev.entao.keb.core.*
 import dev.entao.keb.page.OrderParam
 import dev.entao.keb.page.P
+import dev.entao.keb.page.bootstrap.a
+import dev.entao.keb.page.bootstrap.buttonApplyTheme
+import dev.entao.keb.page.bootstrap.buttonX
+import dev.entao.keb.page.bootstrap.linkButtonX
 import dev.entao.keb.page.displayOf
 import dev.entao.keb.page.modules.Upload
 import dev.entao.keb.page.tag.*
@@ -37,10 +37,10 @@ class XTable<T>(tableParent: Tag, val items: List<T>) {
 
 	}
 	var onTableStyle: (Tag) -> Unit = {
-		it.addClass(B.tableStriped)
+		it += _table_striped
 	}
 	var onHeadStyle: (Tag) -> Unit = {
-		it.addClass(B.theadLight)
+		it += _thead_light
 	}
 
 	private var withHeader = true
@@ -112,7 +112,7 @@ class XTable<T>(tableParent: Tag, val items: List<T>) {
 		}
 
 		tableTag.apply {
-			addClass(B.table)
+			this += _table
 			this@XTable.onTableStyle(this)
 //			colgroup {
 //				columnList.forEach { colInfo ->
@@ -126,14 +126,13 @@ class XTable<T>(tableParent: Tag, val items: List<T>) {
 					this@XTable.onHeadStyle(this)
 					tr {
 						columnList.forEach { ci ->
-							th {
-								scope = "col"
+							th(scope_ to "col") {
 								ci.onHeader(this)
 							}
 						}
 					}
 					val headId = needId()
-					scriptBlock {
+					script {
 						"""
 						Yet.sortCol = '$sortCol';
 						Yet.desc = $desc;
@@ -171,33 +170,30 @@ fun Tag.tableActionPanel(block: TableActionPanel.() -> Unit) {
 	val b = TableActionPanel(this)
 	b.block()
 	b.tag.children.forEach {
-		if (it is ButtonTag) {
-			it.classList += "m-1"
+		if (it.tagName == "button") {
+			it += "m-1"
 		}
 	}
 }
 
 class TableActionPanel(parentTag: Tag) {
-	val tag = parentTag.tag(Tag(parentTag.httpContext, "div"))
+	val tag = parentTag.div(class_ to _d_flex.._flex_row.._justify_content_start.."m-1", block = {})
 
-	init {
-		tag.addClass(B.flex, B.Flex.row, B.Flex.justifyContentStart, "m-1")
-	}
 
-	fun deleteChecked(action: HttpAction): ButtonTag {
+	fun deleteChecked(action: HttpAction): Tag {
 		val b = this.actionChecked(action)
-		b.btnDanger()
-		if (b.dataConfirm.isEmpty()) {
-			b.dataConfirm = "要删除选中记录吗?"
+		b[class_] = _btn.._btn_danger
+		if (b[data_confirm_].isEmpty()) {
+			b[data_confirm_] = "要删除选中记录吗?"
 		}
 		return b
 	}
 
-	fun actionChecked(action: HttpAction): ButtonTag {
-		return tag.button {
-			this.fromAction(action)
+	fun actionChecked(action: HttpAction): Tag {
+		return tag.buttonX(action) {
+			this.buttonApplyTheme(action, _btn_outline_primary.value)
 			val btnId = needId()
-			scriptBlock {
+			script {
 				"""
 				$('#$btnId').click(function(e){
 					var s = Yet.findCheckedIds();
@@ -217,19 +213,17 @@ class TableActionPanel(parentTag: Tag) {
 		}
 	}
 
-	fun dialogChecked(action: KFunction<Unit>): ButtonTag {
-		return tag.button {
-			fromAction(action)
-			onclick = "Yet.openDialogPanelChecked(this);"
+	fun dialogChecked(action: KFunction<*>): Tag {
+		return tag.buttonX(action) {
+			this[onclick_] = "Yet.openDialogPanelChecked(this);"
 		}
 
 	}
 
-	fun action(action: HttpAction): ButtonTag {
-		return tag.button {
-			this.fromAction(action)
+	fun action(action: HttpAction): Tag {
+		return tag.buttonX(action) {
 			val btnId = needId()
-			scriptBlock {
+			script {
 				"""
 				$('#$btnId').click(function(e){
 						var cs = $(this).attr("data-confirm");
@@ -244,18 +238,13 @@ class TableActionPanel(parentTag: Tag) {
 		}
 	}
 
-	fun dialog(action: KFunction<Unit>): ButtonTag {
-		return tag.button {
-			fromAction(action)
-			onclick = "Yet.openDialogPanel(this);"
+	fun dialog(action: KFunction<Unit>): Tag {
+		return tag.buttonX(action) {
+			this[onclick_] = "Yet.openDialogPanel(this);"
 		}
 
 	}
 }
-
-
-
-
 
 
 fun emWidthOfString(text: String): Double {
@@ -345,9 +334,9 @@ open class XTextColumn<T>(table: XTable<T>) : XColumn<T>(table) {
 			n = 1.0
 		}
 		if (n < 20) {
-			colTag.style = "width:${n}em"
+			colTag[style_] = "width:${n}em"
 		} else {
-			colTag.style = "width:*"
+			colTag[style_] = "width:*"
 		}
 	}
 
@@ -359,18 +348,15 @@ open class XTextColumn<T>(table: XTable<T>) : XColumn<T>(table) {
 			headTag.textEscaped(titleValue)
 			return
 		}
-		headTag.a {
-			role = B.button
-			href = "#"
-			attr(P.dataSortCol, sortName)
+		headTag.a(role_ to "button", href_ to "#", P.dataSortCol to sortName) {
 			this.textEscaped(this@XTextColumn.titleValue)
 			if (table.sortCol == sortName) {
 				if (table.desc) {
-					attr(P.dataDesc, "false")
-					textUnsafe(B.DownArrow)
+					this[P.dataDesc] = "false"
+					textUnsafe(V.DownArrow)
 				} else {
-					attr(P.dataDesc, "true")
-					textUnsafe(B.UpArrow)
+					this[P.dataDesc] = "true"
+					textUnsafe(V.UpArrow)
 				}
 			}
 		}
@@ -379,7 +365,7 @@ open class XTextColumn<T>(table: XTable<T>) : XColumn<T>(table) {
 	override fun onCell(tdTag: Tag, item: T) {
 		val v = this.columnValues[this.current]
 		if (v.length > 16) {
-			tdTag.style = "white-space: normal;"
+			tdTag[style_] = "white-space: normal;"
 		}
 		this.current += 1
 		val ac = this.linkAction
@@ -390,16 +376,15 @@ open class XTextColumn<T>(table: XTable<T>) : XColumn<T>(table) {
 		val v2: String = linkProp1?.valOf(item as Any) ?: v
 
 		if (renderButton) {
-			tdTag.linkButton(ac) { param(v2) }.btnSmall().apply {
+			tdTag.linkButtonX(ac + v2).apply {
 				if (linkTarget.isNotEmpty()) {
-					this.target = linkTarget
+					this[target_] = linkTarget
 				}
 			}
 		} else {
-			val p = httpContext.actionUri(ac, v2)
-			tdTag.a(v, p).apply {
+			tdTag.a( ac + v2, v ).apply {
 				if (linkTarget.isNotEmpty()) {
-					this.target = linkTarget
+					this[target_] = linkTarget
 				}
 			}
 		}
@@ -437,13 +422,13 @@ class XPropColumn<T>(table: XTable<T>, val prop: Prop1) : XTextColumn<T>(table) 
 class XCheckColumn<T>(table: XTable<T>, val prop: Prop1) : XColumn<T>(table) {
 
 	override fun onCol(colTag: Tag) {
-		colTag.style = "width:2em"
+		colTag[style_] = "width:2em"
 	}
 
 	override fun onHeader(headTag: Tag) {
 		headTag.checkbox {
 			id = "checkall"
-			scriptBlock {
+			script {
 				"""
 				$('#checkall').click(function (e) {
 					$(this).closest('table').find('tbody td input:checkbox').prop('checked', this.checked);
@@ -455,8 +440,7 @@ class XCheckColumn<T>(table: XTable<T>, val prop: Prop1) : XColumn<T>(table) {
 	}
 
 	override fun onCell(tdTag: Tag, item: T) {
-		tdTag.checkbox {
-			value = prop.valOf(item as Any)
+		tdTag.checkbox(value_ to prop.valOf(item as Any)) {
 		}
 	}
 
@@ -474,7 +458,7 @@ class XColumnActionGroup<T>(table: XTable<T>) : XColumn<T>(table) {
 
 	override fun onHeader(headTag: Tag) {
 		headTag.textEscaped("操作")
-		headTag.classList += "pl-3"
+		headTag += "pl-3"
 	}
 
 	override fun onCell(tdTag: Tag, item: T) {
@@ -487,7 +471,7 @@ class XColumnActionGroup<T>(table: XTable<T>) : XColumn<T>(table) {
 		val a = labelList.map { emWidthOfString(it) + 0.5 }.sum()
 		val b = emWidthOfString("操作")
 		val c = Math.max(a, b).keepDot(1)
-		this.colTag?.style = "width:${c}em"
+		this.colTag?.set(style_, "width:${c}em")
 	}
 
 }
@@ -496,24 +480,22 @@ class XColumnAction<T>(val td: Tag, val item: T) {
 
 	val labelList = ArrayList<String>(4)
 	val group = td.flexRow {
-		classList += B.Flex.justifyContentStart
+		this += _justify_content_start
 	}
 
-	fun actionLinkProp(action: HttpAction, prop: Prop1, block: LinkButton.() -> Unit = {}): LinkButton {
+	fun actionLinkProp(action: HttpAction, prop: Prop1, block: Tag.() -> Unit = {}): Tag {
 		val v = prop.getValue(item as Any)
-		val lk = group.linkButton(action) { param(v) }
-		lk.classList.clear()
-		lk.addClass("px-2")
+		val lk = group.linkButtonX(action + (v?.toString() ?: ""))
+		lk[class_] = "px-2"
 		lk.block()
 		labelList += action.userLabel
 		return lk
 	}
 
-	fun actionLink(action: HttpAction, block: UriMake.() -> Unit): LinkButton {
-		val t = group.linkButton(action, block)
-		t.classList.clear()
-		t.addClass("px-2")
-		labelList += action.userLabel
+	fun actionLink(action: ActionURL): Tag {
+		val t = group.linkButtonX(action)
+		t[class_] = "px-2"
+		labelList += action.action.userLabel
 		return t
 	}
 }
