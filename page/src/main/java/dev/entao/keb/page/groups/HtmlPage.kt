@@ -34,29 +34,7 @@ open class HtmlPage(final override val context: HttpContext) : HttpScope {
 		context.sendHtmlTag(html)
 	}
 
-	fun setupBootstrap() {
-		this.head {
-			meta(charset_ to V.utf8)
-			meta(http_equiv_ to V.X_UA_Compatible, content_ to V.IE_edge)
-			meta(name_ to V.viewport, content_ to V.deviceWidth)
 
-			link(rel_ to "stylesheet", href_ to context.resUri(R.awesomeCSS))
-			link(rel_ to "stylesheet", href_ to context.resUri(R.bootCSS))
-
-		}
-		this.body {
-			script(httpContext.resUri(R.jquery))
-			script(httpContext.resUri(R.popperJS))
-			script(httpContext.resUri(R.bootJS))
-			script(httpContext.resUri(R.buttonsJS))
-
-		}
-	}
-
-	fun setupMyCssJs() {
-		this.head.link(rel_ to "stylesheet", href_ to context.resUri(R.myCSS))
-		this.body.script(context.resUri(R.myJS))
-	}
 }
 
 val Tag.head: Tag get() = this.root.single("head")

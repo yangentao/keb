@@ -175,78 +175,66 @@ private fun Tag.processControlCSS() {
 private fun Tag.processPropertiesOfEdit(p: Prop) {
 	if (p.isTypeInt || p.isTypeLong || p.isTypeFloat || p.isTypeDouble) {
 		this += type_ to "number"
-		val rr = p.findAnnotation<ValueRange>()
-		if (rr != null) {
-			this += min_ to rr.minVal
-			this += max_ to rr.maxVal
-		} else {
-			val mr = p.findAnnotation<MinValue>()
-			if (mr != null) {
-				this += min_ to mr.value
-			}
-			val mr2 = p.findAnnotation<MaxValue>()
-			if (mr2 != null) {
-				this += max_ to mr2.value
-			}
-		}
-		val stepAn = p.findAnnotation<StepValue>()
-		if (stepAn != null) {
-			this += step_ to stepAn.value
-		} else {
-			if (p.isTypeFloat || p.isTypeDouble) {
-				val keepDot = p.findAnnotation<KeepDot>()
-				if (keepDot != null) {
-					val n = keepDot.value
-					val f = Math.pow(0.1, n.toDouble())
-					this += step_ to f.keepDot(n)
-				} else {
-					this += step_ to "0.000000001"
-				}
-			}
-		}
 	} else if (p.isTypeClass(java.sql.Date::class)) {
 		this += type_ to V.date
 	}
-
-	val ht = p.findAnnotation<FormHint>()
-	if (ht != null) {
-		this += placeholder_ to ht.value
-	}
-
-	val lenRange = p.findAnnotation<LengthRange>()
-	if (lenRange != null) {
-		this += maxlength_ to lenRange.maxValue.toString()
-		this += pattern_ to ".{${lenRange.minValue},}"
-	} else {
-		val maxLen = p.findAnnotation<Length>()?.value ?: 0
-		if (maxLen > 0) {
-			this += maxlength_ to maxLen.toString()
-		} else if (p.isTypeString) {
-			this += maxlength_ to "256"
+	val stepAn = p.findAnnotation<StepValue>()
+	if (stepAn == null) {
+		if (p.isTypeFloat || p.isTypeDouble) {
+			val keepDot = p.findAnnotation<KeepDot>()
+			if (keepDot != null) {
+				val n = keepDot.value
+				val f = Math.pow(0.1, n.toDouble())
+				this += step_ to f.keepDot(n)
+			} else {
+				this += step_ to "0.000000001"
+			}
 		}
-
-		val minLen = p.findAnnotation<MinLength>()?.value ?: 0
-		if (minLen > 0) {
-			this += pattern_ to ".{${minLen},}"
+	}
+	val anList = p.annotations
+	for (an in anList) {
+		when (an) {
+			is FormRequired -> this += required_ to "true"
+			is FormHint -> this += placeholder_ to an.value
+			is FormDate -> this += type_ to "date"
+			is FormPassword -> this += type_ to "password"
+			is FormEmail -> this += type_ to "email"
+			is FormPattern -> this += pattern_ to an.value
+			is FormPhone -> {
+				this += type_ to "text"
+				this += pattern_ to """^1[3,4,5,6,7,8,9]\d{9}$"""
+			}
+			is FormTel -> {
+				this += type_ to "text"
+				this += pattern_ to """^(\d{3,4}\-?)?\d{6,8}$"""
+			}
+			is LengthRange -> {
+				this += maxlength_ to an.maxValue.toString()
+				this += pattern_ to ".{${an.minValue},}"
+			}
+			is MinLength -> {
+				if (an.value > 0) {
+					this += pattern_ to ".{${an.value},}"
+				}
+			}
+			is Length -> {
+				val hasRange = null != anList.find { it is LengthRange }
+				if (!hasRange) {
+					if (an.value > 0) {
+						this += maxlength_ to an.value.toString()
+					} else if (p.isTypeString) {
+						this += maxlength_ to "256"
+					}
+				}
+			}
+			is MinValue -> this += min_ to an.value
+			is MaxValue -> this += max_ to an.value
+			is ValueRange -> {
+				this += min_ to an.minVal
+				this += max_ to an.maxVal
+			}
+			is StepValue -> this += step_ to an.value
 		}
-
-	}
-	if (null != p.findAnnotation<FormRequired>()) {
-		this += required_ to "true"
-	}
-	val fd = p.findAnnotation<FormDate>()
-	if (fd != null) {
-		this += type_ to "date"
-	}
-	if (p.hasAnnotation<FormPassword>()) {
-		this += type_ to "password"
-	}
-	if (p.hasAnnotation<FormEmail>()) {
-		this += type_ to "email"
-	}
-	val pat = p.findAnnotation<FormPattern>()
-	if (pat != null) {
-		this += pattern_ to pat.value
 	}
 
 }

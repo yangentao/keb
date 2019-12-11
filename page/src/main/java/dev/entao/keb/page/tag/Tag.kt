@@ -99,6 +99,14 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 		return this.first(tagname_ to tagname) ?: this.tag(tagname)
 	}
 
+	fun singleX(tagname: String, vararg vs: HKeyValue): Tag {
+		for (c in this.children) {
+			if (c.tagName == tagname && c.match(*vs)) {
+				return c
+			}
+		}
+		return this.tag(tagname, *vs)
+	}
 
 	private fun match(vararg vs: HKeyValue): Boolean {
 		for (a in vs) {
@@ -144,8 +152,7 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 
 	fun needId(): String {
 		if (this[id_].isEmpty()) {
-			++eleId
-			this[id_] = tagName + "_$eleId"
+			this[id_] = generateElementId(tagName)
 		}
 		return this[id_]
 	}
@@ -205,9 +212,11 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 		return t
 	}
 
-	fun tag(tagname: String, vararg kv: HKeyValue, block: TagCallback): Tag {
+	fun tag(tagname: String, vararg kv: HKeyValue, block: TagCallback? = null): Tag {
 		val t = this.tag(tagname, *kv)
-		t.block()
+		if (block != null) {
+			t.block()
+		}
 		return t
 	}
 
@@ -246,6 +255,10 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 
 	companion object {
 		private var eleId: Int = 1
+		fun generateElementId(prefix: String = "element"): String {
+			val aid = eleId++
+			return "$prefix$aid"
+		}
 	}
 }
 

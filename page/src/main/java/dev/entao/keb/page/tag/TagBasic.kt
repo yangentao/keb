@@ -23,12 +23,20 @@ fun Tag.meta(vararg kv: HKeyValue): Tag {
 	return this.tag("meta", *kv, block = {})
 }
 
-fun Tag.script(src: String): Tag {
-	return this.tag("script", type_ to "text/javascript", src_ to src, block = {})
+fun Tag.keywords(ws: List<String>) {
+	meta(name_ to "keywords", content_ to ws.joinToString(","))
 }
 
-fun Tag.script(block: () -> String): Tag {
-	return this.tag("script", type_ to "text/javascript") {
+fun Tag.scriptRes(srcRes: String) {
+	this.tag("script", type_ to "text/javascript", src_ to httpContext.resUri(srcRes))
+}
+
+fun Tag.script(src: String) {
+	this.tag("script", type_ to "text/javascript", src_ to src)
+}
+
+fun Tag.script(block: () -> String) {
+	this.tag("script", type_ to "text/javascript") {
 		textUnsafe(block)
 	}
 }
@@ -39,6 +47,10 @@ fun Tag.option(vararg kv: HKeyValue, block: TagCallback): Tag {
 
 fun Tag.div(vararg kv: HKeyValue, block: TagCallback): Tag {
 	return this.tag("div", *kv, block = block)
+}
+
+fun Tag.i(vararg kv: HKeyValue, block: TagCallback? = null): Tag {
+	return this.tag("i", *kv, block = block)
 }
 
 fun Tag.form(vararg kv: HKeyValue, block: TagCallback): Tag {
@@ -260,4 +272,8 @@ fun Tag.article(vararg kv: HKeyValue, block: TagCallback): Tag {
 
 fun Tag.stylesheet(url: String) {
 	link(rel_ to "stylesheet", href_ to url)
+}
+
+fun Tag.stylesheetRes(url: String) {
+	link(rel_ to "stylesheet", href_ to httpContext.resUri(url))
 }

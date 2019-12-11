@@ -29,6 +29,16 @@ annotation class FormPassword
 @Retention(AnnotationRetention.RUNTIME)
 annotation class FormEmail
 
+//手机
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class FormPhone
+
+//电话
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class FormTel
+
 
 //	@FormSelect("0:男", "1:女")
 //	@FormSelect("男", "女")

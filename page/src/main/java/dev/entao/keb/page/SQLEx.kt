@@ -11,34 +11,32 @@ import dev.entao.keb.core.paramNameSet
 import javax.servlet.http.HttpServletRequest
 
 fun SQLQuery.limitPage(context: HttpContext) {
-	val n = context.httpParams.int(P.pageN) ?: 0
+	val n = context.httpParams.int(P.pageArg) ?: 0
 	this.limit(P.pageSize, n * P.pageSize)
 }
 
-class OrderParam(val context: HttpContext, p: Prop1, desc: Boolean = true) {
+class SortParam(val context: HttpContext, sortByName: String, desc: Boolean = true) {
 
 	val sortBy: String
 	val desc: Boolean
 
 	init {
-		val ascKey = context.httpParams.str(P.ascKey)
-		val descKey = context.httpParams.str(P.descKey)
-
-		this.sortBy = ascKey ?: descKey ?: p.userName
-		this.desc = if (ascKey == null && descKey == null) {
-			desc
+		val a = context.httpParams.str(P.sortBy)
+		val d = context.httpParams.str(P.sortDesc) == "1"
+		if (a != null) {
+			this.sortBy = a
+			this.desc = d
 		} else {
-			descKey != null
+			this.sortBy = sortByName
+			this.desc = desc
 		}
-
 	}
+
+	constructor(context: HttpContext, p: Prop1, desc: Boolean) : this(context, p.userName, desc)
 }
 
-fun HttpScope.OrderBy(p: Prop1, desc: Boolean = true): OrderParam {
-	return OrderParam(context, p, desc)
-}
 
-fun SQLQuery.orderBy(sp: OrderParam) {
+fun SQLQuery.orderBy(sp: SortParam) {
 	if (sp.sortBy.isNotEmpty()) {
 		if (sp.desc) {
 			desc(sp.sortBy)

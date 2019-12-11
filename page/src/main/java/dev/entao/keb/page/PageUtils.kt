@@ -13,6 +13,13 @@ import kotlin.reflect.full.findAnnotation
  * Created by entaoyang@163.com on 2017/4/8.
  */
 
+//  """^1[3,4,5,6,7,8,9]\d{9}$"""
+
+fun String.matchPhone(): Boolean {
+	return this.matches("^1[3456789]\\d{9}$".toRegex())
+}
+
+
 class LinkItem(val label: String, val url: String, var active: Boolean = false) {
 	val children: ArrayList<LinkItem> = ArrayList()
 }

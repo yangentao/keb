@@ -168,10 +168,10 @@ fun Tag.confirm(action: HttpAction): Tag {
 }
 
 
-fun Tag.reloadPage() {
-	this[onclick_] = "Yet.reqReload(this); return false ;"
+fun Tag.onClickReload() {
+	this[onclick_] = "reloadLink(this); return false ;"
 }
 
-fun Tag.openDialog() {
-	this[onclick_] = "Yet.openDialogPanel(this); return false;"
+fun Tag.onClickOpenDialog() {
+	this[onclick_] = "openDialogPanel(this); return false;"
 }

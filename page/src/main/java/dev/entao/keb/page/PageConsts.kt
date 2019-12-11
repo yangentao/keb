@@ -4,21 +4,27 @@ package dev.entao.keb.page
 //js,css,image常量连接
 object R {
 
-	const val myJS = "/ylib/my.js"
-	const val myCSS = "/ylib/my.css"
 	const val fileImageDefault = "/ylib/file_miss.png"
-	const val navbarLeft = "/ylib/navbar-fixed-left.css"
-	const val navbarRight = "/ylib/navbar-fixed-right.css"
+	const val myJS = "/ylib/my.js"
+	const val myJS2 = "/ylib/my2.js"
+	const val myCSS = "/ylib/my.css"
+
+	const val sidebarCSS = "/ylib/sidebar.css"
 
 	const val jquery = "/ylib/jquery-3.3.1.min.js"
-	const val popperJS = "/ylib/propper.min.js"
-	const val bootJS = "/ylib/bootstrap.min.js"
-	const val buttonsJS = "/ylib/buttons.js"
+	const val popperJS = "/ylib/popper.min.js"
+//	const val buttonsJS = "/ylib/buttons.js"
 
+	const val bootCSS = "/ylib/boot/bootstrap.css"
+	const val bootJS = "/ylib/boot/bootstrap.min.js"
 
-	const val bootCSS = "/ylib/bootstrap.css"
-	const val awesomeCSS = "/ylib/awesome.min.css"
+	const val faCSS = "/ylib/fa511/css/all.min.css"
+	const val faJS = "/ylib/fa511/js/all.min.js"
 
+	const val mdeCSS = "/ylib/mde/simplemde.css"
+	const val mdeJS = "/ylib/mde/simplemde.min.js"
+
+	const val mdviewCSS = "/ylib/mdview/markdown.css"
 }
 
 //常量应用字符串
@@ -37,20 +43,23 @@ object S {
 //应用参数
 object P {
 
-	const val pageSize = 50
-
-	//是否倒序
-	const val dataDesc = "data-desc"
-	//排序字段名
-	const val dataSortCol = "data-sortcol"
+	var pageSize = 50
+	//不能变, my.js中是固定的
+	var pageArg = "p"
 	const val dataPage = "data-page"
 
+	//是否倒序
+	const val dataSortDesc = "data-desc"
+	//排序字段名
+	const val dataSortBy = "data-sortcol"
+
+
+	const val sortBy = "sortby"
+	const val sortDesc = "sortdesc"
 	//不能变, my.js中是固定的
-	const val pageN = "p"
+//	const val ascKey = "asc_key"
 	//不能变, my.js中是固定的
-	const val ascKey = "asc_key"
-	//不能变, my.js中是固定的
-	const val descKey = "desc_key"
+//	const val descKey = "desc_key"
 
 	const val QUERY_FORM = "queryForm"
 }

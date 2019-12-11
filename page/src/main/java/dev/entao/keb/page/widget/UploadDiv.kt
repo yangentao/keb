@@ -2,6 +2,8 @@ package dev.entao.keb.page.widget
 
 import dev.entao.kava.base.getValue
 import dev.entao.kava.base.userName
+import dev.entao.keb.page.bootstrap.progress
+import dev.entao.keb.page.bootstrap.progressBar
 import dev.entao.keb.page.tag.*
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
@@ -38,8 +40,7 @@ fun Tag.uploadDiv(p: KProperty<*>) {
 
 fun Tag.uploadDiv(hiddenName: String, hiddenValue: String) {
 	this.div(class_ to "form-control drag-upload-div", style_ to "height: 8em;") {
-		hidden(name_ to hiddenName, value_ to hiddenValue) {
-		}
+		hidden(hiddenName, hiddenValue)
 		img(style_ to "height:5em;margin:4px;") {
 		}
 		progress(style_ to "height:0.2em") {
@@ -54,7 +55,10 @@ fun Tag.uploadDiv(hiddenName: String, hiddenValue: String) {
 		val myDivId = needId()
 		script {
 			"""
-				Yet.uplodaBindDivById("$myDivId");
+				$(function(){
+					Yet.uploadBindDivById("$myDivId");
+				});
+				
 			"""
 		}
 	}
