@@ -44,9 +44,14 @@ class TokenModel(val yo: YsonObject = YsonObject()) {
 			}
 			return false
 		}
+
+	val valid: Boolean
+		get() {
+			return this.userName.isNotEmpty() && !this.expired
+		}
 }
 
-
+//0 永不过期
 fun HttpContext.makeToken(userId: Long, userName: String, expireTime: Long): String {
 	val ts = this.filter.sliceList.find { it is TokenSlice } as? TokenSlice
 			?: throw IllegalAccessError("没有找到TokenSlice")
