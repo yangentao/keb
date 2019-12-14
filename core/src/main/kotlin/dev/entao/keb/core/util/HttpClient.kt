@@ -319,10 +319,6 @@ class Http(val url: String) {
 		result.headerMap = connection.headerFields
 		val total = connection.contentLength
 		result.contentLength = total
-
-		if (dumpResp) {
-			result.dump()
-		}
 		val os: OutputStream = if (this.saveToFile != null) {
 			val dir = this.saveToFile!!.parentFile
 			if (dir != null) {
@@ -411,7 +407,11 @@ class Http(val url: String) {
 			preConnect(connection)
 			connection.connect()
 			onSend(connection)
-			return onResponse(connection)
+			val r = onResponse(connection)
+			if (dumpResp) {
+				r.dump()
+			}
+			return r
 		} catch (ex: Exception) {
 			ex.printStackTrace()
 			loge(ex)
@@ -508,7 +508,7 @@ class HttpResult(val url: String) {
 	var responseCode: Int = 0//200
 	var responseMsg: String? = null//OK
 	var contentType: String? = null
-		//text/html;charset=utf-8
+	//text/html;charset=utf-8
 //		set(value) {
 //			field = value
 //			if (value != null && value.startsWith("text/html")) {
@@ -541,7 +541,7 @@ class HttpResult(val url: String) {
 		}
 	val responseText: String?
 		get() {
-			if (response != null) {
+			if (this.response != null) {
 				val ch = contentCharset ?: Charsets.UTF_8
 				var s = String(response!!, ch)
 				if (needDecode) {
@@ -565,7 +565,6 @@ class HttpResult(val url: String) {
 				}
 			}
 		}
-		logd("  ContentLengthX:", contentLength)
 		if (this.contentLength < 4096) {
 			logd("  body:", this.responseText)
 		}
@@ -648,3 +647,13 @@ class HttpResult(val url: String) {
 	}
 
 }
+
+//fun main() {
+//	val url = "http://localhost:8080/taoke/test/json"
+//	val h = Http(url)
+//	h.dumpReq = true
+//	h.dumpResp = true
+//	val r = h.post()
+//	logd(r.strUtf8())
+//	logd("END")
+//}
