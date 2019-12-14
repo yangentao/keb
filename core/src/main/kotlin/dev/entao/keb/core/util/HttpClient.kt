@@ -361,10 +361,18 @@ class Http(val url: String) {
 					val s = buildArgs()
 					if (s.isNotEmpty()) {
 						write(os, s)
+						if (dumpReq) {
+							logd("--body:", s)
+						}
 					}
 				}
 				HttpMethod.POST_MULTIPART -> sendMultipart(os)
-				HttpMethod.POST_RAW_DATA -> os.write(rawData!!)
+				HttpMethod.POST_RAW_DATA -> {
+					os.write(rawData!!)
+					if (dumpReq) {
+						logd("--body:", String(rawData!!, Charsets.UTF_8))
+					}
+				}
 				else -> {
 				}
 			}
@@ -439,6 +447,12 @@ class Http(val url: String) {
 		return request()
 	}
 
+	fun postJson(block: YsonObject.() -> Unit): HttpResult {
+		val yo = YsonObject()
+		yo.block()
+		return this.postRawJson(yo.toString())
+	}
+
 	fun postRawJson(json: String): HttpResult {
 		return postRawData("application/json;charset=utf-8", json.toByteArray(charsetUTF8))
 	}
@@ -495,12 +509,12 @@ class HttpResult(val url: String) {
 	var responseMsg: String? = null//OK
 	var contentType: String? = null
 		//text/html;charset=utf-8
-		set(value) {
-			field = value
-			if (value != null && value.startsWith("text/html")) {
-				needDecode = true
-			}
-		}
+//		set(value) {
+//			field = value
+//			if (value != null && value.startsWith("text/html")) {
+//				needDecode = true
+//			}
+//		}
 	var contentLength: Int = 0//如果是gzip格式, 这个值!=response.length
 	var headerMap: Map<String, List<String>>? = null
 	var exception: Exception? = null
@@ -527,21 +541,33 @@ class HttpResult(val url: String) {
 		}
 	val responseText: String?
 		get() {
-			val bs = this.response ?: return null
-			return String(bs, this.contentCharset ?: Charsets.UTF_8)
+			if (response != null) {
+				val ch = contentCharset ?: Charsets.UTF_8
+				var s = String(response!!, ch)
+				if (needDecode) {
+					s = URLDecoder.decode(s, ch.name())
+				}
+				return s
+			}
+			return null
 		}
 
 	fun dump() {
 		logd("Response:", this.url)
-		logd("--status:", responseCode, responseMsg ?: "")
+		logd("  status:", responseCode, responseMsg ?: "")
 		val map = this.headerMap
 		if (map != null) {
 			for ((k, v) in map) {
-				logd("--head:", k, "=", v)
+				if (v.size == 1) {
+					logd("  head:", k, "=", v.first())
+				} else {
+					logd("  head:", k, "=", v.joinToString(","))
+				}
 			}
 		}
+		logd("  ContentLengthX:", contentLength)
 		if (this.contentLength < 4096) {
-			logd("--body:", this.responseText)
+			logd("  body:", this.responseText)
 		}
 	}
 
