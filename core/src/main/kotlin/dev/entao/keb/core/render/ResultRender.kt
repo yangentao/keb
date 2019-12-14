@@ -3,7 +3,6 @@ package dev.entao.keb.core.render
 import dev.entao.kava.base.Mimes
 import dev.entao.kava.json.YsonArray
 import dev.entao.kava.json.YsonObject
-import dev.entao.kava.json.YsonObjectBuilder
 import dev.entao.kava.json.ysonArray
 import dev.entao.keb.core.HttpContext
 
@@ -155,10 +154,10 @@ class ResultRender(val context: HttpContext) {
 		}
 	}
 
-	fun obj(block: YsonObjectBuilder.() -> Unit) {
-		val jb = YsonObjectBuilder()
+	fun obj(block: YsonObject.() -> Unit) {
+		val jb = YsonObject()
 		jb.block()
-		obj(jb.jo)
+		obj(jb)
 	}
 
 	fun obj(data: YsonObject) {

@@ -8,38 +8,6 @@ import kotlin.reflect.KProperty
  */
 
 
-class YsonObjectBuilder {
-	val jo = YsonObject()
-
-	fun toJson(): String {
-		return jo.toString()
-	}
-
-	infix fun <V> String.to(value: V) {
-		jo.any(this, value)
-	}
-
-	infix fun <V> KProperty<*>.to(value: V) {
-		jo.any(this.userName, value)
-	}
-
-
-	infix fun String.to(value: YsonObject) {
-		jo.obj(this, value)
-	}
-
-	infix fun String.to(value: YsonArray) {
-		jo.arr(this, value)
-	}
-
-
-}
-
-fun ysonObject(block: YsonObjectBuilder.() -> Unit): YsonObject {
-	val b = YsonObjectBuilder()
-	b.block()
-	return b.jo
-}
 
 fun ysonArray(values: Collection<Any?>): YsonArray {
 	val arr = YsonArray()

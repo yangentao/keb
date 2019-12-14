@@ -160,6 +160,29 @@ class YsonObject(val data: LinkedHashMap<String, YsonValue> = LinkedHashMap(32))
 		return get(key)
 	}
 
+
+	fun addObject(key: String): YsonObject {
+		val yo = YsonObject()
+		this.obj(key, yo)
+		return yo
+	}
+
+	fun addArray(key: String): YsonArray {
+		val yarr = YsonArray()
+		this.arr(key, yarr)
+		return yarr
+	}
+
+	fun obj(key: String, block: YsonObject.() -> Unit) {
+		val b = YsonObject()
+		this.obj(key, b)
+		b.block()
+	}
+
+	infix fun <V> String.TO(value: V) {
+		any(this, value)
+	}
+
 	companion object {
 		init {
 
@@ -174,3 +197,12 @@ object YsonObjectText : ITextConvert {
 		return YsonObject(text)
 	}
 }
+
+
+fun ysonObject(block: YsonObject.() -> Unit): YsonObject {
+	val b = YsonObject()
+	b.block()
+	return b
+}
+
+

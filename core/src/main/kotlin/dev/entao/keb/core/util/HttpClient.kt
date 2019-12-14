@@ -48,12 +48,12 @@ class Http(val url: String) {
 	private var progress: Progress? = null
 
 	init {
-		userAgent("android")
+//		userAgent("android")
 		accept("application/json,text/plain,text/html,*/*")
-		acceptLanguage("zh-CN,en-US;q=0.8,en;q=0.6")
-		headerMap["Accept-Charset"] = "UTF-8,*"
+//		acceptLanguage("zh-CN,en-US;q=0.8,en;q=0.6")
+//		headerMap["Accept-Charset"] = "UTF-8,*"
 		headerMap["Connection"] = "close"
-		headerMap["Charset"] = UTF8
+//		headerMap["Charset"] = UTF8
 	}
 
 	fun saveTo(file: File): Http {
@@ -113,6 +113,11 @@ class Http(val url: String) {
 		val usernamePassword = "$user:$pwd"
 		val encodedUsernamePassword = Base64.getUrlEncoder().encodeToString(usernamePassword.toByteArray(charsetUTF8))
 		headerMap["Authorization"] = "Basic $encodedUsernamePassword"
+		return this
+	}
+
+	fun autoBearer(token: String): Http {
+		headerMap["Authorization"] = "Bearer $token"
 		return this
 	}
 
@@ -421,11 +426,11 @@ class Http(val url: String) {
 	}
 
 	fun postRawJson(json: String): HttpResult {
-		return postRawData("text/json;charset=utf-8", json.toByteArray(charsetUTF8))
+		return postRawData("application/json;charset=utf-8", json.toByteArray(charsetUTF8))
 	}
 
 	fun postRawXML(xml: String): HttpResult {
-		return postRawData("text/xml;charset=utf-8", xml.toByteArray(charsetUTF8))
+		return postRawData("application/xml;charset=utf-8", xml.toByteArray(charsetUTF8))
 	}
 
 	fun download(saveto: File, progress: Progress?): HttpResult {
