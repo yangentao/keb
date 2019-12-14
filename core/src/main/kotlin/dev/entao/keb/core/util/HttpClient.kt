@@ -47,6 +47,9 @@ class Http(val url: String) {
 	private var saveToFile: File? = null
 	private var progress: Progress? = null
 
+	var dumpReq: Boolean = false
+	var dumpResp: Boolean = false
+
 	init {
 //		userAgent("android")
 		accept("application/json,text/plain,text/html,*/*")
@@ -309,7 +312,7 @@ class Http(val url: String) {
 
 	@Throws(IOException::class)
 	private fun onResponse(connection: HttpURLConnection): HttpResult {
-		val result = HttpResult()
+		val result = HttpResult(this.url)
 		result.responseCode = connection.responseCode
 		result.responseMsg = connection.responseMessage
 		result.contentType = connection.contentType
@@ -317,8 +320,9 @@ class Http(val url: String) {
 		val total = connection.contentLength
 		result.contentLength = total
 
-		logd("--HttpStatus:", result.responseCode, result.responseMsg ?: "")
-
+		if (dumpResp) {
+			result.dump()
+		}
 		val os: OutputStream = if (this.saveToFile != null) {
 			val dir = this.saveToFile!!.parentFile
 			if (dir != null) {
@@ -370,16 +374,26 @@ class Http(val url: String) {
 		}
 	}
 
+	fun dumpReq() {
+		if (!dumpReq) {
+			return
+		}
+		logd("Http Request:", url)
+		for ((k, v) in headerMap) {
+			logd("--head:", k, "=", v)
+		}
+		for ((k, v) in argMap) {
+			logd("--arg:", k, "=", v)
+		}
+		for (fp in fileList) {
+			logd("--file:", fp)
+		}
+	}
+
 	private fun request(): HttpResult {
 		var connection: HttpURLConnection? = null
 		try {
-			log("Http Request:", url)
-			for ((k, v) in argMap) {
-				log("--arg:", k, "=", v)
-			}
-			for (fp in fileList) {
-				log("--file:", fp)
-			}
+			dumpReq()
 			connection = if (method == HttpMethod.GET || method == HttpMethod.POST_RAW_DATA) {
 				URL(buildGetUrl()).openConnection() as HttpURLConnection
 			} else {
@@ -393,7 +407,7 @@ class Http(val url: String) {
 		} catch (ex: Exception) {
 			ex.printStackTrace()
 			loge(ex)
-			val result = HttpResult()
+			val result = HttpResult(this.url)
 			result.exception = ex
 			return result
 		} finally {
@@ -475,8 +489,7 @@ class FileParam(val key: String,
 }
 
 
-class HttpResult {
-
+class HttpResult(val url: String) {
 	var response: ByteArray? = null//如果Http.request参数给定了文件参数, 则,response是null
 	var responseCode: Int = 0//200
 	var responseMsg: String? = null//OK
@@ -512,6 +525,25 @@ class HttpResult {
 			}
 			return null
 		}
+	val responseText: String?
+		get() {
+			val bs = this.response ?: return null
+			return String(bs, this.contentCharset ?: Charsets.UTF_8)
+		}
+
+	fun dump() {
+		logd("Response:", this.url)
+		logd("--status:", responseCode, responseMsg ?: "")
+		val map = this.headerMap
+		if (map != null) {
+			for ((k, v) in map) {
+				logd("--head:", k, "=", v)
+			}
+		}
+		if (this.contentLength < 4096) {
+			logd("--body:", this.responseText)
+		}
+	}
 
 	fun needDecode(): HttpResult {
 		this.needDecode = true
