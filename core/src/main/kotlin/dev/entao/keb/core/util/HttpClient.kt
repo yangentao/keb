@@ -565,8 +565,11 @@ class HttpResult(val url: String) {
 				}
 			}
 		}
-		if (this.contentLength < 4096) {
-			logd("  body:", this.responseText)
+		val ct = this.contentType?.toLowerCase()
+		if (ct != null) {
+			if ("json" in ct || "xml" in ct || "html" in ct || "text" in ct) {
+				logd("  body:", this.responseText)
+			}
 		}
 	}
 
