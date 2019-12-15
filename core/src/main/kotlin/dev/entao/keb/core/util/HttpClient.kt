@@ -13,6 +13,19 @@ import java.nio.charset.Charset
 import java.util.*
 import java.util.zip.GZIPInputStream
 
+
+fun httpGet(url: String, block: HttpGet.() -> Unit): HttpResult {
+	val h = HttpGet(url)
+	h.block()
+	return h.request()
+}
+
+fun httpPost(url: String, block: HttpPost.() -> Unit): HttpResult {
+	val h = HttpPost(url)
+	h.block()
+	return h.request()
+}
+
 /**
  * Created by entaoyang@163.com on 2016/12/20.
  */
