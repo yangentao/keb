@@ -26,6 +26,18 @@ fun httpPost(url: String, block: HttpPost.() -> Unit): HttpResult {
 	return h.request()
 }
 
+fun httpRaw(url: String, block: HttpRaw.() -> Unit): HttpResult {
+	val h = HttpRaw(url)
+	h.block()
+	return h.request()
+}
+
+fun httpMultipart(url: String, block: HttpMultipart.() -> Unit): HttpResult {
+	val h = HttpMultipart(url)
+	h.block()
+	return h.request()
+}
+
 /**
  * Created by entaoyang@163.com on 2016/12/20.
  */
