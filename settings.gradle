@@ -8,4 +8,5 @@ include ':json'
 include ':log'
 include ':sql'
 include ':qr'
+include ':tcp'
 
