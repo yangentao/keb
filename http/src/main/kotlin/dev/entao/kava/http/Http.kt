@@ -1,6 +1,6 @@
 @file:Suppress("unused", "MemberVisibilityCanBePrivate", "PrivatePropertyName", "PropertyName", "FunctionName")
 
-package dev.entao.keb.core.util
+package dev.entao.kava.http
 
 import dev.entao.kava.base.*
 import dev.entao.kava.json.YsonArray
@@ -13,7 +13,9 @@ import java.nio.charset.Charset
 import java.util.*
 import java.util.zip.GZIPInputStream
 
-
+/**
+ * Created by entaoyang@163.com on 2016/12/20.
+ */
 fun httpGet(url: String, block: HttpGet.() -> Unit): HttpResult {
 	val h = HttpGet(url)
 	h.block()
@@ -38,9 +40,7 @@ fun httpMultipart(url: String, block: HttpMultipart.() -> Unit): HttpResult {
 	return h.request()
 }
 
-/**
- * Created by entaoyang@163.com on 2016/12/20.
- */
+
 class HttpGet(url: String) : HttpReq(url) {
 	init {
 		method = "GET"
@@ -327,6 +327,15 @@ abstract class HttpReq(val url: String) {
 		return this
 	}
 
+	fun arg(key: String, value: Int): HttpReq {
+		argMap[key] = "" + value
+		return this
+	}
+
+	fun arg(key: String, value: Double): HttpReq {
+		argMap[key] = "" + value
+		return this
+	}
 
 	fun args(vararg args: Pair<String, String>): HttpReq {
 		for ((k, v) in args) {
@@ -412,28 +421,33 @@ abstract class HttpReq(val url: String) {
 		result.headerMap = connection.headerFields
 		val total = connection.contentLength
 		result.contentLength = total
-		val os: OutputStream = if (this.saveToFile != null) {
-			val dir = this.saveToFile!!.parentFile
-			if (dir != null) {
-				if (!dir.exists()) {
-					if (!dir.mkdirs()) {
-						loge("创建目录失败")
-						throw IOException("创建目录失败!")
+
+		try {
+			val os: OutputStream = if (this.saveToFile != null) {
+				val dir = this.saveToFile!!.parentFile
+				if (dir != null) {
+					if (!dir.exists()) {
+						if (!dir.mkdirs()) {
+							loge("创建目录失败")
+							throw IOException("创建目录失败!")
+						}
 					}
 				}
+				FileOutputStream(saveToFile!!)
+			} else {
+				ByteArrayOutputStream(if (total > 0) total else 64)
 			}
-			FileOutputStream(saveToFile!!)
-		} else {
-			ByteArrayOutputStream(if (total > 0) total else 64)
-		}
-		var input = connection.inputStream
-		val mayGzip = connection.contentEncoding
-		if (mayGzip != null && mayGzip.contains("gzip")) {
-			input = GZIPInputStream(input)
-		}
-		copyStream(input, true, os, true, total, progress)
-		if (os is ByteArrayOutputStream) {
-			result.response = os.toByteArray()
+			var input = connection.inputStream
+			val mayGzip = connection.contentEncoding
+			if (mayGzip != null && mayGzip.contains("gzip")) {
+				input = GZIPInputStream(input)
+			}
+			copyStream(input, true, os, true, total, progress)
+			if (os is ByteArrayOutputStream) {
+				result.response = os.toByteArray()
+			}
+		} catch (ex: Exception) {
+			result.exception = ex
 		}
 		return result
 	}
@@ -483,169 +497,11 @@ private fun write(os: OutputStream, vararg arr: String) {
 	}
 }
 
-private fun allowDump(ct: String?): Boolean {
+fun allowDump(ct: String?): Boolean {
 	val a = ct?.toLowerCase() ?: return false
 	return "json" in a || "xml" in a || "html" in a || "text" in a
 }
 
-//file, key, filename, mime都不能是空
-class FileParam(val key: String, val file: File, var filename: String = file.name, var mime: String = "application/octet-stream") {
-	var progress: Progress? = null
-
-	fun mime(mime: String?): FileParam {
-		if (mime != null) {
-			this.mime = mime
-		}
-		return this
-	}
-
-	fun fileName(filename: String?): FileParam {
-		if (filename != null) {
-			this.filename = filename
-		}
-		return this
-	}
-
-	fun progress(progress: Progress?): FileParam {
-		this.progress = progress
-		return this
-	}
-
-	override fun toString(): String {
-		return "key=$key, filename=$filename, mime=$mime, file=$file"
-	}
-}
-
-
-class HttpResult(val url: String) {
-	var response: ByteArray? = null//如果Http.request参数给定了文件参数, 则,response是null
-	var responseCode: Int = 0//200
-	var responseMsg: String? = null//OK
-	var contentType: String? = null
-	var contentLength: Int = 0//如果是gzip格式, 这个值!=response.length
-	var headerMap: Map<String, List<String>>? = null
-	var exception: Exception? = null
-
-	var needDecode: Boolean = false
-
-	val OK: Boolean get() = responseCode in 200..299
-
-	val contentCharset: Charset?
-		get() {
-			val ct = this.contentType ?: return null
-			val ls: List<String> = ct.split(";".toRegex()).dropLastWhile { it.isEmpty() }
-			for (item in ls) {
-				val ss = item.trim()
-				if (ss.startsWith("charset")) {
-					val charset = ss.substringAfterLast('=', "")
-					if (charset.length >= 2) {
-						return Charset.forName(charset)
-					}
-				}
-			}
-			return null
-		}
-
-	fun responseText(charset: Charset = Charsets.UTF_8): String? {
-		val r = this.response ?: return null
-		val ch = contentCharset ?: charset
-		var s = String(r, ch)
-		if (needDecode) {
-			s = URLDecoder.decode(s, ch.name())
-		}
-		return s
-	}
-
-	fun dump() {
-		logd(">>Response:", this.url)
-		logd("  >>status:", responseCode, responseMsg ?: "")
-		val map = this.headerMap
-		if (map != null) {
-			for ((k, v) in map) {
-				if (v.size == 1) {
-					logd("  >>head:", k, "=", v.first())
-				} else {
-					logd("  >>head:", k, "=", "[" + v.joinToString(",") + "]")
-				}
-			}
-		}
-		if (allowDump(this.contentType)) {
-			logd("  >>body:", this.responseText())
-		}
-	}
-
-	fun needDecode(): HttpResult {
-		this.needDecode = true
-		return this
-	}
-
-	fun str(charset: Charset): String? {
-		if (OK) {
-			return this.responseText(charset)
-		}
-		return null
-	}
-
-	fun strISO8859_1(): String? = str(Charsets.ISO_8859_1)
-
-	fun strUtf8(): String? = str(Charsets.UTF_8)
-
-	fun <T> textTo(block: (String) -> T): T? {
-		if (OK) {
-			val s = strUtf8()
-			if (s != null && s.isNotEmpty()) {
-				try {
-					return block(s)
-				} catch (e: Exception) {
-					e.printStackTrace()
-				}
-			}
-		}
-		return null
-	}
-
-	fun ysonArray(): YsonArray? {
-		return textTo { YsonArray(it) }
-	}
-
-	fun ysonObject(): YsonObject? {
-		return textTo { YsonObject(it) }
-	}
-
-	fun bytes(): ByteArray? {
-		if (OK) {
-			return response
-		}
-		return null
-	}
-
-	fun saveTo(file: File): Boolean {
-		val data = this.response ?: return false
-		if (OK) {
-			val dir = file.parentFile
-			if (dir != null) {
-				if (!dir.exists()) {
-					if (!dir.mkdirs()) {
-						loge("创建目录失败")
-						return false
-					}
-				}
-			}
-			var fos: FileOutputStream? = null
-			try {
-				fos = FileOutputStream(file)
-				fos.write(data)
-				fos.flush()
-			} catch (ex: Exception) {
-				ex.printStackTrace()
-			} finally {
-				fos?.closeSafe()
-			}
-		}
-		return false
-	}
-
-}
 
 //fun main() {
 //	val url = "http://localhost:8080/taoke/userapi/login"
