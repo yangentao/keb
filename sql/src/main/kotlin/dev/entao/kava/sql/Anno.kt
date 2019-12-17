@@ -27,11 +27,6 @@ annotation class AutoInc
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Unique(val value: String = "")
 
-//是否唯一约束--联合--用于类
-@Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class Uniques(vararg val value: String)
-
 //是否在该列建索引
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
@@ -67,3 +62,7 @@ annotation class ForeignLabel(val labelCol: String)
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class LimitRows(val value: Int)
+
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class DecimalDef(val p: Int, val s: Int)

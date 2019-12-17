@@ -7,6 +7,7 @@ import dev.entao.kava.base.Prop
 import dev.entao.kava.base.Prop1
 import dev.entao.kava.sql.ext.Test
 import java.sql.Connection
+import java.sql.DriverManager
 import java.sql.ResultSet
 import kotlin.reflect.KClass
 
@@ -18,6 +19,12 @@ fun useMySQL(block: Connection.() -> Unit) {
 	SqlConfig.logEnable = true
 	val url = "jdbc:mysql://localhost:3306/test?useSSL=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true"
 	val con = OpenUrl(url, "test", "test") ?: return
+	con.use(block)
+}
+
+fun userPostgres(block: Connection.() -> Unit) {
+	Class.forName("org.postgresql.Driver");
+	val con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/yangentao", "yangentao", "")
 	con.use(block)
 }
 
@@ -61,14 +68,19 @@ fun dumpResultSets(r: ResultSet) {
 }
 
 fun main() {
-	useMySQL {
-		val md = this.metaData
-		logd(md.databaseProductName)
-		logd(md.driverName)
-		val r = SQL(this).select("test.id", "test.name as testName").from(Test::class).query()
-		dumpResultSets(r)
-	}
+//	useMySQL {
+//		val md = this.metaData
+//		logd(md.databaseProductName)
+//		logd(md.driverName)
+//		val r = SQL(this).select("test.id", "test.name as testName").from(Test::class).query()
+//		dumpResultSets(r)
+//	}
 
+	userPostgres {
+		logd(this.metaData.databaseProductName)
+		val r  =this.metaData.tableTypes
+		r.dump()
+	}
 }
 
 class SelOpt {

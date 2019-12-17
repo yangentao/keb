@@ -28,12 +28,12 @@ val String.sqlEscaped: String
 //==
 val KClass<*>.sqlName: String
 	get() {
-		return this.userName
+		return this.userName.toLowerCase()
 	}
 
 val KProperty<*>.sqlName: String
 	get() {
-		return this.userName.sqlEscaped
+		return this.userName.toLowerCase()
 	}
 val KProperty<*>.sqlFullName: String
 	get() {

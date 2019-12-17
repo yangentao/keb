@@ -18,7 +18,7 @@ open class ModelClass<out T : Model> {
     private val modelClass = javaClass.enclosingClass.kotlin
 
     init {
-        ModelMerge(modelClass)
+        DefTable(modelClass)
     }
 
     @Suppress("UNCHECKED_CAST")
