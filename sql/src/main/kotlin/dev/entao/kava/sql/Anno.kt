@@ -56,9 +56,14 @@ annotation class SQLType(val value: String)
 
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class ForeignKey(val cls: KClass<out dev.entao.kava.sql.Model>)
+annotation class ForeignKey(val cls: KClass<out Model>)
 
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ForeignLabel(val labelCol: String)
 
+
+//限定表的最多行数, 必须有自增的id主键, int, long
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class LimitRows(val value: Int)
