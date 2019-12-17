@@ -28,7 +28,7 @@ open class ModelClass<out T : Model> {
         return m
     }
 
-    val con: Connection get() = ConnLook.named(modelClass)
+    val con: Connection get() = modelClass.namedConn
 
     val sql: SQL get() = SQL(con)
 

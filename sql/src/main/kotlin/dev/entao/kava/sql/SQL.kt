@@ -5,6 +5,7 @@ package dev.entao.kava.sql
 import dev.entao.kava.log.logd
 import dev.entao.kava.base.Prop
 import dev.entao.kava.base.Prop1
+import dev.entao.kava.sql.ext.Test
 import java.sql.Connection
 import java.sql.ResultSet
 import kotlin.reflect.KClass
@@ -86,7 +87,7 @@ class SQL(val conn: Connection? = null) {
 	private val buf = StringBuilder(512)
 	val args: ArrayList<Any?> = ArrayList()
 
-	constructor(cls: KClass<*>) : this(ConnLook.named(cls))
+	constructor(cls: KClass<*>) : this(cls.namedConn)
 
 	val sql: String get() = buf.toString()
 

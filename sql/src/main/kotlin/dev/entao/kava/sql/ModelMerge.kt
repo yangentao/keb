@@ -19,19 +19,19 @@ class ModelMerge(private val modelClass: KClass<*>) {
 	init {
 		val a = modelClass.findAnnotation<AutoCreateTable>()
 		if (a == null || a.value) {
+			val conn = modelClass.namedConn
 			val tabName = modelClass.sqlName
 
 			val pList = columnProperties
-			val existTable = ConnLook.named(modelClass).tableExists(tabName)
+			val existTable = conn.tableExists(tabName)
 			if (!existTable) {
-				createTableIfNotExists(ConnLook.named(modelClass))
+				createTableIfNotExists(conn)
 			} else {
-				val c = ConnLook.named(modelClass)
-				val colList = c.tableDesc(tabName)
-				mergeTable(c, tabName, colList, pList)
+				val colList = conn.tableDesc(tabName)
+				mergeTable(conn, tabName, colList, pList)
 
-				val indexList = c.tableIndexList(tabName)
-				mergeIndex(c, tabName, indexList, pList)
+				val indexList = conn.tableIndexList(tabName)
+				mergeIndex(conn, tabName, indexList, pList)
 
 			}
 		}

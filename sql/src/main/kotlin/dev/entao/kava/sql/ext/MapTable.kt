@@ -1,9 +1,10 @@
-package dev.entao.kava.sql
+package dev.entao.kava.sql.ext
 
 import dev.entao.kava.base.defaultValue
 import dev.entao.kava.base.userName
 import dev.entao.kava.base.defaultValueOfProperty
 import dev.entao.kava.base.strToV
+import dev.entao.kava.sql.*
 import java.sql.Connection
 import kotlin.reflect.KProperty
 

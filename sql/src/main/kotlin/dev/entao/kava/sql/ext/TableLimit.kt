@@ -1,6 +1,7 @@
-package dev.entao.kava.sql
+package dev.entao.kava.sql.ext
 
 import dev.entao.kava.base.*
+import dev.entao.kava.sql.*
 import java.lang.Integer.max
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
@@ -33,7 +34,7 @@ class TableLimit(private val cls: KClass<out Model>, limitValue: Int = 0) {
 			if (maxRow <= 0) {
 				return
 			}
-			val c = ConnLook.named(cls)
+			val c = cls.namedConn
 			val r = c.query {
 				select(pk)
 				from(cls)

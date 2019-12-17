@@ -49,10 +49,14 @@ class ModelMap(capacity: Int = 32) : HashMap<String, Any?>(capacity) {
 		}
 	}
 
+	//select user.id, user.name from user
+	//sqlite 返回的结果集中, columnLabel 是 user.id, user.name
+	//mysql 返回的结果集 columnLabel 是 id, name
 	@Suppress("UNCHECKED_CAST")
 	operator fun <V> getValue(thisRef: Any?, property: KProperty<*>): V {
 		val retType = property.returnType
-		val v = this[property.sqlFullName] ?: this[property.userName]
+//		val v = this[property.sqlFullName] ?: this[property.userName]
+		val v = this[property.userName]
 		if (v != null) {
 			if (retType.isClass(YsonObject::class)) {
 				return when (v) {
@@ -67,7 +71,7 @@ class ModelMap(capacity: Int = 32) : HashMap<String, Any?>(capacity) {
 					else -> throw IllegalArgumentException("类型不匹配: " + property.fullName)
 				}
 			}
-
+			//TODO decimal, double, float, Long, Int
 			return v as V
 		}
 		if (retType.isMarkedNullable) {

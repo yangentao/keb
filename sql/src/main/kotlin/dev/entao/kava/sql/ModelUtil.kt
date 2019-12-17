@@ -9,9 +9,12 @@ import kotlin.reflect.full.memberProperties
  * Created by entaoyang@163.com on 2017/3/31.
  */
 
+
 val KClass<*>.modelProperties: List<KMutableProperty<*>>
 	get() {
-		return classPropCache.get(this)!!
+		return classPropCache.getOrPut(this) {
+			findModelProperties(this)
+		}
 	}
 
 val KClass<*>.modelPrimaryKeys: List<KMutableProperty<*>>
@@ -21,9 +24,7 @@ val KClass<*>.modelPrimaryKeys: List<KMutableProperty<*>>
 		}
 	}
 
-private val classPropCache = CacheMap<KClass<*>, List<KMutableProperty<*>>> {
-	findModelProperties(it)
-}
+private val classPropCache = HashMap<KClass<*>, List<KMutableProperty<*>>>(64)
 
 private fun findModelProperties(cls: KClass<*>): List<KMutableProperty<*>> {
 	return cls.memberProperties.filter {
@@ -36,3 +37,4 @@ private fun findModelProperties(cls: KClass<*>): List<KMutableProperty<*>> {
 		} else !it.isExcluded
 	}.map { it as KMutableProperty<*> }
 }
+
