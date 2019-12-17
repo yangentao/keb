@@ -13,18 +13,59 @@ import kotlin.reflect.KClass
  * Created by yangentao on 2016/12/14.
  */
 
-fun main() {
+fun useMySQL(block: Connection.() -> Unit) {
 	SqlConfig.logEnable = true
-	val url = "jdbc:mysql://mgxy0531.cn:3306/campus?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true"
-	val con = OpenUrl(url, "yang", "Yang1981") ?: return
-	val ls = SQL(con).selectAll().from(Test::class).where(Test::id LE 11).query().allRows().map {
-		val t = Test()
-		t.model.putAll(it)
-		t
-	}
+	val url = "jdbc:mysql://localhost:3306/test?useSSL=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true"
+	val con = OpenUrl(url, "test", "test") ?: return
+	con.use(block)
+}
 
-	for (t in ls) {
-		logd(t.id, t.name)
+fun testQuery() {
+	useMySQL {
+		val ls = SQL(this).selectAll().from(Test::class).where(Test::id LE 11).query().allRows().map {
+			val t = Test()
+			t.model.putAll(it)
+			t
+		}
+
+		for (t in ls) {
+			logd(t.id, t.name)
+		}
+	}
+}
+
+fun testInsert() {
+	useMySQL {
+		this.createTable("test", listOf("id int primary key AUTO_INCREMENT", "name varchar(256)"))
+		for (i in 1..20) {
+			val m = Test()
+			m.name = "Name $i "
+			this.insert(m)
+		}
+	}
+}
+
+fun dumpResultSets(r: ResultSet) {
+	val meta = r.metaData
+	val colCount = meta.columnCount
+	r.closeAfter {
+		while (r.next()) {
+			for (i in 1..meta.columnCount) {
+				logd("CAT:", meta.getCatalogName(i), "SCM:", meta.getSchemaName(i), "TAB:", meta.getTableName(i),
+						"COL", meta.getColumnName(i), "COLLB:", meta.getColumnLabel(i),
+						"CLS:", meta.getColumnClassName(i), "TYP:", meta.getColumnTypeName(i), "VAL:", r.getObject(i))
+			}
+		}
+	}
+}
+
+fun main() {
+	useMySQL {
+		val md = this.metaData
+		logd(md.databaseProductName)
+		logd(md.driverName)
+		val r = SQL(this).select("test.id", "test.name as testName").from(Test::class).query()
+		dumpResultSets(r)
 	}
 
 }

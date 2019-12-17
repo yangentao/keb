@@ -17,7 +17,7 @@ class ModelMerge(private val modelClass: KClass<*>) {
 	private val primaryKeyColumns: List<KMutableProperty<*>> = modelClass.modelPrimaryKeys
 
 	init {
-		val a = modelClass.findAnnotation<dev.entao.kava.sql.AutoCreateTable>()
+		val a = modelClass.findAnnotation<AutoCreateTable>()
 		if (a == null || a.value) {
 			val tabName = modelClass.sqlName
 
@@ -70,7 +70,7 @@ class ModelMerge(private val modelClass: KClass<*>) {
 			ls.add("PRIMARY KEY ($pkcol)")
 		}
 		val uls = columnProperties.filter {
-			val u = it.findAnnotation<dev.entao.kava.sql.Unique>()
+			val u = it.findAnnotation<Unique>()
 			u != null && u.value.trim().isEmpty()
 		}
 		uls.forEach {
@@ -79,15 +79,15 @@ class ModelMerge(private val modelClass: KClass<*>) {
 		}
 
 		val uls2 = columnProperties.filter {
-			val u = it.findAnnotation<dev.entao.kava.sql.Unique>()
+			val u = it.findAnnotation<Unique>()
 			u != null && u.value.trim().isNotEmpty()
 		}.toMutableList()
 		if (uls2.isNotEmpty()) {
 			while (uls2.isNotEmpty()) {
 				val first = uls2.first()
-				val uname = first.findAnnotation<dev.entao.kava.sql.Unique>()!!.value
+				val uname = first.findAnnotation<Unique>()!!.value
 				val cols = uls2.filter {
-					it.findAnnotation<dev.entao.kava.sql.Unique>()?.value == first.findAnnotation<dev.entao.kava.sql.Unique>()?.value
+					it.findAnnotation<Unique>()?.value == first.findAnnotation<Unique>()?.value
 				}
 				val cs = cols.map { it.sqlName }.joinToString(",")
 				val idxName = "${uname}_UNIQUE".sqlEscaped
@@ -95,7 +95,7 @@ class ModelMerge(private val modelClass: KClass<*>) {
 				uls2.removeAll(cols)
 			}
 		}
-		val indexList = columnProperties.filter { it.hasAnnotation<dev.entao.kava.sql.Index>() || it.hasAnnotation<dev.entao.kava.sql.ForeignKey>() }
+		val indexList = columnProperties.filter { it.hasAnnotation<Index>() || it.hasAnnotation<ForeignKey>() }
 		indexList.forEach {
 			val idxName = "${it.userName}_INDEX".sqlEscaped
 			ls.add("INDEX $idxName (${it.sqlName})")
@@ -106,7 +106,7 @@ class ModelMerge(private val modelClass: KClass<*>) {
 	}
 
 	private fun canNull(p: KMutableProperty<*>): Boolean {
-		if (p.isPrimaryKey || p.hasAnnotation<dev.entao.kava.sql.NotNull>()) {
+		if (p.isPrimaryKey || p.hasAnnotation<NotNull>()) {
 			return false
 		}
 		return p.returnType.isMarkedNullable
@@ -192,7 +192,7 @@ class ModelMerge(private val modelClass: KClass<*>) {
 	}
 
 	private fun makeDefaultValue(p: KMutableProperty<*>, s: String): String {
-		if (p.isPrimaryKey || p.hasAnnotation<dev.entao.kava.sql.AutoInc>() || p.hasAnnotation<dev.entao.kava.sql.Unique>()) {
+		if (p.isPrimaryKey || p.hasAnnotation<AutoInc>() || p.hasAnnotation<Unique>()) {
 			return ""
 		}
 
