@@ -15,7 +15,7 @@ fun main() {
 	ConnLook.maker = pgMaker
 
 	val a = Test.findByKey(2)
-	a?.updateByKey {
+	a?.update {
 		it.fee = 99.888
 	}
 

@@ -155,7 +155,7 @@ open class Model(val model: ModelMap = ModelMap()) {
 
 }
 
-fun <T : Model> T.updateByKey(block: (T) -> Unit): Boolean {
+fun <T : Model> T.update(block: (T) -> Unit): Boolean {
 	val ls = this.model.gather {
 		block(this)
 	}
