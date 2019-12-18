@@ -95,37 +95,38 @@ class SQL {
 		return this
 	}
 
-	fun insertOrUpdateMySqL(modelCls: KClass<*>, kvs: List<Pair<Prop, Any?>>, updateColumns: List<Prop>): SQL {
-		return this.insertOrUpdateMySqL(modelCls.sqlName, kvs.map { it.first.sqlName to it.second }, updateColumns.map { it.sqlName })
+	fun insertOrUpdateMySqL(modelCls: KClass<*>, kvs: List<Pair<Prop, Any?>>, uniqColumns: List<Prop>): SQL {
+		return this.insertOrUpdateMySqL(modelCls.sqlName, kvs.map { it.first.sqlName to it.second }, uniqColumns.map { it.sqlName })
 	}
 
-	fun insertOrUpdateMySqL(table: String, kvs: List<Pair<String, Any?>>, updateColumns: List<String>): SQL {
-		if (updateColumns.isEmpty()) {
-			throw IllegalArgumentException("insertOrUpdate $table  updateColumns参数不能是空")
+	fun insertOrUpdateMySqL(table: String, kvs: List<Pair<String, Any?>>, uniqColumns: List<String>): SQL {
+		if (uniqColumns.isEmpty()) {
+			throw IllegalArgumentException("insertOrUpdate $table  uniqColumns 参数不能是空")
 		}
 		val ks = kvs.joinToString(", ") { it.first }
 		val vs = kvs.joinToString(", ") { "?" }
 		buf.append("INSERT INTO $table ($ks ) VALUES ( $vs ) ")
 		buf.append(" ON DUPLICATE KEY UPDATE ")
-		val us = kvs.map { it.first }.filter { it in updateColumns }.joinToString(", ") { "$it = VALUES($it) " }
+		val us = kvs.map { it.first }.filter { it !in uniqColumns }.joinToString(", ") { "$it = VALUES($it) " }
 		buf.append(us)
 		args.addAll(kvs.map { it.second })
 		return this
 	}
 
-	fun insertOrUpdatePG(modelCls: KClass<*>, kvs: List<Pair<Prop, Any?>>, updateColumns: List<Prop>): SQL {
-		return this.insertOrUpdatePG(modelCls.sqlName, kvs.map { it.first.sqlName to it.second }, updateColumns.map { it.sqlName })
+	fun insertOrUpdatePG(modelCls: KClass<*>, kvs: List<Pair<Prop, Any?>>, uniqColumns: List<Prop>): SQL {
+		return this.insertOrUpdatePG(modelCls.sqlName, kvs.map { it.first.sqlName to it.second }, uniqColumns.map { it.sqlName })
 	}
 
-	fun insertOrUpdatePG(table: String, kvs: List<Pair<String, Any?>>, updateColumns: List<String>): SQL {
-		if (updateColumns.isEmpty()) {
-			throw IllegalArgumentException("insertOrUpdate $table  updateColumns参数不能是空")
+	fun insertOrUpdatePG(table: String, kvs: List<Pair<String, Any?>>, uniqColumns: List<String>): SQL {
+		if (uniqColumns.isEmpty()) {
+			throw IllegalArgumentException("insertOrUpdate $table  uniqColumns 参数不能是空")
 		}
 		val ks = kvs.joinToString(", ") { it.first }
 		val vs = kvs.joinToString(", ") { "?" }
 		buf.append("INSERT INTO $table ($ks ) VALUES ( $vs ) ")
-		val uc = updateColumns.joinToString(",")
-		val uv = updateColumns.joinToString(",") { "excluded.$it" }
+		val updateCols = kvs.map { it.first }.filter { it !in uniqColumns }
+		val uc = updateCols.joinToString(",")
+		val uv = updateCols.joinToString(",") { "excluded.$it" }
 		buf.append(" ON CONFLICT DO UPDATE SET ($uc)=($uv)")
 		args.addAll(kvs.map { it.second })
 		return this

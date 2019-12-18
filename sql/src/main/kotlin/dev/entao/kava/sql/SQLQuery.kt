@@ -1,9 +1,11 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "MemberVisibilityCanBePrivate", "PropertyName")
 
 package dev.entao.kava.sql
 
 import dev.entao.kava.base.Prop
 import dev.entao.kava.base.plusAssign
+import java.sql.Connection
+import java.sql.ResultSet
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
@@ -47,17 +49,18 @@ class SQLQuery {
 		return this
 	}
 
-	fun distinct(): SQLQuery {
-		this.distinct = true
-		return this
-	}
+	val DISTINCT: SQLQuery
+		get() {
+			this.distinct = true
+			return this
+		}
 
 	fun selectAll(): SQLQuery {
 		selectArr.add("*")
 		return this
 	}
 
-	fun select(vararg cols: KProperty<*>): SQLQuery {
+	fun select(vararg cols: Prop): SQLQuery {
 		cols.mapTo(selectArr) { it.sqlFullName }
 		return this
 	}
@@ -67,7 +70,7 @@ class SQLQuery {
 		return this
 	}
 
-	fun from(vararg clses: KClass<*>): SQLQuery {
+	fun from(vararg clses: TabClass): SQLQuery {
 		clses.mapTo(fromArr) { it.sqlName }
 		return this
 	}
@@ -81,7 +84,7 @@ class SQLQuery {
 		return this.join(tables.toList())
 	}
 
-	fun join(vararg modelClasses: KClass<*>): SQLQuery {
+	fun join(vararg modelClasses: TabClass): SQLQuery {
 		return join(modelClasses.map { it.sqlName })
 	}
 
@@ -107,7 +110,7 @@ class SQLQuery {
 	}
 
 	fun where(w: Where?): SQLQuery {
-		if (w != null) {
+		if (w != null && w.value.isNotEmpty()) {
 			whereClause = "WHERE ${w.value}"
 			args.addAll(w.args)
 		}
@@ -138,11 +141,11 @@ class SQLQuery {
 		return this
 	}
 
-	fun asc(p: KProperty<*>): SQLQuery {
+	fun asc(p: Prop): SQLQuery {
 		return asc(p.sqlFullName)
 	}
 
-	fun desc(p: KProperty<*>): SQLQuery {
+	fun desc(p: Prop): SQLQuery {
 		return desc(p.sqlFullName)
 	}
 
@@ -183,4 +186,22 @@ class SQLQuery {
 		return sb.toString()
 	}
 
+}
+
+
+fun Connection.query(q: SQLQuery): ResultSet {
+	return this.query(q.toSQL(), q.args)
+}
+
+fun Connection.query(block: SQLQuery.() -> Unit): ResultSet {
+	val q = SQLQuery()
+	q.block()
+	return this.query(q.toSQL(), q.args)
+}
+
+fun Connection.dump(block: SQLQuery.() -> Unit) {
+	val q = SQLQuery()
+	q.block()
+	val sql = q.toSQL()
+	this.query(sql, emptyList()).dump()
 }

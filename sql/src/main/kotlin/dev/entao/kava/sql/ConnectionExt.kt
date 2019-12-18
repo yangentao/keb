@@ -65,36 +65,6 @@ fun Connection.insert(model: Model): Boolean {
 	return true
 }
 
-
-
-
-
-
-
-
-fun Connection.query(q: SQLQuery): ResultSet {
-	return this.query(q.toSQL(), q.args)
-}
-
-fun Connection.query(block: SQLQuery.() -> Unit): ResultSet {
-	val q = SQLQuery()
-	q.block()
-	return this.query(q.toSQL(), q.args)
-}
-
-fun Connection.countAll(cls: KClass<*>, w: Where?): Int {
-	return this.querySQL {
-		select("COUNT(*)").from(cls).where(w)
-	}.intValue ?: 0
-}
-
-fun Connection.dump(block: SQLQuery.() -> Unit) {
-	val q = SQLQuery()
-	q.block()
-	val sql = q.toSQL()
-	this.query(sql, emptyList()).dump()
-}
-
 fun Connection.updateByKey(model: Model, ps: List<KMutableProperty<*>> = model.modelPropertiesExists): Boolean {
 	val pkList = model::class.modelPrimaryKeys
 	if (pkList.isEmpty()) {
@@ -108,13 +78,20 @@ fun Connection.updateByKey(model: Model, ps: List<KMutableProperty<*>> = model.m
 	} > 0
 }
 
-fun Connection.update(cls: KClass<*>, map: Map<Prop, Any?>, w: Where?): Int {
+fun Connection.countAll(cls: TabClass, w: Where?): Int {
+	return this.querySQL {
+		select("COUNT(*)").from(cls).where(w)
+	}.intValue ?: 0
+}
+
+
+fun Connection.update(cls: TabClass, map: Map<Prop, Any?>, w: Where?): Int {
 	return this.updateSQL {
 		update(cls, map).where(w)
 	}
 }
 
-fun Connection.delete(cls: KClass<*>, w: Where?): Int {
+fun Connection.delete(cls: TabClass, w: Where?): Int {
 	return this.updateSQL {
 		deleteFrom(cls).where(w)
 	}
