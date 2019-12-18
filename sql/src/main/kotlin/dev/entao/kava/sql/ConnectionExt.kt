@@ -17,8 +17,8 @@ import kotlin.reflect.KMutableProperty
 /**
  * Created by entaoyang@163.com on 2017/4/5.
  */
-val Connection.isMySQL: Boolean get() = "mysql" in this.metaData.databaseProductName.toLowerCase()
-val Connection.isPostgres: Boolean get() = "postgresql" in this.metaData.databaseProductName.toLowerCase()
+val Connection.isMySQL: Boolean get() = "MySQL" == this.metaData.databaseProductName
+val Connection.isPostgres: Boolean get() = "PostgreSQL" == this.metaData.databaseProductName
 
 fun PreparedStatement.setParams(params: List<Any?>) {
 	for (i in params.indices) {

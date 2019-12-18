@@ -72,7 +72,7 @@ class DefTable(private val cls: KClass<*>) {
 
 		val idxList = columns.filter { it.index }
 		for (idx in idxList) {
-			conn.exec("CREATE INDEX ${idx.name} ON $name (${idx.name})")
+			conn.exec("CREATE INDEX ${idx.name}_index ON $name (${idx.name})")
 		}
 	}
 }

@@ -37,7 +37,7 @@ val KProperty<*>.sqlName: String
 	}
 val KProperty<*>.sqlFullName: String
 	get() {
-		return "${this.ownerClass!!.userName}.${this.sqlName}"
+		return "${this.ownerClass!!.sqlName}.${this.sqlName}"
 	}
 
 
