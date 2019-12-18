@@ -300,7 +300,7 @@ class OnBuilder {
 	}
 }
 
-fun Connection.querySQL(a: SQL): ResultSet {
+fun Connection.query(a: SQL): ResultSet {
 	return this.query(a.sql, a.args)
 }
 
@@ -310,7 +310,7 @@ fun Connection.querySQL(block: SQL.() -> Unit): ResultSet {
 	return this.query(a.sql, a.args)
 }
 
-fun Connection.updateSQL(a: SQL): Int {
+fun Connection.update(a: SQL): Int {
 	return this.update(a.sql, a.args)
 }
 
@@ -320,7 +320,7 @@ fun Connection.updateSQL(block: SQL.() -> Unit): Int {
 	return this.update(a.sql, a.args)
 }
 
-fun Connection.insertSQL(a: SQL): Int {
+fun Connection.insert(a: SQL): Int {
 	return this.update(a.sql, a.args)
 }
 

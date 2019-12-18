@@ -1,15 +1,7 @@
 package dev.entao.kava.sql
 
-import dev.entao.kava.json.*
-import dev.entao.kava.base.getValue
-import dev.entao.kava.base.hasAnnotation
-import dev.entao.kava.base.isTypeLong
-import dev.entao.kava.base.setValue
-import dev.entao.kava.log.logd
-import dev.entao.kava.base.Prop
-import java.lang.IllegalArgumentException
+import dev.entao.kava.base.*
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.sql.ResultSet
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
@@ -38,7 +30,7 @@ fun Connection.insertOrUpdate(model: Model): Boolean {
 		a.insertOrUpdatePG(model::class, cs.map { it to it.getValue(model) }, model::class.modelPrimaryKeys)
 	}
 	if (!autoInc) {
-		return this.insertSQL(a) > 0
+		return this.insert(a) > 0
 	}
 	val lVal = this.insertSQLGenKey(a)
 	if (lVal <= 0L) {
@@ -58,7 +50,7 @@ fun Connection.insert(model: Model): Boolean {
 	val a = SQL()
 	a.insert(model::class.s, model.modelPropertiesExists.map { it.s to it.getValue(model) })
 	if (!autoInc) {
-		return this.insertSQL(a) > 0
+		return this.insert(a) > 0
 	}
 	val lVal = this.insertSQLGenKey(a)
 	if (lVal <= 0L) {
