@@ -68,7 +68,7 @@ annotation class LimitRows(val value: Int)
 
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class DecimalDef(val p: Int, val s: Int)
+annotation class Decimal(val p: Int, val s: Int)
 
 
 

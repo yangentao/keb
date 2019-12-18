@@ -69,13 +69,6 @@ open class Model(val model: ModelMap = ModelMap()) {
 		}
 	}
 
-	fun updateByKey(block: () -> Unit): Boolean {
-		val ls = this.model.gather(block)
-		if (ls.isNotEmpty()) {
-			return this.updateByKey(ls)
-		}
-		return false
-	}
 
 	fun toJsonClient(vararg ps: KProperty<*>): YsonObject {
 		val jo = YsonObject()
@@ -160,4 +153,14 @@ open class Model(val model: ModelMap = ModelMap()) {
 			return w
 		}
 
+}
+
+fun <T : Model> T.updateByKey(block: (T) -> Unit): Boolean {
+	val ls = this.model.gather {
+		block(this)
+	}
+	if (ls.isNotEmpty()) {
+		return this.updateByKey(ls)
+	}
+	return false
 }

@@ -18,7 +18,7 @@ class MapTable(val tableName: String, val connName: String = "") {
 
 	val mapCon: Connection
 		get() = if (connName.isEmpty()) {
-			ConnLook.first
+			ConnLook.defaultConnection
 		} else {
 			ConnLook.named(connName)
 		}

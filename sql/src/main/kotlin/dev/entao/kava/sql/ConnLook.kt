@@ -6,13 +6,11 @@ import dev.entao.kava.base.Task
 import java.sql.Connection
 import java.sql.DriverManager
 import javax.naming.InitialContext
-import javax.naming.NameNotFoundException
 import javax.sql.DataSource
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
 interface ConnMaker {
-	fun defaultConnection(): Connection
 	fun namedConnection(name: String): Connection
 }
 
@@ -21,10 +19,6 @@ class MySQLConnMaker(val url: String, val user: String, val pwd: String) : ConnM
 
 	init {
 		assert("mysql" in url)
-	}
-
-	override fun defaultConnection(): Connection {
-		return namedConnection("")
 	}
 
 	@Throws
@@ -41,9 +35,6 @@ class PostgreSQLConnMaker(val url: String, val user: String, val pwd: String) : 
 		assert("postgresql" in url)
 	}
 
-	override fun defaultConnection(): Connection {
-		return namedConnection("")
-	}
 
 	@Throws
 	override fun namedConnection(name: String): Connection {
@@ -65,12 +56,13 @@ class WebContextConnMaker : ConnMaker {
 		}
 	}
 
-	override fun defaultConnection(): Connection {
-		return namedConnection(nameList.first())
-	}
-
 	override fun namedConnection(name: String): Connection {
-		val defaultDataSource = ctx.lookup("${prefix}/$name") as DataSource
+		val n = if (name.isEmpty()) {
+			nameList.first()
+		} else {
+			name
+		}
+		val defaultDataSource = ctx.lookup("${prefix}/$n") as DataSource
 		return defaultDataSource.connection
 	}
 
@@ -126,12 +118,12 @@ object ConnLook {
 		}
 	}
 
-	val first: Connection get() = maker.defaultConnection()
+	val defaultConnection: Connection get() = named("")
 
 	fun named(modelClass: KClass<*>): Connection {
-		val cname = modelClass.findAnnotation<ConnName>() ?: return first
-		if (cname.value.isEmpty()) {
-			return first
+		val cname = modelClass.findAnnotation<ConnName>()
+		if (cname == null || cname.value.isEmpty()) {
+			return defaultConnection
 		}
 		return named(cname.value)
 	}

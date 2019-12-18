@@ -1,10 +1,6 @@
 package dev.entao.kava.sql.ext
 
-import dev.entao.kava.sql.AutoInc
-import dev.entao.kava.sql.Model
-import dev.entao.kava.sql.ModelClass
-import dev.entao.kava.sql.PrimaryKey
-import java.text.DecimalFormat
+import dev.entao.kava.sql.*
 
 class Test : Model() {
 
@@ -14,6 +10,9 @@ class Test : Model() {
 	var name: String by model
 
 	var user: String by model
+
+	@Decimal(6, 3)
+	var fee: Double by model
 
 	companion object : ModelClass<Test>()
 

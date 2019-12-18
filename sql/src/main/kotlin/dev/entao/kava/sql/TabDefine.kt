@@ -97,7 +97,7 @@ class DefColumn(private val prop: Prop, val dbType: Int) {
 	val index: Boolean = prop.hasAnnotation<Index>()
 	val unique: String? = prop.findAnnotation<Unique>()?.value
 	private val autoInc: Boolean = prop.hasAnnotation<AutoInc>()
-	private val notNull: Boolean = prop.hasAnnotation<NotNull>() || !prop.returnType.isMarkedNullable
+	private val notNull: Boolean = prop.hasAnnotation<NotNull>()
 	private val sqlType: String? = prop.findAnnotation<SQLType>()?.value
 	private val lengthValue: Int = prop.findAnnotation<Length>()?.value ?: 256
 	private val defaultValue: String? = prop.findAnnotation<DefaultValue>()?.value
@@ -105,7 +105,7 @@ class DefColumn(private val prop: Prop, val dbType: Int) {
 	private val decimal: Pair<Int, Int>?
 
 	init {
-		val n = prop.findAnnotation<DecimalDef>()
+		val n = prop.findAnnotation<Decimal>()
 		decimal = if (n == null) {
 			null
 		} else {
