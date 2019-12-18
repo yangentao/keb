@@ -77,4 +77,11 @@ fun main() {
 
 	val t = Test.findOne(Test::id EQ 2)
 	logd(t?.id, t?.name)
+
+	val map = MapTable("kvmap")
+	map.put("yang", "entao")
+	map.put("age", "99")
+	logd("yang?", map.get("yang"))
+	val b = map.mapValue
+	logd(b)
 }
