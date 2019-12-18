@@ -8,6 +8,7 @@ import dev.entao.kava.base.Prop1
 import dev.entao.kava.base.userName
 import java.sql.Connection
 import java.sql.ResultSet
+import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
 /**
@@ -17,25 +18,14 @@ import kotlin.reflect.full.createInstance
 open class ModelClass<out T : Model> {
 
 	private val modelClass = javaClass.enclosingClass.kotlin
-	//lowercased => columnName
-	private val colMap: HashMap<String, String> = HashMap(64)
-	private val propMap: HashMap<Prop, String> = HashMap(64)
-	private val dbType: Int
+
+	@Suppress("UNCHECKED_CAST")
+	private val tabCls: KClass<T> = javaClass.enclosingClass.kotlin as KClass<T>
 
 	init {
-		val d = DefTable(modelClass)
-		dbType = d.dbType
-		val cs = con.tableDesc(d.name).map { it.COLUMN_NAME }
-		for (a in cs) {
-			colMap[a.toLowerCase()] = a
-		}
+		DefTable(modelClass)
 	}
 
-	fun col(p: Prop): String {
-		return propMap.getOrPut(p) {
-			colMap[p.userName.toLowerCase()] ?: p.userName.toLowerCase()
-		}
-	}
 
 	@Suppress("UNCHECKED_CAST")
 	open fun onMapInstance(map: Map<String, Any?>): T {

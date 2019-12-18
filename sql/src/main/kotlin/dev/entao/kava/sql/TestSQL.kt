@@ -67,6 +67,11 @@ fun main() {
 	m.name = "yang"
 	m.insert()
 
+	val ls = Test.findAll()
+	for (a in ls) {
+		logd(a.id, a.name)
+	}
+
 	val r = Test.con.query("select test.id, test.name,test.user from test", emptyList())
 	r.dump()
 }
