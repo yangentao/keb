@@ -69,6 +69,7 @@ class WebContextConnMaker : ConnMaker {
 //先赋值maker, 后使用
 object ConnLook {
 	lateinit var maker: ConnMaker
+	var logEnable = true
 
 	private val threadLocal: ThreadLocal<HashMap<String, Connection>> =
 			object : ThreadLocal<HashMap<String, Connection>>() {

@@ -4,6 +4,7 @@ package dev.entao.kava.sql
 
 import dev.entao.kava.base.Prop
 import dev.entao.kava.base.Prop1
+import dev.entao.kava.log.logd
 import java.sql.Connection
 import java.sql.ResultSet
 import kotlin.reflect.KClass
@@ -13,12 +14,11 @@ import kotlin.reflect.KClass
  */
 
 
-
 class SelOpt {
 	var distinct = false
 }
 
-val Prop.s: String get() = this.sqlFullName
+val Prop.s: String get() = this.sqlName
 val KClass<*>.s: String get() = this.sqlName
 
 infix fun String.AS(other: String): String {
@@ -287,6 +287,10 @@ class SQL(val conn: Connection? = null) {
 	fun insertGenKey(): Long {
 		val st = conn!!.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
 		st.setParams(args)
+		if (ConnLook.logEnable) {
+			logd(sql)
+			logd(args)
+		}
 		val n = st.executeUpdate()
 		val r: Long = if (n <= 0) {
 			0L

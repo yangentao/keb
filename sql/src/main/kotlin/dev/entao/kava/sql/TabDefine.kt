@@ -15,7 +15,7 @@ class DefTable(private val cls: KClass<*>) {
 	private val dbType: Int = if (conn.isMySQL) typeMYSQL else if (conn.isPostgres) typePostgresql else throw java.lang.IllegalArgumentException("只支持MySQL或PostgreSQL")
 	private val name: String = cls.sqlName
 	private val autoCreate: Boolean = cls.findAnnotation<AutoCreateTable>()?.value ?: true
-	private val columns: List<DefColumn> = cls.modelProperties.map { DefColumn(it) }
+	private val columns: List<DefColumn> = cls.modelProperties.map { DefColumn(it, dbType) }
 
 	init {
 		if (autoCreate) {
@@ -43,14 +43,14 @@ class DefTable(private val cls: KClass<*>) {
 		val cols: Set<String> = conn.tableDesc(name).map { it.columnName.toLowerCase() }.toSet()
 		for (p in columns) {
 			if (p.name !in cols) {
-				val s = p.defColumnn(dbType)
+				val s = p.defColumnn()
 				conn.exec("ALTER TABLE $name ADD COLUMN $s")
 			}
 		}
 	}
 
 	private fun createTable(conn: Connection) {
-		val colList: MutableList<String> = columns.map { it.defColumnn(dbType) }.toMutableList()
+		val colList: MutableList<String> = columns.map { it.defColumnn() }.toMutableList()
 		val pkCols = columns.filter { it.pk }.joinToString(",") { it.name }
 		if (pkCols.isNotEmpty()) {
 			colList += "PRIMARY KEY ($pkCols)"
@@ -77,13 +77,13 @@ class DefTable(private val cls: KClass<*>) {
 	}
 }
 
-class DefColumn(private val prop: Prop) {
+class DefColumn(private val prop: Prop, val dbType: Int) {
 	val name: String = prop.sqlName
 	val pk: Boolean = prop.hasAnnotation<PrimaryKey>()
 	val index: Boolean = prop.hasAnnotation<Index>()
 	val unique: String? = prop.findAnnotation<Unique>()?.value
 	private val autoInc: Boolean = prop.hasAnnotation<AutoInc>()
-	private val notNull: Boolean = prop.hasAnnotation<NotNull>()
+	private val notNull: Boolean = prop.hasAnnotation<NotNull>() || !prop.returnType.isMarkedNullable
 	private val sqlType: String? = prop.findAnnotation<SQLType>()?.value
 	private val lengthValue: Int = prop.findAnnotation<Length>()?.value ?: 256
 	private val defaultValue: String? = prop.findAnnotation<DefaultValue>()?.value
@@ -99,51 +99,43 @@ class DefColumn(private val prop: Prop) {
 		}
 	}
 
-	fun defColumnn(dbType: Int): String {
-		val sb = StringBuilder(64)
-		sb.append(name)
-		sb.append(" ")
-		val typeDefStr = makeTypeString(dbType).toLowerCase()
-		sb.append(typeDefStr)
-		sb.append(" ")
-		if (notNull) {
-			sb.append("NOT NULL")
-		} else {
-			sb.append("NULL")
+	fun defColumnn(): String {
+		val partList = ArrayList<String>(8)
+		partList += name
+		val typeDefStr = makeTypeString().toLowerCase()
+		partList += typeDefStr
+		if (notNull && !pk) {
+			partList += "NOT NULL"
 		}
-		sb.append(" ")
 		if ("json" !in typeDefStr && "blob" !in typeDefStr && "text" !in typeDefStr && "bytea" !in typeDefStr) {
 			if (defaultValue != null && defaultValue.isNotEmpty()) {
-				sb.append("DEFAULT ")
-				if (prop.isTypeString) {
-					sb.append("'$defaultValue'")
+				partList += "DEFAULT"
+				partList += if (prop.isTypeString) {
+					"'$defaultValue'"
 				} else {
-					sb.append(defaultValue)
+					defaultValue
 				}
 			} else if (!notNull) {
 				val s = makeDefaultValue()
 				if (s.isNotEmpty()) {
-					sb.append("DEFAULT ")
-					sb.append(s)
+					partList += "DEFAULT "
+					partList += s
 				}
 			}
-
 		}
-		sb.append(" ")
 		if (autoInc) {
 			if (dbType == typeMYSQL) {
-				sb.append("AUTO_INCREMENT")
+				partList += "AUTO_INCREMENT"
 			}
 		}
-		sb.append(" ")
 		if (labelValue != null) {
-			sb.append("COMMENT '$labelValue'")
+			partList += "COMMENT '$labelValue'"
 		}
 
-		return sb.toString()
+		return partList.joinToString(" ")
 	}
 
-	private fun makeTypeString(dbType: Int): String {
+	private fun makeTypeString(): String {
 		if (sqlType != null) {
 			return sqlType
 		}

@@ -6,20 +6,20 @@ import java.sql.Connection
 import java.sql.ResultSet
 
 val mysqlUrl = "jdbc:mysql://localhost:3306/test?useSSL=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true"
-val mysql: ConnMaker = MySQLConnMaker(mysqlUrl, "test", "test")
+val mysqlMaker: ConnMaker = MySQLConnMaker(mysqlUrl, "test", "test")
 
-val postgreSQL: ConnMaker = PostgreSQLConnMaker("jdbc:postgresql://localhost:5432/yangentao", "yangentao", "")
+val pgMaker: ConnMaker = PostgreSQLConnMaker("jdbc:postgresql://localhost:5432/yangentao", "yangentao", "")
 
 fun useMySQL(block: Connection.() -> Unit) {
-	SqlConfig.logEnable = true
-	val con = mysql.defaultConnection()
+	val con = mysqlMaker.defaultConnection()
 	con.use(block)
+	ConnLook.maker = mysqlMaker
 }
 
 fun usePostgres(block: Connection.() -> Unit) {
-	SqlConfig.logEnable = true
-	val con = postgreSQL.defaultConnection()
+	val con = pgMaker.defaultConnection()
 	con.use(block)
+	ConnLook.maker = pgMaker
 }
 
 fun testQuery() {
@@ -76,15 +76,11 @@ fun main() {
 //		logd(r)
 ////		r.dump()
 //	}
-	useMySQL {
-		//		val r = SQL(this).select("""`id`,`name`""").from(Test::class).query()
-//		r.dump()
-		this.setClientInfo("dbtype", "mysql")
-		val a = this.getClientInfo("dbtype")
-		logd(a)
-		val r = this.metaData.clientInfoProperties
-		r.dump()
-		logd(this::class.qualifiedName)
+	ConnLook.maker = pgMaker
+	val m = Test()
+	m.name = "yang"
+	m.insert()
 
-	}
+	val r = Test.con.query("select * from test", emptyList())
+	r.dump()
 }

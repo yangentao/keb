@@ -2,6 +2,7 @@ package dev.entao.kava.sql.ext
 
 import dev.entao.kava.sql.AutoInc
 import dev.entao.kava.sql.Model
+import dev.entao.kava.sql.ModelClass
 import dev.entao.kava.sql.PrimaryKey
 import java.text.DecimalFormat
 
@@ -11,5 +12,7 @@ class Test : Model() {
 	@PrimaryKey
 	var id: Int by model
 	var name: String by model
+
+	companion object : ModelClass<Test>()
 
 }

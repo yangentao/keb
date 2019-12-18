@@ -43,7 +43,7 @@ fun Connection.insertOrUpdate(model: Model): Boolean {
 	val cs = model.modelPropertiesExists
 	var autoInc = false
 	for (pk in model::class.modelPrimaryKeys) {
-		if (pk.hasAnnotation<dev.entao.kava.sql.AutoInc>()) {
+		if (pk.hasAnnotation<AutoInc>()) {
 			autoInc = true
 		}
 		if (pk !in cs) {
@@ -59,7 +59,7 @@ fun Connection.insertOrUpdate(model: Model): Boolean {
 	if (lVal <= 0L) {
 		return false
 	}
-	val pkProp = model::class.modelPrimaryKeys.first { it.hasAnnotation<dev.entao.kava.sql.AutoInc>() }
+	val pkProp = model::class.modelPrimaryKeys.first { it.hasAnnotation<AutoInc>() }
 	if (pkProp.returnType.isTypeLong) {
 		pkProp.setValue(model, lVal)
 	} else {
@@ -69,7 +69,7 @@ fun Connection.insertOrUpdate(model: Model): Boolean {
 }
 
 fun Connection.insert(model: Model): Boolean {
-	val autoInc = model::class.modelPrimaryKeys.find { it.hasAnnotation<dev.entao.kava.sql.AutoInc>() } != null
+	val autoInc = model::class.modelPrimaryKeys.find { it.hasAnnotation<AutoInc>() } != null
 	val a = SQL(this)
 	a.insert(model::class.s, model.modelPropertiesExists.map { it.s to it.getValue(model) })
 	if (!autoInc) {
@@ -79,7 +79,7 @@ fun Connection.insert(model: Model): Boolean {
 	if (lVal <= 0L) {
 		return false
 	}
-	val pkProp = model::class.modelPrimaryKeys.first { it.hasAnnotation<dev.entao.kava.sql.AutoInc>() }
+	val pkProp = model::class.modelPrimaryKeys.first { it.hasAnnotation<AutoInc>() }
 	if (pkProp.returnType.isTypeLong) {
 		pkProp.setValue(model, lVal)
 	} else {
@@ -89,7 +89,7 @@ fun Connection.insert(model: Model): Boolean {
 }
 
 fun Connection.replace(model: Model): Boolean {
-	val autoInc = model::class.modelPrimaryKeys.find { it.hasAnnotation<dev.entao.kava.sql.AutoInc>() } != null
+	val autoInc = model::class.modelPrimaryKeys.find { it.hasAnnotation<AutoInc>() } != null
 	val a = SQL(this)
 	a.replace(model::class.s, model.modelPropertiesExists.map { it.s to it.getValue(model) })
 	if (!autoInc) {
@@ -99,7 +99,7 @@ fun Connection.replace(model: Model): Boolean {
 	if (lVal <= 0L) {
 		return false
 	}
-	val pkProp = model::class.modelPrimaryKeys.first { it.hasAnnotation<dev.entao.kava.sql.AutoInc>() }
+	val pkProp = model::class.modelPrimaryKeys.first { it.hasAnnotation<AutoInc>() }
 	if (pkProp.returnType.isTypeLong) {
 		pkProp.setValue(model, lVal)
 	} else {
@@ -109,7 +109,7 @@ fun Connection.replace(model: Model): Boolean {
 }
 
 fun Connection.update(sql: String, args: List<Any?> = emptyList()): Int {
-	if (SqlConfig.logEnable) {
+	if (ConnLook.logEnable) {
 		logd(sql)
 		logd(args)
 	}
@@ -121,7 +121,7 @@ fun Connection.update(sql: String, args: List<Any?> = emptyList()): Int {
 }
 
 fun Connection.query(sql: String, args: List<Any?>): ResultSet {
-	if (SqlConfig.logEnable) {
+	if (ConnLook.logEnable) {
 		logd(sql)
 		logd(args)
 	}
@@ -172,7 +172,7 @@ fun Connection.delete(cls: KClass<*>, w: Where?): Int {
 }
 
 fun Connection.exec(sql: String, args: List<Any> = emptyList()): Boolean {
-	if (SqlConfig.logEnable) {
+	if (ConnLook.logEnable) {
 		logd(sql)
 	}
 	val st = this.prepareStatement(sql)
