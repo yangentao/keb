@@ -16,11 +16,11 @@ import kotlin.reflect.KProperty
 open class Model(val model: ModelMap = ModelMap()) {
 
 	fun hasProp(p: KProperty<*>): Boolean {
-		return hasProp(p.userName)
+		return hasProp(p)
 	}
 
 	fun hasProp(key: String): Boolean {
-		return model.containsKey(key)
+		return model.containsKey(key) || model.containsKey(key.toLowerCase())
 	}
 
 	fun removeProperty(p: KProperty<*>) {
@@ -147,7 +147,7 @@ open class Model(val model: ModelMap = ModelMap()) {
 	@Exclude
 	val modelPropertiesExists: List<KMutableProperty<*>>
 		get() {
-			return this::class.modelProperties.filter { model.containsKey(it.userName) }
+			return this::class.modelProperties.filter { model.hasProp(it) }
 		}
 
 	@Exclude

@@ -1,11 +1,6 @@
 package dev.entao.kava.sql
 
-import dev.entao.kava.base.defaultValue
-import dev.entao.kava.base.fullName
-import dev.entao.kava.base.userName
-import dev.entao.kava.base.defaultValueOfProperty
-import dev.entao.kava.base.isClass
-import dev.entao.kava.base.strToV
+import dev.entao.kava.base.*
 import dev.entao.kava.json.YsonArray
 import dev.entao.kava.json.YsonObject
 import kotlin.reflect.KMutableProperty
@@ -30,7 +25,12 @@ class ModelMap(capacity: Int = 32) : HashMap<String, Any?>(capacity) {
 		return ls
 	}
 
+	fun hasProp(p: Prop): Boolean {
+		return this.containsKey(p.sqlName) || this.containsKey(p.userName)
+	}
+
 	fun removeProperty(p: KProperty<*>) {
+		this.remove(p.sqlName)
 		this.remove(p.userName)
 	}
 
@@ -39,7 +39,7 @@ class ModelMap(capacity: Int = 32) : HashMap<String, Any?>(capacity) {
 	}
 
 	operator fun <V> setValue(thisRef: Any?, property: KProperty<*>, value: V) {
-		this[property.userName] = value
+		this[property.sqlName] = value
 		if (this.gather) {
 			if (property is KMutableProperty) {
 				if (property !in this._changedProperties) {
@@ -55,8 +55,8 @@ class ModelMap(capacity: Int = 32) : HashMap<String, Any?>(capacity) {
 	@Suppress("UNCHECKED_CAST")
 	operator fun <V> getValue(thisRef: Any?, property: KProperty<*>): V {
 		val retType = property.returnType
-//		val v = this[property.sqlFullName] ?: this[property.userName]
-		val v = this[property.userName]
+//		val v = this[property.sqlFullName] ?: this[property.sqlName]
+		val v = this[property.sqlName] ?: this[property.userName]
 		if (v != null) {
 			if (retType.isClass(YsonObject::class)) {
 				return when (v) {

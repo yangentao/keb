@@ -1,7 +1,7 @@
-package dev.entao.kava.sql
+package dev.entao.kava.sql.ext
 
 import dev.entao.kava.log.logd
-import dev.entao.kava.sql.ext.Test
+import dev.entao.kava.sql.*
 import java.sql.Connection
 import java.sql.ResultSet
 

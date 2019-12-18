@@ -18,6 +18,11 @@ interface ConnMaker {
 
 class MySQLConnMaker(val url: String, val user: String, val pwd: String) : ConnMaker {
 	private val driverName = "com.mysql.cj.jdbc.Driver"
+
+	init {
+		assert("mysql" in url)
+	}
+
 	override fun defaultConnection(): Connection {
 		return namedConnection("")
 	}
@@ -31,6 +36,11 @@ class MySQLConnMaker(val url: String, val user: String, val pwd: String) : ConnM
 
 class PostgreSQLConnMaker(val url: String, val user: String, val pwd: String) : ConnMaker {
 	private val driverName = "org.postgresql.Driver"
+
+	init {
+		assert("postgresql" in url)
+	}
+
 	override fun defaultConnection(): Connection {
 		return namedConnection("")
 	}

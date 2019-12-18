@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate", "unused")
+
 package dev.entao.kava.sql.ext
 
 import dev.entao.kava.base.defaultValue
@@ -61,7 +63,11 @@ class MapTable(val tableName: String, val connName: String = "") {
 	}
 
 	fun put(key: String, value: String) {
-		mapCon.update("REPLACE INTO $tableName(key_,value_) VALUES(?,?)", listOf(key, value))
+		if (has(key)) {
+			mapCon.update("UPDATE $tableName SET value_ = ?", listOf(value))
+		} else {
+			mapCon.update("INSERT INTO $tableName(key_,value_) VALUES(?,?)", listOf(key, value))
+		}
 	}
 
 	fun remove(key: String): Int {

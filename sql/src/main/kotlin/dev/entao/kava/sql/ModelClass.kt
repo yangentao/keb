@@ -5,11 +5,14 @@ package dev.entao.kava.sql
 import dev.entao.kava.log.loge
 import dev.entao.kava.base.Prop
 import dev.entao.kava.base.Prop1
+import dev.entao.kava.base.isPublic
 import dev.entao.kava.base.userName
 import java.sql.Connection
 import java.sql.ResultSet
 import kotlin.reflect.KClass
+import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.memberProperties
 
 /**
  * Created by entaoyang@163.com on 2017/4/5.
@@ -135,4 +138,34 @@ open class ModelClass<out T : Model> {
 		con.dump { from(tabCls) }
 	}
 
+}
+
+
+
+val KClass<*>.modelProperties: List<KMutableProperty<*>>
+	get() {
+		return classPropCache.getOrPut(this) {
+			findModelProperties(this)
+		}
+	}
+
+val KClass<*>.modelPrimaryKeys: List<KMutableProperty<*>>
+	get() {
+		return this.modelProperties.filter {
+			it.isPrimaryKey
+		}
+	}
+
+private val classPropCache = HashMap<KClass<*>, List<KMutableProperty<*>>>(64)
+
+private fun findModelProperties(cls: KClass<*>): List<KMutableProperty<*>> {
+	return cls.memberProperties.filter {
+		if (it !is KMutableProperty<*>) {
+			false
+		} else if (it.isAbstract || it.isConst || it.isLateinit) {
+			false
+		} else if (!it.isPublic) {
+			false
+		} else !it.isExcluded
+	}.map { it as KMutableProperty<*> }
 }

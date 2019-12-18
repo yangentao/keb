@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package dev.entao.kava.sql
+package dev.entao.kava.sql.ext
 
 import java.sql.Connection
 import java.sql.DriverManager

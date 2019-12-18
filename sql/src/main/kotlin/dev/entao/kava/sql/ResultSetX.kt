@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package dev.entao.kava.sql
 
 import dev.entao.kava.log.logd
@@ -60,7 +62,7 @@ val ResultSet.existRow: Boolean
 		}
 	}
 
-val ResultSet.intValueList: ArrayList<Int>
+val ResultSet.intList: ArrayList<Int>
 	get() {
 		val ls = ArrayList<Int>()
 		this.closeAfter {
@@ -71,7 +73,7 @@ val ResultSet.intValueList: ArrayList<Int>
 		return ls
 	}
 
-val ResultSet.longValueList: ArrayList<Long>
+val ResultSet.longList: ArrayList<Long>
 	get() {
 		val ls = ArrayList<Long>()
 		this.closeAfter {
@@ -81,7 +83,7 @@ val ResultSet.longValueList: ArrayList<Long>
 		}
 		return ls
 	}
-val ResultSet.strValueList: ArrayList<String>
+val ResultSet.strList: ArrayList<String>
 	get() {
 		val ls = ArrayList<String>()
 		this.closeAfter {
@@ -92,7 +94,7 @@ val ResultSet.strValueList: ArrayList<String>
 		return ls
 	}
 
-val ResultSet.doubleValueList: ArrayList<Double>
+val ResultSet.doubleList: ArrayList<Double>
 	get() {
 		val ls = ArrayList<Double>()
 		this.closeAfter {
