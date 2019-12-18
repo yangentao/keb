@@ -13,6 +13,8 @@ class Test : Model() {
 	var id: Int by model
 	var name: String by model
 
+	var user: String by model
+
 	companion object : ModelClass<Test>()
 
 }

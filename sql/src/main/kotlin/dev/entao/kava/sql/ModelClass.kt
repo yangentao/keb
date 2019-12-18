@@ -17,32 +17,32 @@ import kotlin.reflect.full.createInstance
 
 open class ModelClass<out T : Model> {
 
-	private val modelClass = javaClass.enclosingClass.kotlin
+//	private val modelClass = javaClass.enclosingClass.kotlin
 
 	@Suppress("UNCHECKED_CAST")
 	private val tabCls: KClass<T> = javaClass.enclosingClass.kotlin as KClass<T>
 
 	init {
-		DefTable(modelClass)
+		DefTable(tabCls)
 	}
 
 
 	@Suppress("UNCHECKED_CAST")
 	open fun onMapInstance(map: Map<String, Any?>): T {
-		val m = modelClass.createInstance() as T
+		val m = tabCls.createInstance() as T
 		m.model.putAll(map)
 		return m
 	}
 
-	val con: Connection get() = modelClass.namedConn
+	val con: Connection get() = tabCls.namedConn
 
 
 	open fun delete(w: Where?): Int {
-		return con.delete(modelClass, w)
+		return con.delete(tabCls, w)
 	}
 
 	open fun update(map: Map<Prop, Any?>, w: Where?): Int {
-		return con.update(modelClass, map, w)
+		return con.update(tabCls, map, w)
 	}
 
 	open fun update(p: Pair<Prop, Any?>, w: Where?): Int {
@@ -59,13 +59,13 @@ open class ModelClass<out T : Model> {
 
 	open fun query(block: SQLQuery.() -> Unit): ResultSet {
 		return con.query {
-			from(modelClass)
+			from(tabCls)
 			this.block()
 		}
 	}
 
 	open fun countAll(w: Where?): Int {
-		return con.countAll(modelClass, w)
+		return con.countAll(tabCls, w)
 	}
 
 	open fun findAll(block: SQLQuery.() -> Unit): List<T> {
@@ -74,13 +74,13 @@ open class ModelClass<out T : Model> {
 
 	open fun findAll(w: Where?): List<T> {
 		return con.querySQL {
-			selectAll().from(modelClass).where(w)
+			selectAll().from(tabCls).where(w)
 		}.allRows().map { onMapInstance(it) }
 	}
 
 	open fun findAll(w: Where?, block: SQLQuery.() -> Unit): List<T> {
 		val ls = con.query {
-			from(modelClass)
+			from(tabCls)
 			if (w != null) {
 				where(w)
 			}
@@ -95,7 +95,7 @@ open class ModelClass<out T : Model> {
 
 	open fun findOne(w: Where?): T? {
 		return con.querySQL {
-			selectAll().from(modelClass).where(w).limit(1)
+			selectAll().from(tabCls).where(w).limit(1)
 		}.allRows().map { onMapInstance(it) }.firstOrNull()
 	}
 
@@ -121,7 +121,7 @@ open class ModelClass<out T : Model> {
 	}
 
 	open fun findByKey(pkValue: Any): T? {
-		val pks = this.modelClass.modelPrimaryKeys
+		val pks = this.tabCls.modelPrimaryKeys
 		if (pks.size != 1) {
 			loge("${this::class.qualifiedName} 主键和给的值,数量不匹配")
 			return null
@@ -130,7 +130,7 @@ open class ModelClass<out T : Model> {
 	}
 
 	open fun dumpTable() {
-		con.dump { from(modelClass) }
+		con.dump { from(tabCls) }
 	}
 
 }

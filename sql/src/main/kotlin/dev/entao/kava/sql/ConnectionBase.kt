@@ -90,7 +90,8 @@ fun Connection.createTable(tableName: String, columns: List<String>): Int {
 fun Connection.tableExists(tableName: String): Boolean {
 	val meta = this.metaData
 	val rs = meta.getTables(this.catalog, this.schema, tableName, arrayOf("TABLE"))
-	val s = rs.firstRow()?.get("TABLE_NAME")?.toString() ?: ""
+	val firstRow = rs.firstRow()
+	val s = firstRow?.get("TABLE_NAME")?.toString() ?: firstRow?.get("table_name")?.toString() ?: ""
 	return s.toLowerCase() == tableName.toLowerCase()
 }
 

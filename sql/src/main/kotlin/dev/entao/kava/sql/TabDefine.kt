@@ -62,7 +62,9 @@ class DefTable(private val cls: KClass<*>) {
 	}
 
 	private fun createTable(conn: Connection) {
-		val colList: MutableList<String> = columns.map { it.defColumnn() }.toMutableList()
+		val colList: MutableList<String> = columns.map {
+			it.defColumnn()
+		}.toMutableList()
 		val pkCols = columns.filter { it.pk }.joinToString(",") { it.name }
 		if (pkCols.isNotEmpty()) {
 			colList += "PRIMARY KEY ($pkCols)"
@@ -111,9 +113,20 @@ class DefColumn(private val prop: Prop, val dbType: Int) {
 		}
 	}
 
+	private val escName: String
+		get() {
+			if (dbType == TypeMYSQL && name in mysqlKeySet) {
+				return "`$name`"
+			}
+			if (dbType == TypePostgresql && name in pgKeySet) {
+				return "\"$name\""
+			}
+			return name
+		}
+
 	fun defColumnn(): String {
 		val partList = ArrayList<String>(8)
-		partList += name
+		partList += escName
 		val typeDefStr = makeTypeString().toLowerCase()
 		partList += typeDefStr
 		if (notNull && !pk) {

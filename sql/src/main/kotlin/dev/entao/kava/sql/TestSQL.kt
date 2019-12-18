@@ -74,4 +74,7 @@ fun main() {
 
 	val r = Test.con.query("select test.id, test.name,test.user from test", emptyList())
 	r.dump()
+
+	val t = Test.findOne(Test::id EQ 2)
+	logd(t?.id, t?.name)
 }
