@@ -50,12 +50,16 @@ fun Connection.insertOrUpdate(model: Model): Boolean {
 			throw IllegalArgumentException("insertOrUpdate 必须包含主键的值")
 		}
 	}
-	val a = SQL(this)
-	a.insertOrUpdate(model::class.s, model::class.modelPrimaryKeys.map { it.s }, cs.map { it.s to it.getValue(model) })
-	if (!autoInc) {
-		return a.insert() > 0
+	val a = SQL()
+	if (this.isMySQL) {
+		a.insertOrUpdateMySqL(model::class, cs.map { it to it.getValue(model) }, model::class.modelPrimaryKeys)
+	} else if (this.isPostgres) {
+		a.insertOrUpdatePG(model::class, cs.map { it to it.getValue(model) }, model::class.modelPrimaryKeys)
 	}
-	val lVal = a.insertGenKey()
+	if (!autoInc) {
+		return this.insertSQL(a) > 0
+	}
+	val lVal = this.insertSQLGenKey(a)
 	if (lVal <= 0L) {
 		return false
 	}
@@ -70,12 +74,12 @@ fun Connection.insertOrUpdate(model: Model): Boolean {
 
 fun Connection.insert(model: Model): Boolean {
 	val autoInc = model::class.modelPrimaryKeys.find { it.hasAnnotation<AutoInc>() } != null
-	val a = SQL(this)
+	val a = SQL()
 	a.insert(model::class.s, model.modelPropertiesExists.map { it.s to it.getValue(model) })
 	if (!autoInc) {
-		return a.insert() > 0
+		return this.insertSQL(a) > 0
 	}
-	val lVal = a.insertGenKey()
+	val lVal = this.insertSQLGenKey(a)
 	if (lVal <= 0L) {
 		return false
 	}
@@ -88,25 +92,6 @@ fun Connection.insert(model: Model): Boolean {
 	return true
 }
 
-fun Connection.replace(model: Model): Boolean {
-	val autoInc = model::class.modelPrimaryKeys.find { it.hasAnnotation<AutoInc>() } != null
-	val a = SQL(this)
-	a.replace(model::class.s, model.modelPropertiesExists.map { it.s to it.getValue(model) })
-	if (!autoInc) {
-		return a.insert() > 0
-	}
-	val lVal = a.insertGenKey()
-	if (lVal <= 0L) {
-		return false
-	}
-	val pkProp = model::class.modelPrimaryKeys.first { it.hasAnnotation<AutoInc>() }
-	if (pkProp.returnType.isTypeLong) {
-		pkProp.setValue(model, lVal)
-	} else {
-		pkProp.setValue(model, lVal.toInt())
-	}
-	return true
-}
 
 fun Connection.update(sql: String, args: List<Any?> = emptyList()): Int {
 	if (ConnLook.logEnable) {
@@ -119,6 +104,24 @@ fun Connection.update(sql: String, args: List<Any?> = emptyList()): Int {
 	st.close()
 	return n
 }
+
+fun Connection.insertGenKey(sql: String, args: ArrayList<Any?>): Long {
+	val st = this.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
+	st.setParams(args)
+	if (ConnLook.logEnable) {
+		logd(sql)
+		logd(args)
+	}
+	val n = st.executeUpdate()
+	val r: Long = if (n <= 0) {
+		0L
+	} else {
+		st.generatedKeys.longValue ?: 0L
+	}
+	st.close()
+	return r
+}
+
 
 fun Connection.query(sql: String, args: List<Any?>): ResultSet {
 	if (ConnLook.logEnable) {
@@ -141,7 +144,9 @@ fun Connection.query(block: SQLQuery.() -> Unit): ResultSet {
 }
 
 fun Connection.countAll(cls: KClass<*>, w: Where?): Int {
-	return SQL(this).select("COUNT(*)").from(cls).where(w).query().intValue ?: 0
+	return this.querySQL {
+		select("COUNT(*)").from(cls).where(w)
+	}.intValue ?: 0
 }
 
 fun Connection.dump(block: SQLQuery.() -> Unit) {
@@ -157,18 +162,23 @@ fun Connection.updateByKey(model: Model, ps: List<KMutableProperty<*>> = model.m
 		throw IllegalArgumentException("updateByKey, 必须定义主键")
 	}
 	val ls = ps.filter { it !in pkList }
-	return SQL(this).update(model::class.s, ls.map {
-		it.s to it.getValue(model)
-	}).where(model.whereByPrimaryKey).update() > 0
+	return this.updateSQL {
+		update(model::class.s, ls.map {
+			it.s to it.getValue(model)
+		}).where(model.whereByPrimaryKey)
+	} > 0
 }
 
 fun Connection.update(cls: KClass<*>, map: Map<Prop, Any?>, w: Where?): Int {
-	val a = SQL(this).update(cls, map).where(w)
-	return a.update()
+	return this.updateSQL {
+		update(cls, map).where(w)
+	}
 }
 
 fun Connection.delete(cls: KClass<*>, w: Where?): Int {
-	return SQL(this).deleteFrom(cls).where(w).update()
+	return this.updateSQL {
+		deleteFrom(cls).where(w)
+	}
 }
 
 fun Connection.exec(sql: String, args: List<Any> = emptyList()): Boolean {

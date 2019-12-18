@@ -1,4 +1,4 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "FunctionName", "MemberVisibilityCanBePrivate")
 
 package dev.entao.kava.sql
 
@@ -6,11 +6,9 @@ import dev.entao.kava.base.Name
 import dev.entao.kava.base.Prop
 import dev.entao.kava.base.Prop1
 import dev.entao.kava.base.ownerClass
-import dev.entao.kava.log.logd
 import java.sql.Connection
 import java.sql.ResultSet
 import kotlin.reflect.KClass
-import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
 
 /**
@@ -22,16 +20,20 @@ val KClass<*>.sqlName: String
 		return this.findAnnotation<Name>()?.value ?: this.simpleName!!.toLowerCase()
 	}
 
-val KProperty<*>.sqlName: String
+val Prop.sqlName: String
 	get() {
 		return this.findAnnotation<Name>()?.value ?: this.name.toLowerCase()
 	}
-val KProperty<*>.sqlFullName: String
+val Prop.sqlFullName: String
 	get() {
 		return "${this.ownerClass!!.sqlName}.${this.sqlName}"
 	}
+
+typealias TabClass = KClass<*>
+
 val Prop.s: String get() = this.sqlName
-val KClass<*>.s: String get() = this.sqlName
+
+val TabClass.s: String get() = this.sqlName
 
 class SelOpt {
 	var distinct = false
@@ -43,24 +45,16 @@ infix fun String.AS(other: String): String {
 }
 
 
-class SQL(val conn: Connection? = null) {
+class SQL {
 	private val buf = StringBuilder(512)
 	val args: ArrayList<Any?> = ArrayList()
-
-	constructor(cls: KClass<*>) : this(cls.namedConn)
-
 	val sql: String get() = buf.toString()
 
-	fun clearBuf() {
-		buf.setLength(0)
-		args.clear()
-	}
-
-	fun update(cls: KClass<*>, map: Map<Prop, Any?>): SQL {
+	fun update(cls: TabClass, map: Map<Prop, Any?>): SQL {
 		return this.update(cls.s, map.mapKeys { it.key.s })
 	}
 
-	fun update(cls: KClass<*>, list: List<Pair<Prop, Any?>>): SQL {
+	fun update(cls: TabClass, list: List<Pair<Prop, Any?>>): SQL {
 		return this.update(cls.s, list.map { it.first.s to it.second })
 	}
 
@@ -94,46 +88,45 @@ class SQL(val conn: Connection? = null) {
 	}
 
 	fun insert(table: String, kvs: List<Pair<String, Any?>>): SQL {
-		val keyList = kvs.map { it.first }
-		buf.append("INSERT INTO $table (")
-		val ks = keyList.joinToString(", ")
+		val ks = kvs.joinToString(", ") { it.first }
 		val vs = kvs.joinToString(", ") { "?" }
-		buf.append("$ks ) VALUES ( $vs ) ")
+		buf.append("INSERT INTO $table ($ks) VALUES ($vs) ")
 		args.addAll(kvs.map { it.second })
 		return this
 	}
 
-	fun replace(modelCls: KClass<*>, kvs: List<Pair<Prop1, Any?>>): SQL {
-		return this.replace(modelCls.sqlName, kvs.map { it.first.sqlName to it.second })
+	fun insertOrUpdateMySqL(modelCls: KClass<*>, kvs: List<Pair<Prop, Any?>>, updateColumns: List<Prop>): SQL {
+		return this.insertOrUpdateMySqL(modelCls.sqlName, kvs.map { it.first.sqlName to it.second }, updateColumns.map { it.sqlName })
 	}
 
-	fun replace(table: String, kvs: List<Pair<String, Any?>>): SQL {
-		val keyList = kvs.map { it.first }
-		buf.append("REPLACE INTO $table (")
-		val ks = keyList.joinToString(", ")
-		val vs = kvs.joinToString(", ") { "?" }
-		buf.append("$ks ) VALUES ( $vs ) ")
-		args.addAll(kvs.map { it.second })
-		return this
-	}
-
-	fun insertOrUpdate(modelCls: KClass<*>, pkColumns: List<Prop1>, kvs: List<Pair<Prop1, Any?>>): SQL {
-		return this.insertOrUpdate(modelCls.sqlName, pkColumns.map { it.sqlName }, kvs.map { it.first.sqlName to it.second })
-	}
-
-	fun insertOrUpdate(table: String, pkColumns: List<String>, kvs: List<Pair<String, Any?>>): SQL {
-		if (pkColumns.isEmpty()) {
-			throw IllegalArgumentException("insertOrUpdate $table  uniqeColumns参数不能是空")
+	fun insertOrUpdateMySqL(table: String, kvs: List<Pair<String, Any?>>, updateColumns: List<String>): SQL {
+		if (updateColumns.isEmpty()) {
+			throw IllegalArgumentException("insertOrUpdate $table  updateColumns参数不能是空")
 		}
-		val keyList = kvs.map { it.first }
-		buf.append("INSERT INTO $table (")
-		val ks = keyList.joinToString(", ")
+		val ks = kvs.joinToString(", ") { it.first }
 		val vs = kvs.joinToString(", ") { "?" }
-		buf.append("$ks ) VALUES ( $vs ) ")
+		buf.append("INSERT INTO $table ($ks ) VALUES ( $vs ) ")
 		buf.append(" ON DUPLICATE KEY UPDATE ")
-		val pkList = pkColumns.map { it }
-		val us = keyList.filter { it !in pkList }.joinToString(", ") { "$it = VALUES($it) " }
+		val us = kvs.map { it.first }.filter { it in updateColumns }.joinToString(", ") { "$it = VALUES($it) " }
 		buf.append(us)
+		args.addAll(kvs.map { it.second })
+		return this
+	}
+
+	fun insertOrUpdatePG(modelCls: KClass<*>, kvs: List<Pair<Prop, Any?>>, updateColumns: List<Prop>): SQL {
+		return this.insertOrUpdatePG(modelCls.sqlName, kvs.map { it.first.sqlName to it.second }, updateColumns.map { it.sqlName })
+	}
+
+	fun insertOrUpdatePG(table: String, kvs: List<Pair<String, Any?>>, updateColumns: List<String>): SQL {
+		if (updateColumns.isEmpty()) {
+			throw IllegalArgumentException("insertOrUpdate $table  updateColumns参数不能是空")
+		}
+		val ks = kvs.joinToString(", ") { it.first }
+		val vs = kvs.joinToString(", ") { "?" }
+		buf.append("INSERT INTO $table ($ks ) VALUES ( $vs ) ")
+		val uc = updateColumns.joinToString(",")
+		val uv = updateColumns.joinToString(",") { "excluded.$it" }
+		buf.append(" ON CONFLICT DO UPDATE SET ($uc)=($uv)")
 		args.addAll(kvs.map { it.second })
 		return this
 	}
@@ -180,7 +173,7 @@ class SQL(val conn: Connection? = null) {
 		return this
 	}
 
-	fun from(vararg clses: KClass<*>): SQL {
+	fun from(vararg clses: TabClass): SQL {
 		return from(clses.map { it.sqlName })
 	}
 
@@ -194,7 +187,7 @@ class SQL(val conn: Connection? = null) {
 		return this
 	}
 
-	fun join(vararg modelClasses: KClass<*>): SQL {
+	fun join(vararg modelClasses: TabClass): SQL {
 		return join(modelClasses.map { it.sqlName })
 	}
 
@@ -223,7 +216,7 @@ class SQL(val conn: Connection? = null) {
 	}
 
 	fun where(w: Where?): SQL {
-		if (w != null) {
+		if (w != null && w.value.isNotEmpty()) {
 			buf.append(" WHERE ")
 			buf.append(w.value)
 			args.addAll(w.args)
@@ -232,9 +225,11 @@ class SQL(val conn: Connection? = null) {
 	}
 
 	fun where(w: String, vararg params: Any): SQL {
-		buf.append(" WHERE ")
-		buf.append(w)
-		args.addAll(params)
+		if (w.isNotEmpty()) {
+			buf.append(" WHERE ")
+			buf.append(w)
+			args.addAll(params)
+		}
 		return this
 	}
 
@@ -288,41 +283,11 @@ class SQL(val conn: Connection? = null) {
 		buf.append(" LIMIT $size OFFSET $offset")
 		return this
 	}
-
-	fun query(): ResultSet {
-		return conn!!.query(sql, args)
-	}
-
-	fun update(): Int {
-		return conn!!.update(sql, args)
-	}
-
-	fun insert(): Int {
-		return conn!!.update(sql, args)
-	}
-
-	fun insertGenKey(): Long {
-		val st = conn!!.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
-		st.setParams(args)
-		if (ConnLook.logEnable) {
-			logd(sql)
-			logd(args)
-		}
-		val n = st.executeUpdate()
-		val r: Long = if (n <= 0) {
-			0L
-		} else {
-			st.generatedKeys.longValue ?: 0L
-		}
-		st.close()
-		return r
-	}
-
 }
 
 class OnBuilder {
 
-	infix fun Prop1.EQ(s: Prop1): String {
+	infix fun Prop.EQ(s: Prop1): String {
 		return "${this.sqlFullName} = ${s.sqlFullName}"
 	}
 
@@ -333,4 +298,44 @@ class OnBuilder {
 	infix fun String.AND(s: String): String {
 		return "$this AND $s"
 	}
+}
+
+fun Connection.querySQL(a: SQL): ResultSet {
+	return this.query(a.sql, a.args)
+}
+
+fun Connection.querySQL(block: SQL.() -> Unit): ResultSet {
+	val a = SQL()
+	a.block()
+	return this.query(a.sql, a.args)
+}
+
+fun Connection.updateSQL(a: SQL): Int {
+	return this.update(a.sql, a.args)
+}
+
+fun Connection.updateSQL(block: SQL.() -> Unit): Int {
+	val a = SQL()
+	a.block()
+	return this.update(a.sql, a.args)
+}
+
+fun Connection.insertSQL(a: SQL): Int {
+	return this.update(a.sql, a.args)
+}
+
+fun Connection.insertSQL(block: SQL.() -> Unit): Int {
+	val a = SQL()
+	a.block()
+	return this.update(a.sql, a.args)
+}
+
+fun Connection.insertSQLGenKey(a: SQL): Long {
+	return this.insertGenKey(a.sql, a.args)
+}
+
+fun Connection.insertSQLGenKey(block: SQL.() -> Unit): Long {
+	val a = SQL()
+	a.block()
+	return this.insertGenKey(a.sql, a.args)
 }

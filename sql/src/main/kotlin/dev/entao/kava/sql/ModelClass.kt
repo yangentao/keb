@@ -46,7 +46,6 @@ open class ModelClass<out T : Model> {
 
 	val con: Connection get() = modelClass.namedConn
 
-	val sql: SQL get() = SQL(con)
 
 	open fun delete(w: Where?): Int {
 		return con.delete(modelClass, w)
@@ -84,7 +83,9 @@ open class ModelClass<out T : Model> {
 	}
 
 	open fun findAll(w: Where?): List<T> {
-		return SQL(con).selectAll().from(modelClass).where(w).query().allRows().map { onMapInstance(it) }
+		return con.querySQL {
+			selectAll().from(modelClass).where(w)
+		}.allRows().map { onMapInstance(it) }
 	}
 
 	open fun findAll(w: Where?, block: SQLQuery.() -> Unit): List<T> {
@@ -103,8 +104,9 @@ open class ModelClass<out T : Model> {
 	}
 
 	open fun findOne(w: Where?): T? {
-		return SQL(con).selectAll().from(modelClass).where(w).limit(1).query().allRows().map { onMapInstance(it) }
-				.firstOrNull()
+		return con.querySQL {
+			selectAll().from(modelClass).where(w).limit(1)
+		}.allRows().map { onMapInstance(it) }.firstOrNull()
 	}
 
 	open fun findOne(w: Where?, block: SQLQuery.() -> Unit): T? {

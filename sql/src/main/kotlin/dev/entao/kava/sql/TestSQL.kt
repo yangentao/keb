@@ -22,19 +22,6 @@ fun usePostgres(block: Connection.() -> Unit) {
 	ConnLook.maker = pgMaker
 }
 
-fun testQuery() {
-	useMySQL {
-		val ls = SQL(this).selectAll().from(Test::class).where(Test::id LE 11).query().allRows().map {
-			val t = Test()
-			t.model.putAll(it)
-			t
-		}
-
-		for (t in ls) {
-			logd(t.id, t.name)
-		}
-	}
-}
 
 fun testInsert() {
 	useMySQL {
@@ -49,7 +36,6 @@ fun testInsert() {
 
 fun dumpResultSets(r: ResultSet) {
 	val meta = r.metaData
-	val colCount = meta.columnCount
 	r.closeAfter {
 		while (r.next()) {
 			for (i in 1..meta.columnCount) {

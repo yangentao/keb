@@ -1,6 +1,9 @@
 package dev.entao.kava.sql
 
+import dev.entao.kava.base.Exclude
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
+import kotlin.reflect.full.findAnnotation
 
 /**
  * 通用注释
@@ -66,3 +69,15 @@ annotation class LimitRows(val value: Int)
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class DecimalDef(val p: Int, val s: Int)
+
+
+
+
+val KProperty<*>.isExcluded: Boolean
+	get() {
+		return this.findAnnotation<Exclude>() != null
+	}
+val KProperty<*>.isPrimaryKey: Boolean
+	get() {
+		return this.findAnnotation<PrimaryKey>() != null
+	}

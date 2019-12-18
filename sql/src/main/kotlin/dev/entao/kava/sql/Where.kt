@@ -1,9 +1,9 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "FunctionName")
 
 package dev.entao.kava.sql
 
+import dev.entao.kava.base.Prop
 import java.util.*
-import kotlin.reflect.KProperty
 
 /**
  * Created by yangentao on 2016/12/14.
@@ -32,29 +32,29 @@ fun IsNull(col: String): Where {
 	return Where("$col IS NULL")
 }
 
-fun IsNotNull(col: String): Where {
-	return Where("$col IS NOT NULL")
-}
-
-fun IsNull(p: KProperty<*>): Where {
+fun IsNull(p: Prop): Where {
 	val col = p.sqlFullName
 	return IsNull(col)
 }
 
-fun IsNotNull(p: KProperty<*>): Where {
+fun IsNotNull(col: String): Where {
+	return Where("$col IS NOT NULL")
+}
+
+fun IsNotNull(p: Prop): Where {
 	val col = p.sqlFullName
 	return IsNotNull(col)
 }
 
-fun EQS(a: Pair<KProperty<*>, Any?>, vararg ps: Pair<KProperty<*>, Any?>): Where {
-	var w: Where? = a.first.EQ(a.second)
+fun EQS(a: Pair<Prop, Any?>, vararg ps: Pair<Prop, Any?>): Where {
+	var w: Where = a.first.EQ(a.second)
 	for (p in ps) {
 		w = w AND p.first.EQ(p.second)
 	}
-	return w!!
+	return w
 }
 
-infix fun KProperty<*>.EQ(value: Any?): Where {
+infix fun Prop.EQ(value: Any?): Where {
 	return this.sqlFullName.EQ(value)
 }
 
@@ -66,7 +66,7 @@ infix fun String.EQ(value: Any?): Where {
 	}
 }
 
-infix fun KProperty<*>.NE(value: Any?): Where {
+infix fun Prop.NE(value: Any?): Where {
 	return this.sqlFullName.NE(value)
 }
 
@@ -79,7 +79,7 @@ infix fun String.NE(value: Any?): Where {
 	}
 }
 
-infix fun KProperty<*>.GE(value: Any): Where {
+infix fun Prop.GE(value: Any): Where {
 	return this.sqlFullName.GE(value)
 }
 
@@ -88,7 +88,7 @@ infix fun String.GE(value: Any): Where {
 	return Where("$s >= ?").addArg(value)
 }
 
-infix fun KProperty<*>.GT(value: Any): Where {
+infix fun Prop.GT(value: Any): Where {
 	return this.sqlFullName.GT(value)
 }
 
@@ -97,7 +97,7 @@ infix fun String.GT(value: Any): Where {
 	return Where("$s > ?").addArg(value)
 }
 
-infix fun KProperty<*>.LE(value: Any): Where {
+infix fun Prop.LE(value: Any): Where {
 	return this.sqlFullName.LE(value)
 }
 
@@ -106,7 +106,7 @@ infix fun String.LE(value: Any): Where {
 	return Where("$s <= ?").addArg(value)
 }
 
-infix fun KProperty<*>.LT(value: Any): Where {
+infix fun Prop.LT(value: Any): Where {
 	return this.sqlFullName.LT(value)
 }
 
@@ -115,7 +115,7 @@ infix fun String.LT(value: Any): Where {
 	return Where("$s < ?").addArg(value)
 }
 
-infix fun KProperty<*>.LIKE(value: String): Where {
+infix fun Prop.LIKE(value: String): Where {
 	return this.sqlFullName.LIKE(value)
 }
 
@@ -124,7 +124,7 @@ infix fun String.LIKE(value: String): Where {
 	return Where("$s LIKE ?").addArg(value)
 }
 
-infix fun KProperty<*>.IN(values: Collection<Any>): Where {
+infix fun Prop.IN(values: Collection<Any>): Where {
 	return this.sqlFullName.IN(values)
 }
 
@@ -133,32 +133,24 @@ infix fun String.IN(values: Collection<Any>): Where {
 	return Where("$this IN ( $a )").addArgs(values)
 }
 
-infix fun Where?.AND(other: Where?): Where? {
+infix fun Where?.AND(other: Where): Where {
 	if (this == null) {
 		return other
 	}
-	if (other == null) {
-		return this
-	}
-	if (this.value.isBlank()) {
-		return other
-	}
+	assert(this.value.isNotEmpty())
+	assert(other.value.isNotEmpty())
 	val w = Where("($this) AND ($other)")
 	w.args.addAll(this.args)
 	w.args.addAll(other.args)
 	return w
 }
 
-infix fun Where?.OR(other: Where?): Where? {
+infix fun Where?.OR(other: Where): Where {
 	if (this == null) {
 		return other
 	}
-	if (other == null) {
-		return this
-	}
-	if (this.value.isBlank()) {
-		return other
-	}
+	assert(this.value.isNotEmpty())
+	assert(other.value.isNotEmpty())
 	val w = Where("($this) OR ($other)")
 	w.args.addAll(this.args)
 	w.args.addAll(other.args)

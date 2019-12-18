@@ -29,7 +29,9 @@ open class Model(val model: ModelMap = ModelMap()) {
 
 	fun existRowByKey(): Boolean {
 		val w = this.whereByPrimaryKey ?: throw IllegalArgumentException("必须设置主键")
-		return SQL(conn).selectAll().from(this::class).where(w).limit(1).query().existRow
+		return conn.querySQL {
+			selectAll().from(this::class).where(w).limit(1)
+		}.existRow
 	}
 
 	private val conn: Connection get() = this::class.namedConn
@@ -45,10 +47,6 @@ open class Model(val model: ModelMap = ModelMap()) {
 
 	fun insert(): Boolean {
 		return conn.insert(this)
-	}
-
-	fun replace(): Boolean {
-		return conn.replace(this)
 	}
 
 	fun insertOrUpdate(): Boolean {
