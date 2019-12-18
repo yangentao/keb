@@ -17,8 +17,6 @@ import kotlin.reflect.full.createInstance
 
 open class ModelClass<out T : Model> {
 
-//	private val modelClass = javaClass.enclosingClass.kotlin
-
 	@Suppress("UNCHECKED_CAST")
 	private val tabCls: KClass<T> = javaClass.enclosingClass.kotlin as KClass<T>
 
@@ -106,16 +104,10 @@ open class ModelClass<out T : Model> {
 		}.firstOrNull()
 	}
 
-	open fun findAll(vararg ps: Pair<Prop1, Any>): List<T> {
-		if (ps.isEmpty()) {
-			return emptyList()
-		}
-		var w: Where? = null
-		for (p in ps) {
-			w = w AND (p.first EQ p.second)
-		}
-		if (w == null) {
-			return emptyList()
+	open fun findAll(p: Pair<Prop, Any>, vararg ps: Pair<Prop1, Any>): List<T> {
+		var w: Where = p.first EQ p.second
+		for (a in ps) {
+			w = w AND (a.first EQ a.second)
 		}
 		return findAll(w)
 	}
@@ -127,6 +119,16 @@ open class ModelClass<out T : Model> {
 			return null
 		}
 		return findOne(pks[0] EQ pkValue)
+	}
+
+	open fun findByKeys(vararg keys: Any): T? {
+		val pks = this.tabCls.modelPrimaryKeys
+		assert(keys.isNotEmpty() && pks.size == keys.size)
+		var w: Where? = null
+		for (i in pks.indices) {
+			w = w AND (pks[i] EQ keys[i])
+		}
+		return findOne(w)
 	}
 
 	open fun dumpTable() {
