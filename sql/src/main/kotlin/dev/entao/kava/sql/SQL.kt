@@ -2,24 +2,41 @@
 
 package dev.entao.kava.sql
 
+import dev.entao.kava.base.Name
 import dev.entao.kava.base.Prop
 import dev.entao.kava.base.Prop1
+import dev.entao.kava.base.ownerClass
 import dev.entao.kava.log.logd
 import java.sql.Connection
 import java.sql.ResultSet
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
+import kotlin.reflect.full.findAnnotation
 
 /**
  * Created by yangentao on 2016/12/14.
  */
 
+val KClass<*>.sqlName: String
+	get() {
+		return this.findAnnotation<Name>()?.value ?: this.simpleName!!.toLowerCase()
+	}
+
+val KProperty<*>.sqlName: String
+	get() {
+		return this.findAnnotation<Name>()?.value ?: this.name.toLowerCase()
+	}
+val KProperty<*>.sqlFullName: String
+	get() {
+		return "${this.ownerClass!!.sqlName}.${this.sqlName}"
+	}
+val Prop.s: String get() = this.sqlName
+val KClass<*>.s: String get() = this.sqlName
 
 class SelOpt {
 	var distinct = false
 }
 
-val Prop.s: String get() = this.sqlName
-val KClass<*>.s: String get() = this.sqlName
 
 infix fun String.AS(other: String): String {
 	return "$this AS $other"
@@ -73,7 +90,7 @@ class SQL(val conn: Connection? = null) {
 	}
 
 	fun insert(modelCls: KClass<*>, kvs: List<Pair<Prop1, Any?>>): SQL {
-		return this.insert(modelCls.sqlName, kvs.map { it.first.sqlFullName to it.second })
+		return this.insert(modelCls.sqlName, kvs.map { it.first.sqlName to it.second })
 	}
 
 	fun insert(table: String, kvs: List<Pair<String, Any?>>): SQL {
@@ -87,7 +104,7 @@ class SQL(val conn: Connection? = null) {
 	}
 
 	fun replace(modelCls: KClass<*>, kvs: List<Pair<Prop1, Any?>>): SQL {
-		return this.replace(modelCls.sqlName, kvs.map { it.first.sqlFullName to it.second })
+		return this.replace(modelCls.sqlName, kvs.map { it.first.sqlName to it.second })
 	}
 
 	fun replace(table: String, kvs: List<Pair<String, Any?>>): SQL {
@@ -101,7 +118,7 @@ class SQL(val conn: Connection? = null) {
 	}
 
 	fun insertOrUpdate(modelCls: KClass<*>, pkColumns: List<Prop1>, kvs: List<Pair<Prop1, Any?>>): SQL {
-		return this.insertOrUpdate(modelCls.sqlName, pkColumns.map { it.sqlFullName }, kvs.map { it.first.sqlFullName to it.second })
+		return this.insertOrUpdate(modelCls.sqlName, pkColumns.map { it.sqlName }, kvs.map { it.first.sqlName to it.second })
 	}
 
 	fun insertOrUpdate(table: String, pkColumns: List<String>, kvs: List<Pair<String, Any?>>): SQL {

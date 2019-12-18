@@ -11,34 +11,9 @@ import kotlin.reflect.full.findAnnotation
  * Created by entaoyang@163.com on 2017/4/6.
  */
 
-val String.sqlEscaped: String
-	get() {
-		return this
-//		val buf = StringBuilder(this.length + 2)
-//		if (!this.startsWith('`')) {
-//			buf.append('`')
-//		}
-//		buf.append(this)
-//		if (!this.endsWith('`')) {
-//			buf.append('`')
-//		}
-//		return buf.toString()
-	}
 
 //==
-val KClass<*>.sqlName: String
-	get() {
-		return this.userName.toLowerCase()
-	}
 
-val KProperty<*>.sqlName: String
-	get() {
-		return this.userName.toLowerCase()
-	}
-val KProperty<*>.sqlFullName: String
-	get() {
-		return "${this.ownerClass!!.sqlName}.${this.sqlName}"
-	}
 
 
 val KProperty<*>.isExcluded: Boolean

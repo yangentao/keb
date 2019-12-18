@@ -7,17 +7,29 @@ import java.sql.Connection
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
-private const val typeMYSQL: Int = 0
-private const val typePostgresql: Int = 1
+const val TypeMYSQL: Int = 0
+const val TypePostgresql: Int = 1
 
 class DefTable(private val cls: KClass<*>) {
+	val name: String = cls.sqlName
 	private val conn: Connection by lazy { cls.namedConn }
-	private val dbType: Int = if (conn.isMySQL) typeMYSQL else if (conn.isPostgres) typePostgresql else throw java.lang.IllegalArgumentException("只支持MySQL或PostgreSQL")
-	private val name: String = cls.sqlName
+	val dbType: Int = if (conn.isMySQL) TypeMYSQL else if (conn.isPostgres) TypePostgresql else throw java.lang.IllegalArgumentException("只支持MySQL或PostgreSQL")
 	private val autoCreate: Boolean = cls.findAnnotation<AutoCreateTable>()?.value ?: true
 	private val columns: List<DefColumn> = cls.modelProperties.map { DefColumn(it, dbType) }
 
 	init {
+		if (dbType == TypeMYSQL) {
+			assert(name.toLowerCase() !in mysqlKeySet)
+			for (c in columns) {
+				assert(c.name.toLowerCase() !in mysqlKeySet)
+			}
+		} else if (dbType == TypePostgresql) {
+			assert(name.toLowerCase() !in pgKeySet)
+			for (c in columns) {
+				assert(c.name.toLowerCase() !in pgKeySet)
+			}
+		}
+
 		if (autoCreate) {
 			if (!conn.tableExists(name)) {
 				createTable(conn)
@@ -29,7 +41,7 @@ class DefTable(private val cls: KClass<*>) {
 	}
 
 	private fun mergeIndex() {
-		val oldIdxs = conn.tableIndexList(name).map { it.colName.toLowerCase() }.toSet()
+		val oldIdxs = conn.tableIndexList(name).map { it.colName }.toSet()
 		val newIdxs = columns.filter { it.index }
 		for (p in newIdxs) {
 			if (p.name !in oldIdxs) {
@@ -40,7 +52,7 @@ class DefTable(private val cls: KClass<*>) {
 	}
 
 	private fun mergeTable() {
-		val cols: Set<String> = conn.tableDesc(name).map { it.columnName.toLowerCase() }.toSet()
+		val cols: Set<String> = conn.tableDesc(name).map { it.columnName }.toSet()
 		for (p in columns) {
 			if (p.name !in cols) {
 				val s = p.defColumnn()
@@ -62,7 +74,7 @@ class DefTable(private val cls: KClass<*>) {
 		val uniq2 = columns.filter { it.unique != null && it.unique.isNotEmpty() }.groupBy { it.unique }
 		for ((k, ls) in uniq2) {
 			val s = ls.joinToString(",") { it.name }
-			colList += if (dbType == typeMYSQL) {
+			colList += if (dbType == TypeMYSQL) {
 				"CONSTRAINT $k UNIQUE ($s) "
 			} else {
 				"UNIQUE ($s) "
@@ -124,7 +136,7 @@ class DefColumn(private val prop: Prop, val dbType: Int) {
 			}
 		}
 		if (autoInc) {
-			if (dbType == typeMYSQL) {
+			if (dbType == TypeMYSQL) {
 				partList += "AUTO_INCREMENT"
 			}
 		}
@@ -141,7 +153,7 @@ class DefColumn(private val prop: Prop, val dbType: Int) {
 		}
 		if (prop.isTypeString) {
 			return if (lengthValue >= 65535) {
-				if (dbType == typePostgresql) {
+				if (dbType == TypePostgresql) {
 					"text"
 				} else {
 					"longtext"
@@ -151,7 +163,7 @@ class DefColumn(private val prop: Prop, val dbType: Int) {
 			}
 		}
 		if (prop.isTypeInt) {
-			return if (dbType == typePostgresql) {
+			return if (dbType == TypePostgresql) {
 				if (autoInc) {
 					"serial"
 				} else {
@@ -163,7 +175,7 @@ class DefColumn(private val prop: Prop, val dbType: Int) {
 
 		}
 		if (prop.isTypeLong) {
-			return if (autoInc && dbType == typePostgresql) {
+			return if (autoInc && dbType == TypePostgresql) {
 				"bigserial"
 			} else {
 				"bigint"
@@ -171,12 +183,12 @@ class DefColumn(private val prop: Prop, val dbType: Int) {
 		}
 		if (prop.isTypeFloat) {
 			return if (decimal != null) {
-				if (dbType == typeMYSQL) {
+				if (dbType == TypeMYSQL) {
 					"decimal(${decimal.first},${decimal.second})"
 				} else {
 					"numeric(${decimal.first},${decimal.second})"
 				}
-			} else if (dbType == typeMYSQL) {
+			} else if (dbType == TypeMYSQL) {
 				"float"
 			} else {
 				"real"
@@ -184,12 +196,12 @@ class DefColumn(private val prop: Prop, val dbType: Int) {
 		}
 		if (prop.isTypeDouble) {
 			return if (decimal != null) {
-				if (dbType == typeMYSQL) {
+				if (dbType == TypeMYSQL) {
 					"decimal(${decimal.first},${decimal.second})"
 				} else {
 					"numeric(${decimal.first},${decimal.second})"
 				}
-			} else if (dbType == typeMYSQL) {
+			} else if (dbType == TypeMYSQL) {
 				"double"
 			} else {
 				"double precision"
@@ -208,14 +220,14 @@ class DefColumn(private val prop: Prop, val dbType: Int) {
 			return "DATETIME"
 		}
 		if (prop.isTypeClass(YsonArray::class) || prop.isTypeClass(YsonObject::class)) {
-			return if (dbType == typeMYSQL) {
+			return if (dbType == TypeMYSQL) {
 				"JSON"
 			} else {
 				"json" //jsonb
 			}
 		}
 		if (prop.isTypeClass(ByteArray::class)) {
-			return if (dbType == typeMYSQL) {
+			return if (dbType == TypeMYSQL) {
 				if (lengthValue < 65535) {
 					"blob"
 				} else {

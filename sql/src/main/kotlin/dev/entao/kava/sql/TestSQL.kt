@@ -70,7 +70,7 @@ fun main() {
 //		dumpResultSets(r)
 //	}
 
-//	usePostgres {useMySQL
+//	useMySQL {
 //		logd(this.metaData.databaseProductName)
 //		val r = this.metaData.sqlKeywords
 //		logd(r)
@@ -81,6 +81,6 @@ fun main() {
 	m.name = "yang"
 	m.insert()
 
-	val r = Test.con.query("select * from test", emptyList())
+	val r = Test.con.query("select test.id, test.name,test.user from test", emptyList())
 	r.dump()
 }
