@@ -7,11 +7,11 @@ import dev.entao.kava.log.loge
 import dev.entao.kava.sql.*
 import dev.entao.keb.core.HttpAction
 import dev.entao.keb.core.HttpContext
-import dev.entao.keb.page.FormHelpBlock
 import dev.entao.keb.page.FormOptions
 import dev.entao.keb.page.FormSelectFromTable
 import dev.entao.keb.page.S
-import dev.entao.keb.page.bootstrap.*
+import dev.entao.keb.page.bootstrap.formGroup
+import dev.entao.keb.page.bootstrap.processHelpText
 import dev.entao.keb.page.tag.*
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
@@ -45,8 +45,8 @@ val KProperty<*>.formOptionsMap: Map<String, String>
 private fun keyValueMapByTable(tableName: String, keyCol: String, labelCol: String, w: Where? = null): Map<String, String> {
 	val map = LinkedHashMap<String, String>()
 	if (keyCol == labelCol) {
-		val q = SQLQuery().from(tableName).select(keyCol).asc(keyCol).distinct().where(w)
-		val ls = ConnLook.first.query(q).allRows()
+		val q = SQLQuery().from(tableName).select(keyCol).asc(keyCol).DISTINCT.where(w)
+		val ls = ConnLook.defaultConnection.query(q).allRows()
 		ls.forEach {
 			val k = it[keyCol]
 			if (k != null) {
@@ -54,8 +54,8 @@ private fun keyValueMapByTable(tableName: String, keyCol: String, labelCol: Stri
 			}
 		}
 	} else {
-		val q = SQLQuery().from(tableName).select(keyCol, labelCol).asc(labelCol).distinct().where(w)
-		val ls = ConnLook.first.query(q).allRows()
+		val q = SQLQuery().from(tableName).select(keyCol, labelCol).asc(labelCol).DISTINCT.where(w)
+		val ls = ConnLook.defaultConnection.query(q).allRows()
 		ls.forEach {
 			val k = it[keyCol]
 			val v = it[labelCol]
@@ -107,7 +107,7 @@ fun KProperty<*>.singleSelectDisplay(v: Any): String? {
 
 private fun findLableOfKey(tableName: String, keyCol: String, labelCol: String, keyValue: Any): String? {
 	val q = SQLQuery().from(tableName).select(labelCol).limit(1).where(keyCol EQ keyValue)
-	val a: Any? = ConnLook.first.query(q).anyValue
+	val a: Any? = ConnLook.defaultConnection.query(q).anyValue
 	return a?.toString() ?: ""
 }
 

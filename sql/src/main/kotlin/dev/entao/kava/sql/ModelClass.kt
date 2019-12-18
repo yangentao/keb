@@ -30,7 +30,7 @@ open class ModelClass<out T : Model> {
 
 	@Suppress("UNCHECKED_CAST")
 	open fun onMapInstance(map: Map<String, Any?>): T {
-		val m = tabCls.createInstance() as T
+		val m = tabCls.createInstance()
 		m.model.putAll(map)
 		return m
 	}
@@ -139,7 +139,6 @@ open class ModelClass<out T : Model> {
 	}
 
 }
-
 
 
 val KClass<*>.modelProperties: List<KMutableProperty<*>>

@@ -1,6 +1,6 @@
 package dev.entao.kava.sql.ext
 
-import dev.entao.kava.log.logd
+import dev.entao.kava.log.*
 import dev.entao.kava.sql.*
 import java.sql.Connection
 import java.sql.ResultSet
@@ -14,13 +14,26 @@ val pgMaker: ConnMaker = PostgreSQLConnMaker("jdbc:postgresql://localhost:5432/y
 fun main() {
 	ConnLook.maker = pgMaker
 
-	val a = Test.findByKey(2)
-	a?.update {
-		it.fee = 99.888
+//	val ls = ConnLook.defaultConnection.tableIndexList(LogTable::class.sqlName)
+//	for(item in ls){
+//		logd(item.COLUMN_NAME, item.INDEX_NAME, item.TABLE_NAME, item.TABLE_CAT, item.TYPE)
+//	}
+
+
+	val p = LogTablePrinter()
+	Yog.addPrinter(p)
+
+	logd(" a logd msg")
+
+	LogTable.findAll { desc(LogTable::timestamp) }.forEach {
+		logd(it.id, it.leveln, it.level, it.tag, it.msg, it.date, it.time, it.timestamp)
 	}
 
-	val ls = Test.findAll()
-	for (b in ls) {
-		logd(b.id, b.name, b.fee)
-	}
+//	logi(" a logi msg")
+//	loge(" a loge msg")
+//
+//	logdx("pg", "a logd msg")
+//	logix("pg", " a logi msg")
+//	logex("pg", " a loge msg")
+
 }

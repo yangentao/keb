@@ -16,6 +16,7 @@ class DefTable(private val cls: KClass<*>) {
 	val dbType: Int = if (conn.isMySQL) TypeMYSQL else if (conn.isPostgres) TypePostgresql else throw java.lang.IllegalArgumentException("只支持MySQL或PostgreSQL")
 	private val autoCreate: Boolean = cls.findAnnotation<AutoCreateTable>()?.value ?: true
 	private val columns: List<DefColumn> = cls.modelProperties.map { DefColumn(it, dbType) }
+	val labelValue: String? = cls.findAnnotation<Label>()?.value
 
 	init {
 		if (dbType == TypeMYSQL) {
@@ -41,7 +42,7 @@ class DefTable(private val cls: KClass<*>) {
 	}
 
 	private fun mergeIndex() {
-		val oldIdxs = conn.tableIndexList(name).map { it.colName }.toSet()
+		val oldIdxs = conn.tableIndexList(name).map { it.COLUMN_NAME }.toSet()
 		val newIdxs = columns.filter { it.index }
 		for (p in newIdxs) {
 			if (p.name !in oldIdxs) {
@@ -57,6 +58,9 @@ class DefTable(private val cls: KClass<*>) {
 			if (p.name !in cols) {
 				val s = p.defColumnn()
 				conn.exec("ALTER TABLE $name ADD COLUMN $s")
+				if (p.labelValue != null && p.labelValue.isNotEmpty()) {
+					conn.exec("comment on column ${name}.${p.name} is '${p.labelValue}'")
+				}
 			}
 		}
 	}
@@ -83,6 +87,16 @@ class DefTable(private val cls: KClass<*>) {
 			}
 		}
 		conn.createTable(name, colList)
+		if (dbType == TypePostgresql) {
+			if (this.labelValue != null && this.labelValue.isNotEmpty()) {
+				conn.exec("comment on table $name is '$labelValue'")
+			}
+			for (col in columns) {
+				if (col.labelValue != null && col.labelValue.isNotEmpty()) {
+					conn.exec("comment on column ${name}.${col.name} is '${col.labelValue}'")
+				}
+			}
+		}
 
 		val idxList = columns.filter { it.index }
 		for (idx in idxList) {
@@ -101,7 +115,7 @@ class DefColumn(private val prop: Prop, val dbType: Int) {
 	private val sqlType: String? = prop.findAnnotation<SQLType>()?.value
 	private val lengthValue: Int = prop.findAnnotation<Length>()?.value ?: 256
 	private val defaultValue: String? = prop.findAnnotation<DefaultValue>()?.value
-	private val labelValue: String? = prop.labelOnly
+	val labelValue: String? = prop.labelOnly
 	private val decimal: Pair<Int, Int>?
 
 	init {
@@ -153,8 +167,10 @@ class DefColumn(private val prop: Prop, val dbType: Int) {
 				partList += "AUTO_INCREMENT"
 			}
 		}
-		if (labelValue != null) {
-			partList += "COMMENT '$labelValue'"
+		if (dbType == TypeMYSQL) {
+			if (labelValue != null) {
+				partList += "COMMENT '$labelValue'"
+			}
 		}
 
 		return partList.joinToString(" ")
