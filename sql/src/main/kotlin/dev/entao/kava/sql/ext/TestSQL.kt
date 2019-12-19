@@ -15,17 +15,12 @@ fun main() {
 	ConnLook.logEnable = true
 	ConnLook.maker = pgMaker
 
-	val u = User()
-	u.abort = 10
-	u.cache = "hello"
-	u.insert()
 
-	val ls = User.findAll {
-		desc(User::id)
-	}
-	for (a in ls) {
-		logd(a.id, a.abort, a.cache)
-	}
-
+	val m = Test()
+	m.id = 1
+	m.name = "Hello"
+	m.updateByKey()
+	val x = Test.findByKey(1)
+	logd(x)
 
 }

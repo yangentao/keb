@@ -6,7 +6,6 @@ import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
 
 /**
- * 通用注释
  * Created by yangentao on 2016/12/14.
  */
 

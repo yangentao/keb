@@ -10,35 +10,33 @@ import javax.sql.DataSource
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
+const val MySQLDriver = "com.mysql.cj.jdbc.Driver"
+const val PostgreSQLDriver = "org.postgresql.Driver"
+
 interface ConnMaker {
 	fun namedConnection(name: String): Connection
 }
 
 class MySQLConnMaker(val url: String, val user: String, val pwd: String) : ConnMaker {
-	private val driverName = "com.mysql.cj.jdbc.Driver"
-
 	init {
 		assert("mysql" in url)
 	}
 
 	@Throws
 	override fun namedConnection(name: String): Connection {
-		Class.forName(driverName)
+		Class.forName(MySQLDriver)
 		return DriverManager.getConnection(url, user, pwd)
 	}
 }
 
 class PostgreSQLConnMaker(val url: String, val user: String, val pwd: String) : ConnMaker {
-	private val driverName = "org.postgresql.Driver"
-
 	init {
 		assert("postgresql" in url)
 	}
 
-
 	@Throws
 	override fun namedConnection(name: String): Connection {
-		Class.forName(driverName)
+		Class.forName(PostgreSQLDriver)
 		return DriverManager.getConnection(url, user, pwd)
 	}
 }

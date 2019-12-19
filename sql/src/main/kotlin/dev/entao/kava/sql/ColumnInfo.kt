@@ -2,8 +2,6 @@
 
 package dev.entao.kava.sql
 
-import dev.entao.kava.base.Name
-
 /**
  * Created by entaoyang@163.com on 2017/6/10.
  */

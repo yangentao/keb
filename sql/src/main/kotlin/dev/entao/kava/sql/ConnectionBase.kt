@@ -16,8 +16,12 @@ private const val mysqlKeywors = "ACCESSIBLE,ADD,ANALYZE,ASC,BEFORE,CASCADE,CHAN
 val pgKeySet: Set<String> = pgKeywors.split(',').toSet()
 val mysqlKeySet: Set<String> = mysqlKeywors.toLowerCase().split(',').toSet()
 
+val String.trimSQL: String
+	get() {
+		return this.trim('`', '\"')
+	}
 
-fun Connection.escape(name: String): String {
+fun Connection.esc(name: String): String {
 	if (isMySQL && (name in mysqlKeySet)) {
 		return "`$name`"
 	}
@@ -98,16 +102,17 @@ fun Connection.insertGenKey(sql: String, args: ArrayList<Any?>): Long {
 
 
 fun Connection.tableExists(tableName: String): Boolean {
+	val tname = tableName.trimSQL
 	val meta = this.metaData
-	val rs = meta.getTables(this.catalog, this.schema, tableName, arrayOf("TABLE"))
+	val rs = meta.getTables(this.catalog, this.schema, tname, arrayOf("TABLE"))
 	val firstRow = rs.firstRow()
 	val s = firstRow?.get("TABLE_NAME")?.toString() ?: firstRow?.get("table_name")?.toString() ?: ""
-	return s.toLowerCase() == tableName.toLowerCase()
+	return s.toLowerCase() == tname.toLowerCase()
 }
 
 fun Connection.tableDesc(tableName: String): List<ColumnInfo> {
 	val meta = this.metaData
-	val rs = meta.getColumns(this.catalog, this.schema, tableName, "%")
+	val rs = meta.getColumns(this.catalog, this.schema, tableName.trimSQL, "%")
 	return rs.allRows().map {
 		val m = ColumnInfo()
 		m.model.putAll(it)
@@ -117,13 +122,13 @@ fun Connection.tableDesc(tableName: String): List<ColumnInfo> {
 
 fun Connection.dumpIndex(tableName: String) {
 	val meta = this.metaData
-	val rs = meta.getIndexInfo(this.catalog, this.schema, tableName, false, false)
+	val rs = meta.getIndexInfo(this.catalog, this.schema, tableName.trimSQL, false, false)
 	rs.dump()
 }
 
 fun Connection.tableIndexList(tableName: String): List<IndexInfo> {
 	val meta = this.metaData
-	val rs = meta.getIndexInfo(this.catalog, this.schema, tableName, false, false)
+	val rs = meta.getIndexInfo(this.catalog, this.schema, tableName.trimSQL, false, false)
 	return rs.models {
 		IndexInfo()
 	}
@@ -143,9 +148,8 @@ inline fun Connection.trans(block: (Connection) -> Unit) {
 }
 
 fun Connection.createTable(tableName: String, columns: List<String>): Int {
-	val tname = this.escape(tableName)
 	val sql = buildString {
-		append("CREATE TABLE IF NOT EXISTS $tname (")
+		append("CREATE TABLE IF NOT EXISTS $tableName (")
 		append(columns.joinToString(", "))
 		append(")")
 	}
@@ -153,9 +157,7 @@ fun Connection.createTable(tableName: String, columns: List<String>): Int {
 }
 
 fun Connection.createIndex(tableName: String, columnName: String) {
-	val idxName = "${tableName.trim('\"')}_${columnName}_INDEX"
-	val name2 = this.escape(tableName)
-	val col = this.escape(columnName)
-	exec("CREATE INDEX  $idxName ON $name2(${col})")
+	val idxName = "${tableName.trimSQL}_${columnName.trimSQL}_INDEX"
+	exec("CREATE INDEX  $idxName ON $tableName(${columnName})")
 }
 

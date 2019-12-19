@@ -29,6 +29,8 @@ val Prop.sqlFullName: String
 		return "${this.ownerClass!!.sqlName}.${this.sqlName}"
 	}
 
+
+
 typealias TabClass = KClass<*>
 
 val Prop.s: String get() = this.sqlName
@@ -44,21 +46,28 @@ infix fun String.AS(other: String): String {
 	return "$this AS $other"
 }
 
+val SQL: SQLBuilder get() = SQLBuilder()
 
-class SQL(val con: Connection) {
+
+class SQLBuilder {
 	private val buf = StringBuilder(512)
 	val args: ArrayList<Any?> = ArrayList()
 	val sql: String get() = buf.toString()
 
-	fun update(cls: TabClass, map: Map<Prop, Any?>): SQL {
+	operator fun invoke(block: SQLBuilder.() -> Unit): SQLBuilder {
+		this.block()
+		return this
+	}
+
+	fun update(cls: TabClass, map: Map<Prop, Any?>): SQLBuilder {
 		return this.update(cls.s, map.mapKeys { it.key.s })
 	}
 
-	fun update(cls: TabClass, list: List<Pair<Prop, Any?>>): SQL {
+	fun update(cls: TabClass, list: List<Pair<Prop, Any?>>): SQLBuilder {
 		return this.update(cls.s, list.map { it.first.s to it.second })
 	}
 
-	fun update(table: String, list: List<Pair<String, Any?>>): SQL {
+	fun update(table: String, list: List<Pair<String, Any?>>): SQLBuilder {
 		buf.append("UPDATE $table SET ")
 		val s = list.joinToString(", ") { it.first + " = ?" }
 		buf.append(s).append(" ")
@@ -66,7 +75,7 @@ class SQL(val con: Connection) {
 		return this
 	}
 
-	fun update(table: String, map: Map<String, Any?>): SQL {
+	fun update(table: String, map: Map<String, Any?>): SQLBuilder {
 		buf.append("UPDATE $table SET ")
 		val s = map.map { it.key + " = ?" }.joinToString(", ")
 		buf.append(s).append(" ")
@@ -74,20 +83,20 @@ class SQL(val con: Connection) {
 		return this
 	}
 
-	fun deleteFrom(modelCls: KClass<*>): SQL {
+	fun deleteFrom(modelCls: KClass<*>): SQLBuilder {
 		return this.deleteFrom(modelCls.sqlName)
 	}
 
-	fun deleteFrom(table: String): SQL {
+	fun deleteFrom(table: String): SQLBuilder {
 		buf.append("DELETE FROM $table ")
 		return this
 	}
 
-	fun insert(modelCls: KClass<*>, kvs: List<Pair<Prop1, Any?>>): SQL {
+	fun insert(modelCls: KClass<*>, kvs: List<Pair<Prop1, Any?>>): SQLBuilder {
 		return this.insert(modelCls.sqlName, kvs.map { it.first.sqlName to it.second })
 	}
 
-	fun insert(table: String, kvs: List<Pair<String, Any?>>): SQL {
+	fun insert(table: String, kvs: List<Pair<String, Any?>>): SQLBuilder {
 		val ks = kvs.joinToString(", ") { it.first }
 		val vs = kvs.joinToString(", ") { "?" }
 		buf.append("INSERT INTO $table ($ks) VALUES ($vs) ")
@@ -95,11 +104,11 @@ class SQL(val con: Connection) {
 		return this
 	}
 
-	fun insertOrUpdateMySqL(modelCls: KClass<*>, kvs: List<Pair<Prop, Any?>>, uniqColumns: List<Prop>): SQL {
+	fun insertOrUpdateMySqL(modelCls: KClass<*>, kvs: List<Pair<Prop, Any?>>, uniqColumns: List<Prop>): SQLBuilder {
 		return this.insertOrUpdateMySqL(modelCls.sqlName, kvs.map { it.first.sqlName to it.second }, uniqColumns.map { it.sqlName })
 	}
 
-	fun insertOrUpdateMySqL(table: String, kvs: List<Pair<String, Any?>>, uniqColumns: List<String>): SQL {
+	fun insertOrUpdateMySqL(table: String, kvs: List<Pair<String, Any?>>, uniqColumns: List<String>): SQLBuilder {
 		if (uniqColumns.isEmpty()) {
 			throw IllegalArgumentException("insertOrUpdate $table  uniqColumns 参数不能是空")
 		}
@@ -113,11 +122,11 @@ class SQL(val con: Connection) {
 		return this
 	}
 
-	fun insertOrUpdatePG(modelCls: KClass<*>, kvs: List<Pair<Prop, Any?>>, uniqColumns: List<Prop>): SQL {
+	fun insertOrUpdatePG(modelCls: KClass<*>, kvs: List<Pair<Prop, Any?>>, uniqColumns: List<Prop>): SQLBuilder {
 		return this.insertOrUpdatePG(modelCls.sqlName, kvs.map { it.first.sqlName to it.second }, uniqColumns.map { it.sqlName })
 	}
 
-	fun insertOrUpdatePG(table: String, kvs: List<Pair<String, Any?>>, uniqColumns: List<String>): SQL {
+	fun insertOrUpdatePG(table: String, kvs: List<Pair<String, Any?>>, uniqColumns: List<String>): SQLBuilder {
 		if (uniqColumns.isEmpty()) {
 			throw IllegalArgumentException("insertOrUpdate $table  uniqColumns 参数不能是空")
 		}
@@ -132,19 +141,19 @@ class SQL(val con: Connection) {
 		return this
 	}
 
-	fun selectAll(): SQL {
+	fun selectAll(): SQLBuilder {
 		return select(emptyList())
 	}
 
-	fun select(vararg cols: String): SQL {
+	fun select(vararg cols: String): SQLBuilder {
 		return this.select(cols.toList())
 	}
 
-	fun select(cols: List<String>): SQL {
+	fun select(cols: List<String>): SQLBuilder {
 		return this.select(cols) {}
 	}
 
-	fun select(cols: List<String>, block: SelOpt.() -> Unit): SQL {
+	fun select(cols: List<String>, block: SelOpt.() -> Unit): SQLBuilder {
 		val opt = SelOpt()
 		opt.block()
 		buf.append("SELECT ")
@@ -159,11 +168,11 @@ class SQL(val con: Connection) {
 		return this
 	}
 
-	fun selectCount(col: Prop): SQL {
+	fun selectCount(col: Prop): SQLBuilder {
 		return this.selectCount(col.sqlFullName) {}
 	}
 
-	fun selectCount(col: String, block: SelOpt.() -> Unit): SQL {
+	fun selectCount(col: String, block: SelOpt.() -> Unit): SQLBuilder {
 		val opt = SelOpt()
 		opt.block()
 		if (opt.distinct) {
@@ -174,29 +183,29 @@ class SQL(val con: Connection) {
 		return this
 	}
 
-	fun from(vararg clses: TabClass): SQL {
+	fun from(vararg clses: TabClass): SQLBuilder {
 		return from(clses.map { it.sqlName })
 	}
 
-	fun from(vararg tables: String): SQL {
+	fun from(vararg tables: String): SQLBuilder {
 		return from(tables.toList())
 	}
 
-	fun from(tables: List<String>): SQL {
+	fun from(tables: List<String>): SQLBuilder {
 		buf.append(" FROM ")
 		buf.append(tables.joinToString(", "))
 		return this
 	}
 
-	fun join(vararg modelClasses: TabClass): SQL {
+	fun join(vararg modelClasses: TabClass): SQLBuilder {
 		return join(modelClasses.map { it.sqlName })
 	}
 
-	fun join(vararg tables: String, joinType: String = "LEFT"): SQL {
+	fun join(vararg tables: String, joinType: String = "LEFT"): SQLBuilder {
 		return this.join(tables.toList(), joinType)
 	}
 
-	fun join(tables: List<String>, joinType: String = "LEFT"): SQL {
+	fun join(tables: List<String>, joinType: String = "LEFT"): SQLBuilder {
 		buf.append(" ")
 		buf.append(joinType)
 		buf.append(" JOIN (")
@@ -205,18 +214,18 @@ class SQL(val con: Connection) {
 		return this
 	}
 
-	fun on(s: String): SQL {
+	fun on(s: String): SQLBuilder {
 		buf.append(" ON ($s) ")
 		return this
 	}
 
-	fun on(block: OnBuilder.() -> String): SQL {
+	fun on(block: OnBuilder.() -> String): SQLBuilder {
 		val b = OnBuilder()
 		val s = b.block()
 		return on(s)
 	}
 
-	fun where(w: Where?): SQL {
+	fun where(w: Where?): SQLBuilder {
 		if (w != null && w.value.isNotEmpty()) {
 			buf.append(" WHERE ")
 			buf.append(w.value)
@@ -225,7 +234,7 @@ class SQL(val con: Connection) {
 		return this
 	}
 
-	fun where(w: String, vararg params: Any): SQL {
+	fun where(w: String, vararg params: Any): SQLBuilder {
 		if (w.isNotEmpty()) {
 			buf.append(" WHERE ")
 			buf.append(w)
@@ -234,23 +243,23 @@ class SQL(val con: Connection) {
 		return this
 	}
 
-	fun groupBy(s: String): SQL {
+	fun groupBy(s: String): SQLBuilder {
 		buf.append(" GROUP BY $s")
 		return this
 	}
 
-	fun groupBy(p: Prop): SQL {
+	fun groupBy(p: Prop): SQLBuilder {
 		return this.groupBy(p.sqlFullName)
 	}
 
-	fun having(w: Where): SQL {
+	fun having(w: Where): SQLBuilder {
 		buf.append(" HAVING ")
 		buf.append(w.value)
 		args.addAll(w.args)
 		return this
 	}
 
-	fun asc(col: String): SQL {
+	fun asc(col: String): SQLBuilder {
 		if (buf.contains("ORDER BY")) {
 			buf.append(", $col ASC")
 		} else {
@@ -259,7 +268,7 @@ class SQL(val con: Connection) {
 		return this
 	}
 
-	fun desc(col: String): SQL {
+	fun desc(col: String): SQLBuilder {
 		if (buf.contains("ORDER BY")) {
 			buf.append(", $col DESC")
 		} else {
@@ -268,19 +277,19 @@ class SQL(val con: Connection) {
 		return this
 	}
 
-	fun asc(p: Prop): SQL {
+	fun asc(p: Prop): SQLBuilder {
 		return asc(p.sqlFullName)
 	}
 
-	fun desc(p: Prop): SQL {
+	fun desc(p: Prop): SQLBuilder {
 		return desc(p.sqlFullName)
 	}
 
-	fun limit(size: Int): SQL {
+	fun limit(size: Int): SQLBuilder {
 		return this.limit(size, 0)
 	}
 
-	fun limit(size: Int, offset: Int): SQL {
+	fun limit(size: Int, offset: Int): SQLBuilder {
 		buf.append(" LIMIT $size OFFSET $offset")
 		return this
 	}
@@ -301,42 +310,38 @@ class OnBuilder {
 	}
 }
 
-fun Connection.query(a: SQL): ResultSet {
+fun Connection.query(a: SQLBuilder): ResultSet {
 	return this.query(a.sql, a.args)
 }
 
-fun Connection.querySQL(block: SQL.() -> Unit): ResultSet {
-	val a = SQL(this)
-	a.block()
+fun Connection.querySQL(block: SQLBuilder.() -> Unit): ResultSet {
+	val a = SQL(block)
 	return this.query(a.sql, a.args)
 }
 
-fun Connection.update(a: SQL): Int {
+fun Connection.update(a: SQLBuilder): Int {
 	return this.update(a.sql, a.args)
 }
 
-fun Connection.updateSQL(block: SQL.() -> Unit): Int {
-	val a = SQL(this)
-	a.block()
+fun Connection.updateSQL(block: SQLBuilder.() -> Unit): Int {
+	val a = SQL(block)
 	return this.update(a.sql, a.args)
 }
 
-fun Connection.insert(a: SQL): Int {
+fun Connection.insert(a: SQLBuilder): Int {
 	return this.update(a.sql, a.args)
 }
 
-fun Connection.insertSQL(block: SQL.() -> Unit): Int {
-	val a = SQL(this)
-	a.block()
+fun Connection.insertSQL(block: SQLBuilder.() -> Unit): Int {
+	val a = SQL(block)
 	return this.update(a.sql, a.args)
 }
 
-fun Connection.insertSQLGenKey(a: SQL): Long {
+fun Connection.insertSQLGenKey(a: SQLBuilder): Long {
 	return this.insertGenKey(a.sql, a.args)
 }
 
-fun Connection.insertSQLGenKey(block: SQL.() -> Unit): Long {
-	val a = SQL(this)
-	a.block()
+fun Connection.insertSQLGenKey(block: SQLBuilder.() -> Unit): Long {
+	val a = SQL(block)
 	return this.insertGenKey(a.sql, a.args)
 }
