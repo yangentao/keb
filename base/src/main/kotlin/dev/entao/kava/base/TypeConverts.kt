@@ -2,6 +2,7 @@ package dev.entao.kava.base
 
 import java.sql.Date
 import java.sql.Time
+import java.sql.Timestamp
 import kotlin.reflect.KClassifier
 
 /**
@@ -38,6 +39,7 @@ val TextConverts = hashMapOf<KClassifier, ITextConvert>(
 		java.lang.Double::class to DoubleText,
 		java.sql.Date::class to SQLDateText,
 		java.sql.Time::class to SQLTimeText,
+		java.sql.Timestamp::class to SQLTimestampText,
 		java.util.Date::class to UtilDateText
 
 )
@@ -131,6 +133,19 @@ object SQLTimeText : ITextConvert {
 	}
 }
 
+//"HH:mm:ss"
+object SQLTimestampText : ITextConvert {
+
+	override val defaultValue: Any = java.sql.Timestamp(0)
+	override fun fromText(text: String): Any? {
+		return MyDate.parseTimestamp(text)?.sqlTimestamp
+	}
+
+	override fun toText(value: Any): String {
+		return MyDate((value as Timestamp).time).formatTimestamp()
+	}
+}
+
 //"yyyy-MM-dd HH:mm:ss.SSS"
 object UtilDateText : ITextConvert {
 
@@ -143,6 +158,15 @@ object UtilDateText : ITextConvert {
 	override fun toText(value: Any): String {
 		return MyDate((value as java.util.Date).time).formatDateTimeX()
 	}
+}
+
+
+fun main() {
+	val a = Timestamp(System.currentTimeMillis())
+	val s = a.toString()
+	println(a.toString())
+	val b = MyDate.parseTimestamp(s)?.sqlTimestamp
+	println(b)
 }
 
 

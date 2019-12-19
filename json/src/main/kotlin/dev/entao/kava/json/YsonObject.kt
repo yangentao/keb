@@ -185,7 +185,6 @@ class YsonObject(val data: LinkedHashMap<String, YsonValue> = LinkedHashMap(32))
 
 	companion object {
 		init {
-
 			TextConverts[YsonObject::class] = YsonObjectText
 		}
 	}

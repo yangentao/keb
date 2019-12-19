@@ -27,14 +27,15 @@ open class Model(val model: ModelMap = ModelMap()) {
 		model.removeProperty(p)
 	}
 
-	fun existRowByKey(): Boolean {
-		val w = this.whereByPrimaryKey ?: throw IllegalArgumentException("必须设置主键")
-		return conn.querySQL {
-			selectAll().from(this::class).where(w).limit(1)
-		}.existRow
-	}
 
 	private val conn: Connection get() = this::class.namedConn
+
+	fun existByKey(): Boolean {
+		val w = this.whereByPrimaryKey ?: throw IllegalArgumentException("必须设置主键")
+		return conn.querySQL {
+			select("1").from(this::class).where(w).limit(1)
+		}.existRow
+	}
 
 	fun deleteByKey(): Boolean {
 		val w = this.whereByPrimaryKey ?: return false
