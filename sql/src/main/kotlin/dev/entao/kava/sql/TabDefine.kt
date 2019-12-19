@@ -11,28 +11,17 @@ const val TypeMYSQL: Int = 0
 const val TypePostgresql: Int = 1
 
 class DefTable(private val cls: KClass<*>) {
-	val name: String = cls.sqlName
 	private val conn: Connection by lazy { cls.namedConn }
+	val name: String = cls.sqlName
+	val nameEscaped: String = conn.escape(name)
 	val dbType: Int = if (conn.isMySQL) TypeMYSQL else if (conn.isPostgres) TypePostgresql else throw java.lang.IllegalArgumentException("只支持MySQL或PostgreSQL")
 	private val autoCreate: Boolean = cls.findAnnotation<AutoCreateTable>()?.value ?: true
 	private val columns: List<DefColumn> = cls.modelProperties.map { DefColumn(it, dbType) }
 	val labelValue: String? = cls.findAnnotation<Label>()?.value
 
 	init {
-		if (dbType == TypeMYSQL) {
-			assert(name.toLowerCase() !in mysqlKeySet)
-			for (c in columns) {
-				assert(c.name.toLowerCase() !in mysqlKeySet)
-			}
-		} else if (dbType == TypePostgresql) {
-			assert(name.toLowerCase() !in pgKeySet)
-			for (c in columns) {
-				assert(c.name.toLowerCase() !in pgKeySet)
-			}
-		}
-
 		if (autoCreate) {
-			if (!conn.tableExists(name)) {
+			if (!conn.tableExists(nameEscaped)) {
 				createTable(conn)
 			} else {
 				mergeTable()
@@ -42,24 +31,23 @@ class DefTable(private val cls: KClass<*>) {
 	}
 
 	private fun mergeIndex() {
-		val oldIdxs = conn.tableIndexList(name).map { it.COLUMN_NAME }.toSet()
+		val oldIdxs = conn.tableIndexList(nameEscaped).map { it.COLUMN_NAME }.toSet()
 		val newIdxs = columns.filter { it.index }
 		for (p in newIdxs) {
 			if (p.name !in oldIdxs) {
-				val idxName = "${p.name}_INDEX"
-				conn.exec("CREATE INDEX  $idxName ON $name(${p.name})")
+				conn.createIndex(nameEscaped, p.name)
 			}
 		}
 	}
 
 	private fun mergeTable() {
-		val cols: Set<String> = conn.tableDesc(name).map { it.columnName }.toSet()
+		val cols: Set<String> = conn.tableDesc(nameEscaped).map { it.columnName }.toSet()
 		for (p in columns) {
 			if (p.name !in cols) {
 				val s = p.defColumnn()
-				conn.exec("ALTER TABLE $name ADD COLUMN $s")
+				conn.exec("ALTER TABLE $nameEscaped ADD COLUMN $s")
 				if (p.labelValue != null && p.labelValue.isNotEmpty()) {
-					conn.exec("comment on column ${name}.${p.name} is '${p.labelValue}'")
+					conn.exec("comment on column ${nameEscaped}.${p.name} is '${p.labelValue}'")
 				}
 			}
 		}
@@ -89,18 +77,18 @@ class DefTable(private val cls: KClass<*>) {
 		conn.createTable(name, colList)
 		if (dbType == TypePostgresql) {
 			if (this.labelValue != null && this.labelValue.isNotEmpty()) {
-				conn.exec("comment on table $name is '$labelValue'")
+				conn.exec("comment on table $nameEscaped is '$labelValue'")
 			}
 			for (col in columns) {
 				if (col.labelValue != null && col.labelValue.isNotEmpty()) {
-					conn.exec("comment on column ${name}.${col.name} is '${col.labelValue}'")
+					conn.exec("comment on column ${nameEscaped}.${col.name} is '${col.labelValue}'")
 				}
 			}
 		}
 
 		val idxList = columns.filter { it.index }
 		for (idx in idxList) {
-			conn.exec("CREATE INDEX ${idx.name}_index ON $name (${idx.name})")
+			conn.createIndex(name, idx.name)
 		}
 	}
 }

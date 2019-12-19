@@ -48,7 +48,7 @@ fun Connection.insertOrUpdate(model: Model): Boolean {
 fun Connection.insert(model: Model): Boolean {
 	val autoInc = model::class.modelPrimaryKeys.find { it.hasAnnotation<AutoInc>() } != null
 	val a = SQL()
-	a.insert(model::class.s, model.modelPropertiesExists.map { it.s to it.getValue(model) })
+	a.insert(escape(model::class.s), model.modelPropertiesExists.map { it.s to it.getValue(model) })
 	if (!autoInc) {
 		return this.insert(a) > 0
 	}

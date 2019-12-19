@@ -12,28 +12,20 @@ val pgMaker: ConnMaker = PostgreSQLConnMaker("jdbc:postgresql://localhost:5432/y
 
 
 fun main() {
+	ConnLook.logEnable = true
 	ConnLook.maker = pgMaker
 
-//	val ls = ConnLook.defaultConnection.tableIndexList(LogTable::class.sqlName)
-//	for(item in ls){
-//		logd(item.COLUMN_NAME, item.INDEX_NAME, item.TABLE_NAME, item.TABLE_CAT, item.TYPE)
-//	}
+	val u = User()
+	u.abort = 10
+	u.cache = "hello"
+	u.insert()
 
-
-	val p = LogTablePrinter()
-	Yog.addPrinter(p)
-
-	logd(" a logd msg")
-
-	LogTable.findAll { desc(LogTable::timestamp) }.forEach {
-		logd(it.id, it.leveln, it.level, it.tag, it.msg, it.date, it.time, it.timestamp)
+	val ls = User.findAll {
+		desc(User::id)
+	}
+	for (a in ls) {
+		logd(a.id, a.abort, a.cache)
 	}
 
-//	logi(" a logi msg")
-//	loge(" a loge msg")
-//
-//	logdx("pg", "a logd msg")
-//	logix("pg", " a logi msg")
-//	logex("pg", " a loge msg")
 
 }
