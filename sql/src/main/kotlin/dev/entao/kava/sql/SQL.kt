@@ -45,7 +45,7 @@ infix fun String.AS(other: String): String {
 }
 
 
-class SQL {
+class SQL(val con: Connection) {
 	private val buf = StringBuilder(512)
 	val args: ArrayList<Any?> = ArrayList()
 	val sql: String get() = buf.toString()
@@ -306,7 +306,7 @@ fun Connection.query(a: SQL): ResultSet {
 }
 
 fun Connection.querySQL(block: SQL.() -> Unit): ResultSet {
-	val a = SQL()
+	val a = SQL(this)
 	a.block()
 	return this.query(a.sql, a.args)
 }
@@ -316,7 +316,7 @@ fun Connection.update(a: SQL): Int {
 }
 
 fun Connection.updateSQL(block: SQL.() -> Unit): Int {
-	val a = SQL()
+	val a = SQL(this)
 	a.block()
 	return this.update(a.sql, a.args)
 }
@@ -326,7 +326,7 @@ fun Connection.insert(a: SQL): Int {
 }
 
 fun Connection.insertSQL(block: SQL.() -> Unit): Int {
-	val a = SQL()
+	val a = SQL(this)
 	a.block()
 	return this.update(a.sql, a.args)
 }
@@ -336,7 +336,7 @@ fun Connection.insertSQLGenKey(a: SQL): Long {
 }
 
 fun Connection.insertSQLGenKey(block: SQL.() -> Unit): Long {
-	val a = SQL()
+	val a = SQL(this)
 	a.block()
 	return this.insertGenKey(a.sql, a.args)
 }

@@ -23,7 +23,7 @@ fun Connection.insertOrUpdate(model: Model): Boolean {
 			throw IllegalArgumentException("insertOrUpdate 必须包含主键的值")
 		}
 	}
-	val a = SQL()
+	val a = SQL(this)
 	if (this.isMySQL) {
 		a.insertOrUpdateMySqL(model::class, cs.map { it to it.getValue(model) }, model::class.modelPrimaryKeys)
 	} else if (this.isPostgres) {
@@ -47,7 +47,7 @@ fun Connection.insertOrUpdate(model: Model): Boolean {
 
 fun Connection.insert(model: Model): Boolean {
 	val autoInc = model::class.modelPrimaryKeys.find { it.hasAnnotation<AutoInc>() } != null
-	val a = SQL()
+	val a = SQL(this)
 	a.insert(escape(model::class.s), model.modelPropertiesExists.map { it.s to it.getValue(model) })
 	if (!autoInc) {
 		return this.insert(a) > 0
