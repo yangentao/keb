@@ -20,7 +20,7 @@ fun Tag.tableActionPanel(forTableId: String, block: TableActionPanel.() -> Unit)
 
 class TableActionPanel(context: HttpContext, val forTableId: String) : Tag(context, "div") {
 	init {
-		this[class_] = _d_flex.._flex_row.._justify_content_start.."m-1"
+		this[class_] = _d_flex.._flex_row.._justify_content_start.._my_1
 	}
 
 

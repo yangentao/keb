@@ -20,3 +20,30 @@ fun Tag.form(formAction: ActionURL, vararg kv: HKeyValue, block: TagCallback): T
 	}
 }
 
+fun Tag.formGET(formAction: KFunction<*>, vararg kv: HKeyValue, block: TagCallback): Tag {
+	return form(method_ to V.GET, *kv) {
+		this += formAction
+		this.block()
+	}
+}
+
+fun Tag.formGET(formAction: ActionURL, vararg kv: HKeyValue, block: TagCallback): Tag {
+	return form(method_ to V.GET, *kv) {
+		this += formAction
+		this.block()
+	}
+}
+
+fun Tag.formPOST(formAction: KFunction<*>, vararg kv: HKeyValue, block: TagCallback): Tag {
+	return form(method_ to V.POST, *kv) {
+		this += formAction
+		this.block()
+	}
+}
+
+fun Tag.formPOST(formAction: ActionURL, vararg kv: HKeyValue, block: TagCallback): Tag {
+	return form(method_ to V.POST, *kv) {
+		this += formAction
+		this.block()
+	}
+}

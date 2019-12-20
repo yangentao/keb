@@ -12,6 +12,7 @@ import dev.entao.keb.page.FormSelectFromTable
 import dev.entao.keb.page.S
 import dev.entao.keb.page.bootstrap.formGroup
 import dev.entao.keb.page.bootstrap.processHelpText
+import dev.entao.keb.page.bootstrap.propValue
 import dev.entao.keb.page.tag.*
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
@@ -224,19 +225,11 @@ fun Tag.selectLinkage(opt: LinkageOption) {
 }
 
 fun Tag.formGroupSelectTable(p: Prop, w: Where? = null, dontRetrive: Boolean = false, selectBlock: Tag.() -> Unit = {}): Tag {
-	var selTag: Tag? = null
-	formGroup {
-		val pname = p.userName
-		val selVal: String = if (p is Prop0) {
-			p.getValue()?.toString() ?: ""
-		} else {
-			httpContext.httpParams.str(p.userName) ?: ""
-		}
-
+	return formGroup {
 		this.label { +p.userLabel }
-		selTag = select {
-			idName(pname)
-			this[data_select_value_] = selVal
+		select {
+			idName(p.userName)
+			this[data_select_value_] = propValue(p, null) ?: ""
 			if (!dontRetrive) {
 				val ls = p.selectOptionsTable(w)
 				for (kv in ls) {
@@ -247,8 +240,24 @@ fun Tag.formGroupSelectTable(p: Prop, w: Where? = null, dontRetrive: Boolean = f
 		}
 		this.processHelpText(p)
 	}
-	return selTag!!
 }
 
+fun Tag.formGroupSelectStatic(p: Prop, selectedValue: String? = null, firstLabel: String? = null): Tag {
+	return formGroup {
+		this.label { +p.userLabel }
+		select {
+			idName(p.userName)
+			this[data_select_value_] = propValue(p, null) ?: ""
+			if (firstLabel != null) {
+				option("", firstLabel)
+			}
+			val ls = p.formOptionsMap
+			for (kv in ls) {
+				option(kv.key, kv.value)
+			}
+		}
+		this.processHelpText(p)
+	}
+}
 
 

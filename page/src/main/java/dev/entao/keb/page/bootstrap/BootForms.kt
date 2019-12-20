@@ -7,13 +7,25 @@ import dev.entao.keb.page.tag.*
 import dev.entao.keb.page.widget.uploadDiv
 import java.text.DecimalFormat
 import kotlin.math.pow
+import kotlin.reflect.KFunction
 import kotlin.reflect.full.findAnnotation
 
 private val InputTags = setOf("input", "select", "textarea")
 
+fun Tag.formQuery(formAction: KFunction<*>, vararg kv: HKeyValue, block: TagCallback): Tag {
+	return form(method_ to V.GET, data_form_query to "1", *kv) {
+		this += formAction
+		this.block()
+		submitPrimary("查询")
+	}
+}
 
-fun Tag.formGroupText(labelValue: String, textValue: String) {
-	formGroup {
+fun Tag.formRow(block: TagCallback) {
+	div(class_ to _form_row, block = block)
+}
+
+fun Tag.formGroupText(labelValue: String, textValue: String): Tag {
+	return formGroup {
 		this.label { +labelValue }
 		this.div {
 			this.span(class_ to _form_control_plaintext) {
@@ -23,8 +35,8 @@ fun Tag.formGroupText(labelValue: String, textValue: String) {
 	}
 }
 
-fun Tag.formGroupText(textValue: String) {
-	formGroup {
+fun Tag.formGroupText(textValue: String): Tag {
+	return formGroup {
 		this.div {
 			this.span(class_ to _form_control_plaintext) {
 				+textValue
@@ -44,8 +56,8 @@ fun Tag.formGroupUpload(p: Prop): Tag {
 }
 
 
-fun Tag.formGroupEdit(labelText: String, editName: String, editBlock: Tag.() -> Unit = {}) {
-	formGroup {
+fun Tag.formGroupEdit(labelText: String, editName: String, editBlock: Tag.() -> Unit = {}): Tag {
+	return formGroup {
 		val lb = this.label { +labelText }
 		val ed = this.edit {
 			this[name_] = editName
@@ -56,8 +68,8 @@ fun Tag.formGroupEdit(labelText: String, editName: String, editBlock: Tag.() -> 
 	}
 }
 
-fun Tag.formGroupEdit(p: Prop, block: TagCallback = {}) {
-	formGroup {
+fun Tag.formGroupEdit(p: Prop, block: TagCallback = {}): Tag {
+	return formGroup {
 		val lb = label(p)
 		val ed = edit(p)
 		this.processGroupEditError(ed)
@@ -67,8 +79,8 @@ fun Tag.formGroupEdit(p: Prop, block: TagCallback = {}) {
 	}
 }
 
-fun Tag.formGroupTextArea(p: Prop, block: TagCallback = {}) {
-	formGroup {
+fun Tag.formGroupTextArea(p: Prop, block: TagCallback = {}): Tag {
+	return formGroup {
 		val lb = label(p)
 		val ed = textarea(p)
 		this.processGroupEditError(ed)
@@ -141,7 +153,7 @@ private fun Tag.processGroupEditError(ed: Tag) {
 private fun processLabelRequire(lb: Tag, ed: Tag) {
 	lb[for_] = ed.needId()
 	if (ed[required_] == "true") {
-		val queryForm = lb.parent { it.id == P.QUERY_FORM }
+		val queryForm = lb.parent(data_form_query to "1")
 		if (queryForm == null) {
 			lb.textEscaped("*")
 		} else {

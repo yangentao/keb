@@ -1,7 +1,23 @@
+@file:Suppress("unused")
+
 package dev.entao.keb.page.bootstrap
 
 import dev.entao.keb.page.tag.*
 
+
+val _colx = _col_12.._col_md
+val _colx_1 = _col_12.._col_md_1
+val _colx_2 = _col_12.._col_md_2
+val _colx_3 = _col_12.._col_md_3
+val _colx_4 = _col_12.._col_md_4
+val _colx_5 = _col_12.._col_md_5
+val _colx_6 = _col_12.._col_md_6
+val _colx_7 = _col_12.._col_md_7
+val _colx_8 = _col_12.._col_md_8
+val _colx_9 = _col_12.._col_md_9
+val _colx_10 = _col_12.._col_md_10
+val _colx_11 = _col_12.._col_md_11
+val _colx_12 = _col_12.._col_md_12
 
 fun Tag.divContainer(vararg kv: HKeyValue, block: TagCallback): Tag {
 	return this.div(class_ to _container, *kv, block = block)
@@ -74,11 +90,11 @@ fun Tag.row(vararg kv: HKeyValue, block: TagCallback): Tag {
 }
 
 fun Tag.rowCenter(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(class_ to _row .. _justify_content_center, * kv, block = block)
+	return this.div(class_ to _row.._justify_content_center, * kv, block = block)
 }
 
 fun Tag.colX(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(class_ to _col_12.._col_md, *kv, block = block)
+	return this.div(class_ to _colx, *kv, block = block)
 }
 
 fun Tag.colXN(n: Int, vararg kv: HKeyValue, block: TagCallback): Tag {
@@ -87,50 +103,50 @@ fun Tag.colXN(n: Int, vararg kv: HKeyValue, block: TagCallback): Tag {
 }
 
 fun Tag.colX1(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(class_ to _col_12.._col_md_1, *kv, block = block)
+	return this.div(class_ to _colx_1, *kv, block = block)
 }
 
 fun Tag.colX2(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(class_ to _col_12.._col_md_2, *kv, block = block)
+	return this.div(class_ to _colx_2, *kv, block = block)
 }
 
 fun Tag.colX3(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(class_ to _col_12.._col_md_3, *kv, block = block)
+	return this.div(class_ to _colx_3, *kv, block = block)
 }
 
 fun Tag.colX4(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(class_ to _col_12.._col_md_4, *kv, block = block)
+	return this.div(class_ to _colx_4, *kv, block = block)
 }
 
 fun Tag.colX5(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(class_ to _col_12.._col_md_5, *kv, block = block)
+	return this.div(class_ to _colx_5, *kv, block = block)
 }
 
 fun Tag.colX6(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(class_ to _col_12.._col_md_6, *kv, block = block)
+	return this.div(class_ to _colx_6, *kv, block = block)
 }
 
 
 fun Tag.colX7(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(class_ to _col_12.._col_md_7, *kv, block = block)
+	return this.div(class_ to _colx_7, *kv, block = block)
 }
 
 fun Tag.colX8(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(class_ to _col_12.._col_md_8, *kv, block = block)
+	return this.div(class_ to _colx_8, *kv, block = block)
 }
 
 fun Tag.colX9(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(class_ to _col_12.._col_md_9, *kv, block = block)
+	return this.div(class_ to _colx_9, *kv, block = block)
 }
 
 fun Tag.colX10(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(class_ to _col_12.._col_md_10, *kv, block = block)
+	return this.div(class_ to _colx_10, *kv, block = block)
 }
 
 fun Tag.colX11(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(class_ to _col_12.._col_md_11, *kv, block = block)
+	return this.div(class_ to _colx_11, *kv, block = block)
 }
 
 fun Tag.colX12(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(class_ to _col_12.._col_md_12, *kv, block = block)
+	return this.div(class_ to _colx_12, *kv, block = block)
 }

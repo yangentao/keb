@@ -62,6 +62,8 @@ val data_ride_ = HAttr("data-ride")
 val data_target_ = HAttr("data-target")
 val data_toggle_ = HAttr("data-toggle")
 
+val data_form_query = HAttr("data-form-query")
+
 
 val aria_valuemax_ = HAttr("aria-valuemax")
 val aria_valuemin_ = HAttr("aria-valuemin")

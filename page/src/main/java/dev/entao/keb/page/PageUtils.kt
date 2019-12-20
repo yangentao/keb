@@ -62,6 +62,17 @@ fun eleId(prefix: String = ""): String {
 	return prefix + "_$idInc"
 }
 
+
+fun Prop.displayString(inst: Any?): String {
+	if (this is Prop0) {
+		return displayOf(this, this.getValue())
+	} else if (inst != null) {
+		return displayOf(this, this.getValue(inst))
+	} else {
+		return ""
+	}
+}
+
 fun displayOf(p0: Prop0): String {
 	return displayOf(p0, p0.getValue())
 }

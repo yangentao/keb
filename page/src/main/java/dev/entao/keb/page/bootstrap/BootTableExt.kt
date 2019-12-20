@@ -4,10 +4,7 @@ import dev.entao.kava.base.*
 import dev.entao.keb.core.HttpAction
 import dev.entao.keb.core.plus
 import dev.entao.keb.core.valOf
-import dev.entao.keb.page.ActionDanger
-import dev.entao.keb.page.SortParam
-import dev.entao.keb.page.P
-import dev.entao.keb.page.displayOf
+import dev.entao.keb.page.*
 import dev.entao.keb.page.modules.Upload
 import dev.entao.keb.page.tag.*
 
@@ -89,7 +86,7 @@ open class LinkColumn<T>(val prop: Prop1, val linkTo: HttpAction, val argProp: P
 	}
 
 	override fun onTd(tag: Tag, item: T) {
-		val displayValue = displayOf(prop, item)
+		val displayValue = prop.displayString(item as Any)
 		val argV: String = if (prop === argProp) {
 			displayValue
 		} else {
@@ -131,7 +128,7 @@ open class PropColumn<T>(val prop: Prop1, val label: String = prop.userLabel) : 
 	}
 
 	override fun onTd(tag: Tag, item: T) {
-		val disp = displayOf(prop, item)
+		val disp = prop.displayString(item as Any)
 		tag.textEscaped(disp.head(textLimit))
 	}
 }

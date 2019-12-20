@@ -37,6 +37,14 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 		return p.parent(block)
 	}
 
+	fun parent(attr: HKeyValue, vararg vs: HKeyValue): Tag? {
+		val p = this.parent ?: return null
+		if (p.match(attr, *vs)) {
+			return p
+		}
+		return p.parent(attr, *vs)
+	}
+
 	fun first(block: (Tag) -> Boolean): Tag? {
 		return children.find(block)
 	}
