@@ -10,4 +10,5 @@ include ':sql'
 include ':qr'
 include ':tcp'
 include ':http'
+include ':allweb'
 
