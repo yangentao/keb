@@ -1,8 +1,12 @@
 package dev.entao.kava.base
 
+import java.text.DecimalFormat
 import kotlin.reflect.*
 import kotlin.reflect.full.findAnnotation
 
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class NumberFormat(val pattern: String)
 
 //字段长度--字符串
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
@@ -143,3 +147,14 @@ val KProperty<*>.isHideClient: Boolean
 	}
 
 inline fun <reified T : Annotation> KAnnotatedElement.hasAnnotation(): Boolean = null != this.findAnnotation<T>()
+
+
+//12345.format(",###.##")
+//12345.6789.format("0,000.00")
+fun Number.format(pattern: String): String {
+	return if (pattern.isEmpty()) {
+		this.toString()
+	} else {
+		DecimalFormat(pattern).format(this)
+	}
+}
