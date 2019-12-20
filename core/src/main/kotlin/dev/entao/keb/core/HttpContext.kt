@@ -58,24 +58,33 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 		return this.filter.actionUri(action)
 	}
 
+
 	fun writeHtml(s: String) {
 		this.response.contentTypeHtml()
-		this.response.writer.write(s)
+		val w = this.response.writer
+		w.write(s)
+		w.flush()
 	}
 
 	fun writeTextPlain(s: String) {
 		this.response.contentType = Mimes.PLAIN
-		this.response.writer.write(s)
+		val w = this.response.writer
+		w.write(s)
+		w.flush()
 	}
 
 	fun writeXML(s: String) {
 		this.response.contentType = Mimes.XML
-		this.response.writer.write(s)
+		val w = this.response.writer
+		w.write(s)
+		w.flush()
 	}
 
 	fun writeJSON(s: String) {
 		this.response.contentType = Mimes.JSON
-		this.response.writer.write(s)
+		val w = this.response.writer
+		w.write(s)
+		w.flush()
 	}
 
 	val acceptJson: Boolean

@@ -1,6 +1,9 @@
 package dev.entao.keb.page.bootstrap
 
 import dev.entao.kava.base.*
+import dev.entao.kava.sql.Index
+import dev.entao.kava.sql.PrimaryKey
+import dev.entao.kava.sql.Unique
 import dev.entao.keb.core.HttpAction
 import dev.entao.keb.core.plus
 import dev.entao.keb.core.valOf
@@ -74,27 +77,6 @@ open class ActionColumn<T>(val prop: Prop1, vararg val actions: HttpAction) : Co
 	}
 }
 
-open class LinkColumn<T>(val prop: Prop1, val linkTo: HttpAction, val argProp: Prop1 = prop, val label: String = prop.userLabel) : ColumnBuilder<T>() {
-
-	fun sortable(): LinkColumn<T> {
-		this.sortNamed(prop.userName)
-		return this
-	}
-
-	override fun onTh(tag: Tag) {
-		tag.textEscaped(this.label)
-	}
-
-	override fun onTd(tag: Tag, item: T) {
-		val displayValue = prop.displayString(item as Any)
-		val argV: String = if (prop === argProp) {
-			displayValue
-		} else {
-			argProp.getValue(item as Any)?.toString() ?: ""
-		}
-		tag.a(linkTo + argV, displayValue.head(textLimit))
-	}
-}
 
 open class ResColumn<T>(val prop: Prop1, val downAction: HttpAction, val label: String = prop.userLabel) : ColumnBuilder<T>() {
 
@@ -116,7 +98,18 @@ open class ResColumn<T>(val prop: Prop1, val downAction: HttpAction, val label: 
 	}
 }
 
+private val Prop1.sortable: Boolean
+	get() {
+		return this.hasAnnotation<Index>() || this.hasAnnotation<Unique>() || this.hasAnnotation<PrimaryKey>()
+	}
+
 open class PropColumn<T>(val prop: Prop1, val label: String = prop.userLabel) : ColumnBuilder<T>() {
+
+	init {
+		if (prop.sortable) {
+			this.sortable()
+		}
+	}
 
 	fun sortable(): PropColumn<T> {
 		this.sortNamed(prop.userName)
@@ -130,6 +123,19 @@ open class PropColumn<T>(val prop: Prop1, val label: String = prop.userLabel) : 
 	override fun onTd(tag: Tag, item: T) {
 		val disp = prop.displayString(item as Any)
 		tag.textEscaped(disp.head(textLimit))
+	}
+}
+
+open class LinkColumn<T>(prop: Prop1, val linkTo: HttpAction, val argProp: Prop1 = prop, label: String = prop.userLabel) : PropColumn<T>(prop, label) {
+
+	override fun onTd(tag: Tag, item: T) {
+		val displayValue = prop.displayString(item as Any)
+		val argV: String = if (prop === argProp) {
+			displayValue
+		} else {
+			argProp.getValue(item as Any)?.toString() ?: ""
+		}
+		tag.a(linkTo + argV, displayValue.head(textLimit))
 	}
 }
 
