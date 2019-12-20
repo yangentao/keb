@@ -240,7 +240,7 @@ fun Tag.formGroupSelectTable(p: Prop, w: Where? = null, dontRetrive: Boolean = f
 	}
 }
 
-fun Tag.formGroupSelectStatic(p: Prop, defaultValue: String?, firstLabel: String? = null): Tag {
+fun Tag.formGroupSelectStatic(p: Prop, defaultValue: String?, firstLabel: String? = null, firstValue: String = ""): Tag {
 	return formGroup {
 		this.label { +p.userLabel }
 		val currValue = propValue(p, defaultValue) ?: ""
@@ -248,7 +248,7 @@ fun Tag.formGroupSelectStatic(p: Prop, defaultValue: String?, firstLabel: String
 			idName(p.userName)
 			this[data_select_value_] = currValue
 			if (firstLabel != null) {
-				option("", firstLabel)
+				option(firstValue, firstLabel)
 			}
 			val ls = p.formOptionsMap
 			for (kv in ls) {
@@ -264,7 +264,7 @@ private fun Tag.selectOptionByValue(value: String) {
 	val ls = this.children.filter { it.tagName == "option" }
 	for (op in ls) {
 		if (op[value_] == value) {
-			op += selected_ to "true "
+			op += selected_ to "true"
 		} else {
 			op.removeAttr(selected_)
 		}

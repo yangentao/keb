@@ -15,7 +15,7 @@ fun SQLQuery.limitPage(context: HttpContext) {
 	this.limit(P.pageSize, n * P.pageSize)
 }
 
-class SortParam(val context: HttpContext, sortByName: String, desc: Boolean = true) {
+class SortParam(context: HttpContext, sortByName: String, desc: Boolean = true) {
 
 	val sortBy: String
 	val desc: Boolean
@@ -46,10 +46,29 @@ fun SQLQuery.orderBy(sp: SortParam) {
 	}
 }
 
+private fun HttpScope.sqlParam(p: Prop1): Any? {
+	if (p.isTypeInt) {
+		return context.httpParams.int(p)
+	}
+	if (p.isTypeLong) {
+		return context.httpParams.long(p)
+	}
+	if (p.isTypeFloat || p.isTypeDouble) {
+		return context.httpParams.double(p)
+	}
+	if (p.isTypeString) {
+		val s = context.httpParams.str(p) ?: return null
+		if (s.isEmpty()) {
+			return null
+		}
+	}
+	return null
+}
+
 fun HttpScope.EQ(vararg ps: Prop1): Where? {
 	var w: Where? = null
 	for (p in ps) {
-		val v = paramValue(p) ?: continue
+		val v = sqlParam(p) ?: continue
 		w = w AND p.sqlFullName.EQ(v)
 	}
 	return w
@@ -83,27 +102,27 @@ fun HttpScope._LIKE(p: Prop1): Where? {
 }
 
 fun HttpScope.NE(p: Prop1): Where? {
-	val v = paramValue(p) ?: return null
+	val v = sqlParam(p) ?: return null
 	return p NE v
 }
 
 fun HttpScope.GE(p: Prop1): Where? {
-	val v = paramValue(p) ?: return null
+	val v = sqlParam(p) ?: return null
 	return p GE v
 }
 
 fun HttpScope.GT(p: Prop1): Where? {
-	val v = paramValue(p) ?: return null
+	val v = sqlParam(p) ?: return null
 	return p GT v
 }
 
 fun HttpScope.LE(p: Prop1): Where? {
-	val v = paramValue(p) ?: return null
+	val v = sqlParam(p) ?: return null
 	return p LE v
 }
 
 fun HttpScope.LT(p: Prop1): Where? {
-	val v = paramValue(p) ?: return null
+	val v = sqlParam(p) ?: return null
 	return p LT v
 }
 
