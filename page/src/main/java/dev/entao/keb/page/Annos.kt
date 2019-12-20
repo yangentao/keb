@@ -62,10 +62,6 @@ annotation class FormHelpBlock(val value: String)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class FormRequired
 
-@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class KeepDot(val value: Int)
-
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ActionDanger

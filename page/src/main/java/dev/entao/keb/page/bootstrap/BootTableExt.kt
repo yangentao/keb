@@ -7,6 +7,7 @@ import dev.entao.keb.core.valOf
 import dev.entao.keb.page.ActionDanger
 import dev.entao.keb.page.SortParam
 import dev.entao.keb.page.P
+import dev.entao.keb.page.displayOf
 import dev.entao.keb.page.modules.Upload
 import dev.entao.keb.page.tag.*
 
@@ -88,7 +89,7 @@ open class LinkColumn<T>(val prop: Prop1, val linkTo: HttpAction, val argProp: P
 	}
 
 	override fun onTd(tag: Tag, item: T) {
-		val displayValue = prop.getValue(item as Any)?.toString() ?: ""
+		val displayValue = displayOf(prop, item)
 		val argV: String = if (prop === argProp) {
 			displayValue
 		} else {
@@ -130,7 +131,8 @@ open class PropColumn<T>(val prop: Prop1, val label: String = prop.userLabel) : 
 	}
 
 	override fun onTd(tag: Tag, item: T) {
-		tag.textEscaped(prop.getValue(item as Any)?.toString()?.head(textLimit))
+		val disp = displayOf(prop, item)
+		tag.textEscaped(disp.head(textLimit))
 	}
 }
 

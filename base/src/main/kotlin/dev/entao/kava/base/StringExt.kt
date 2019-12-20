@@ -2,6 +2,7 @@ package dev.entao.kava.base
 
 import java.net.URLDecoder
 import java.net.URLEncoder
+import java.text.DecimalFormat
 import java.util.*
 
 /**
@@ -19,11 +20,18 @@ val REG_INTEGER = "\\d+"
 val REG_FLOAT = "[.\\d]+"
 
 
-fun Double.keepDot(n: Int): String {
+fun Float.maxFraction(n: Int): String {
+	return this.toDouble().maxFraction(n)
+}
+
+fun Double.maxFraction(n: Int): String {
 	if (n <= 0) {
 		return this.toLong().toString()
 	}
-	return String.format("%.${n}f", this)
+	val f = DecimalFormat()
+	f.maximumFractionDigits = n
+	f.isGroupingUsed = false
+	return f.format(this)
 }
 
 fun String.matchIp4(): Boolean {

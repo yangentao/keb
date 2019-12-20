@@ -5,6 +5,8 @@ import dev.entao.keb.core.*
 import dev.entao.keb.page.*
 import dev.entao.keb.page.tag.*
 import dev.entao.keb.page.widget.uploadDiv
+import java.text.DecimalFormat
+import kotlin.math.pow
 import kotlin.reflect.full.findAnnotation
 
 private val InputTags = setOf("input", "select", "textarea")
@@ -108,9 +110,11 @@ private fun Tag.valueByProp(p: Prop): String {
 	val vv = p.getValue() ?: return httpContext.httpParams.str(p.userName) ?: ""
 
 	if (vv is Double) {
-		val kd = p.findAnnotation<KeepDot>()
+		val kd = p.findAnnotation<NumberFormat>()
 		return if (kd != null) {
-			vv.keepDot(kd.value)
+			val fmt = DecimalFormat(kd.pattern)
+			val n = fmt.maximumFractionDigits
+			vv.maxFraction(n)
 		} else {
 			vv.toString()
 		}
@@ -172,6 +176,7 @@ private fun Tag.processControlCSS() {
 	}
 }
 
+
 private fun Tag.processPropertiesOfEdit(p: Prop) {
 	if (p.isTypeInt || p.isTypeLong || p.isTypeFloat || p.isTypeDouble) {
 		this += type_ to "number"
@@ -181,13 +186,17 @@ private fun Tag.processPropertiesOfEdit(p: Prop) {
 	val stepAn = p.findAnnotation<StepValue>()
 	if (stepAn == null) {
 		if (p.isTypeFloat || p.isTypeDouble) {
-			val keepDot = p.findAnnotation<KeepDot>()
-			if (keepDot != null) {
-				val n = keepDot.value
-				val f = Math.pow(0.1, n.toDouble())
-				this += step_ to f.keepDot(n)
+			val keepDot = p.findAnnotation<NumberFormat>()
+			if (keepDot != null && keepDot.pattern.isNotEmpty()) {
+				val fmt = DecimalFormat(keepDot.pattern)
+				val n = fmt.maximumFractionDigits
+				if (n > 0) {
+					this += step_ to 10.toDouble().pow(-n).toString()
+				} else {
+					this += step_ to "1"
+				}
 			} else {
-				this += step_ to "0.000000001"
+				this += step_ to "1"
 			}
 		}
 	}

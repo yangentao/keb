@@ -158,3 +158,9 @@ fun Number.format(pattern: String): String {
 		DecimalFormat(pattern).format(this)
 	}
 }
+
+
+//fun main() {
+//	val fm = DecimalFormat("#.###")
+//	println(fm.maximumFractionDigits)
+//}
