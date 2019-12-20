@@ -152,11 +152,7 @@ fun Tag.option(value: String, label: String, selState: Boolean): Tag {
 }
 
 fun Tag.option(value: String, label: String): Tag {
-	val t = option(value_ to value) { +label }
-	if (parent?.get(data_select_value_) == value) {
-		this[selected_] = "true"
-	}
-	return t
+	return option(value_ to value) { +label }
 }
 
 class LinkageOption(val fromId: String, val targetId: String, val action: HttpAction) {
@@ -227,9 +223,10 @@ fun Tag.selectLinkage(opt: LinkageOption) {
 fun Tag.formGroupSelectTable(p: Prop, w: Where? = null, dontRetrive: Boolean = false, selectBlock: Tag.() -> Unit = {}): Tag {
 	return formGroup {
 		this.label { +p.userLabel }
+		val currValue = propValue(p, null) ?: ""
 		select {
 			idName(p.userName)
-			this[data_select_value_] = propValue(p, null) ?: ""
+			this[data_select_value_] = currValue
 			if (!dontRetrive) {
 				val ls = p.selectOptionsTable(w)
 				for (kv in ls) {
@@ -237,17 +234,19 @@ fun Tag.formGroupSelectTable(p: Prop, w: Where? = null, dontRetrive: Boolean = f
 				}
 			}
 			this.selectBlock()
+			this.selectOptionByValue(currValue)
 		}
 		this.processHelpText(p)
 	}
 }
 
-fun Tag.formGroupSelectStatic(p: Prop, selectedValue: String? = null, firstLabel: String? = null): Tag {
+fun Tag.formGroupSelectStatic(p: Prop, defaultValue: String?, firstLabel: String? = null): Tag {
 	return formGroup {
 		this.label { +p.userLabel }
+		val currValue = propValue(p, defaultValue) ?: ""
 		select {
 			idName(p.userName)
-			this[data_select_value_] = propValue(p, null) ?: ""
+			this[data_select_value_] = currValue
 			if (firstLabel != null) {
 				option("", firstLabel)
 			}
@@ -255,8 +254,20 @@ fun Tag.formGroupSelectStatic(p: Prop, selectedValue: String? = null, firstLabel
 			for (kv in ls) {
 				option(kv.key, kv.value)
 			}
+			this.selectOptionByValue(currValue)
 		}
 		this.processHelpText(p)
+	}
+}
+
+private fun Tag.selectOptionByValue(value: String) {
+	val ls = this.children.filter { it.tagName == "option" }
+	for (op in ls) {
+		if (op[value_] == value) {
+			op += selected_ to "true "
+		} else {
+			op.removeAttr(selected_)
+		}
 	}
 }
 

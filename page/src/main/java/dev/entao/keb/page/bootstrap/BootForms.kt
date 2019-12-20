@@ -157,7 +157,7 @@ private fun processLabelRequire(lb: Tag, ed: Tag) {
 		if (queryForm == null) {
 			lb.textEscaped("*")
 		} else {
-			ed += required_ to "false"
+			ed.attrs.remove(required_.value)
 		}
 	}
 

@@ -270,59 +270,83 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 	}
 }
 
+fun Tag.addClass(clazz: String) {
+	this[class_] = this[class_]..clazz
+}
+
+fun Tag.addClass(clazz: HClass) {
+	this[class_] = this[class_]..clazz
+}
+
+fun Tag.removeClass(clazz: HClass) {
+	val s = this[class_]
+	val ls = s.split(' ').map { it.trim() }.toMutableList()
+	ls.remove(clazz.value)
+	this[class_] = ls.joinToString(" ") { it.trim() }
+}
+
+fun Tag.setKeyValue(kv: HKeyValue) {
+	this[kv.first] = kv.second
+}
+
+fun Tag.setAttr(key: String, value: String) {
+	this[key] = value
+}
+
+fun Tag.removeAttr(key: String) {
+	this.attrs.remove(key)
+}
+
+fun Tag.removeAttr(attr: HAttr) {
+	this.attrs.remove(attr.value)
+}
+
 infix operator fun Tag?.plusAssign(clazz: String) {
-	if (this != null) {
-		this[class_] = this[class_]..clazz
-	}
+	this?.addClass(clazz)
 }
 
 infix operator fun Tag?.plusAssign(clazz: HClass) {
-	if (this != null) {
-		this[class_] = this[class_]..clazz.value
-	}
+	this?.addClass(clazz)
 }
 
 infix operator fun Tag?.plusAssign(kv: HKeyValue) {
-	if (this != null) {
-		this[kv.first] = kv.second
-	}
+	this?.setKeyValue(kv)
 }
 
 
 infix operator fun Tag?.minusAssign(clazz: HClass) {
-	if (this != null) {
-		val s = this[class_]
-		val ls = s.split(' ').map { it.trim() }.toMutableList()
-		ls.remove(clazz.value)
-		this[class_] = ls.joinToString(" ") { it.trim() }
-	}
+	this?.removeClass(clazz)
 }
 
 
-infix operator fun Tag?.plusAssign(action: HttpAction) {
-	if (this != null) {
-		val url = this.httpContext.filter.actionUri(action)
-		this.setActionUrl(url)
-		this.confirm(action)
-		if (this.tagName == "button" || this.tagName == "a") {
-			if (this.children.isEmpty()) {
-				this.textEscaped(action.userLabel)
-			}
+fun Tag.setHttpAction(action: HttpAction) {
+	val url = this.httpContext.filter.actionUri(action)
+	this.setActionUrl(url)
+	this.confirm(action)
+	if (this.tagName == "button" || this.tagName == "a") {
+		if (this.children.isEmpty()) {
+			this.textEscaped(action.userLabel)
 		}
 	}
+}
+
+fun Tag.setActionURL(action: ActionURL) {
+	val url = action.toURL(this.httpContext)
+	this.setActionUrl(url)
+	this.confirm(action.action)
+	if (this.tagName == "button" || this.tagName == "a") {
+		if (this.children.isEmpty()) {
+			this.textEscaped(action.action.userLabel)
+		}
+	}
+}
+
+infix operator fun Tag?.plusAssign(action: HttpAction) {
+	this?.setHttpAction(action)
 }
 
 infix operator fun Tag?.plusAssign(action: ActionURL) {
-	if (this != null) {
-		val url = action.toURL(this.httpContext)
-		this.setActionUrl(url)
-		this.confirm(action.action)
-		if (this.tagName == "button" || this.tagName == "a") {
-			if (this.children.isEmpty()) {
-				this.textEscaped(action.action.userLabel)
-			}
-		}
-	}
+	this?.setActionURL(action)
 }
 
 fun Tag.setActionUrl(url: String) {

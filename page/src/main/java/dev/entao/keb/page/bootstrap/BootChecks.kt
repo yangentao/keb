@@ -3,24 +3,21 @@ package dev.entao.keb.page.bootstrap
 import dev.entao.kava.base.*
 import dev.entao.keb.page.tag.*
 import dev.entao.keb.page.widget.formOptionsMap
-import dev.entao.keb.page.widget.select
 
 
-fun Tag.propValue(p: Prop, selValue: String? = null): String? {
+fun Tag.propValue(p: Prop, defaultValue: String? = null): String? {
 	return if (p is Prop0) {
-		p.getValue()?.toString() ?: selValue
+		p.getValue()?.toString() ?: httpContext.httpParams.str(p.userName) ?: defaultValue
 	} else {
-		selValue
-	} ?: httpContext.httpParams.str(p.userName)
+		httpContext.httpParams.str(p.userName) ?: defaultValue
+	}
 }
 
 
-
-
-fun Tag.formGroupRadioStatic(p: Prop, selectedValue: String? = null, inlines: Boolean = false): Tag {
+fun Tag.formGroupRadioStatic(p: Prop, defaultValue: String? = null, inlines: Boolean = false): Tag {
 	return formGroup {
 		val pname = p.userName
-		var selVal: String? = propValue(p, selectedValue)
+		var selVal: String? = propValue(p, defaultValue)
 
 		this.label { +p.userLabel }
 		val ls = p.formOptionsMap
@@ -44,10 +41,10 @@ fun Tag.formGroupRadioStatic(p: Prop, selectedValue: String? = null, inlines: Bo
 	}
 }
 
-fun Tag.formGroupCheckStatic(p: Prop, selectedValue: String? = null, inlines: Boolean = false): Tag {
+fun Tag.formGroupCheckStatic(p: Prop, defaultValue: String? = null, inlines: Boolean = false): Tag {
 	return formGroup {
 		val pname = p.userName
-		var selVal: String? = propValue(p, selectedValue)
+		var selVal: String? = propValue(p, defaultValue)
 
 		this.label { +p.userLabel }
 		val ls = p.formOptionsMap
