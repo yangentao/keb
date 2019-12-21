@@ -116,8 +116,12 @@ open class ModelClass<out T : Model> {
 		}
 	}
 
-	fun count(w: Where, vararg ws: Where): Int {
-		return con.countAll(tabCls, andW(w, *ws))
+	fun count(w: Where?, vararg ws: Where): Int {
+		var ww = w
+		for (a in ws) {
+			ww = ww AND a
+		}
+		return con.countAll(tabCls, ww)
 	}
 }
 
