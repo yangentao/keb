@@ -90,7 +90,7 @@ open class ResColumn<T>(val prop: Prop1, val downAction: HttpAction, val label: 
 		val displayValue = if (v == null || v == 0) {
 			""
 		} else {
-			Upload.findByKey(v)?.rawname ?: ""
+			Upload.oneKey(v)?.rawname ?: ""
 		}
 		if (v != null) {
 			tag.a(downAction + v, displayValue.head(textLimit))

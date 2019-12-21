@@ -66,7 +66,7 @@ class ResGroup(context: HttpContext) : HttpGroup(context) {
 	}
 
 	private fun sendFile(id: Int, isMedia: Boolean) {
-		val item = Upload.findOne(Upload::id EQ id)
+		val item = Upload.one(Upload::id EQ id)
 		if (item == null) {
 			context.abort(404, "无效的标识")
 //			resultSender.failed(-1, "无效的标识")
@@ -87,7 +87,7 @@ class ResGroup(context: HttpContext) : HttpGroup(context) {
 	}
 
 	fun imgAction(id: Int) {
-		val item = Upload.findOne(Upload::id EQ id)
+		val item = Upload.one(Upload::id EQ id)
 		if (item == null) {
 			context.abort(404, "无效的标识")
 			return
@@ -110,7 +110,7 @@ class ResGroup(context: HttpContext) : HttpGroup(context) {
 	companion object {
 
 		fun deleteRes(context: HttpContext, id: Int) {
-			val item = Upload.findOne(Upload::id EQ id) ?: return
+			val item = Upload.one(Upload::id EQ id) ?: return
 			val file = item.localFile(context)
 			file.delete()
 			item.deleteByKey()

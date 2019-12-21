@@ -20,7 +20,7 @@ fun main() {
 	m.id = 1
 	m.name = "Hello"
 	m.updateByKey()
-	val x = Test.findByKey(1)
+	val x = Test.oneKey(1)
 	logd(x)
 
 }

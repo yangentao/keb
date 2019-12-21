@@ -156,3 +156,11 @@ infix fun Where?.OR(other: Where): Where {
 	w.args.addAll(other.args)
 	return w
 }
+
+fun andW(w: Where, vararg ws: Where): Where {
+	var ww = w
+	for (a in ws) {
+		ww = ww AND a
+	}
+	return ww
+}

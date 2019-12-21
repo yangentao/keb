@@ -2,8 +2,10 @@ package dev.entao.keb.page.modules
 
 import dev.entao.kava.base.DefaultValue
 import dev.entao.kava.base.Name
+import dev.entao.kava.sql.AutoInc
 import dev.entao.kava.sql.Model
 import dev.entao.kava.sql.ModelClass
+import dev.entao.kava.sql.PrimaryKey
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.account.account
 import java.io.File
@@ -17,8 +19,8 @@ import javax.servlet.http.Part
 @Name("upload")
 class Upload : Model() {
 
-	@dev.entao.kava.sql.PrimaryKey
-	@dev.entao.kava.sql.AutoInc
+	@PrimaryKey
+	@AutoInc
 	var id: Int by model
 	var localFileName: String by model
 	var extName: String by model
