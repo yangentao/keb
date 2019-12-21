@@ -1,33 +1,38 @@
 package dev.entao.tcp
 
 import java.nio.channels.SelectionKey
-
-
-fun main() {
-
-	val callback = object : TcpClientCallback {
-		override fun onClientReadFrame(key: SelectionKey, data: ByteArray) {
-			println(data.strUTF8)
-		}
-
-		override fun onClientConnected(key: SelectionKey) {
-			println("Connected")
-			key.writeLine("Yang")
-		}
-
-		override fun onClientConnectFailed(key: SelectionKey) {
-			println("Connect Failed")
-		}
-
-		override fun onClientFinish() {
-			println("Finished")
-		}
-	}
-
-	val a = TcpClient(callback)
-	a.start("localhost", 9000)
-	println("client Started")
-	Thread.sleep(30_000)
-	a.stop()
-	println("client END")
-}
+//
+//
+//fun testTcpClient() {
+//	val callback = object : TcpClientCallback {
+//		override fun onTcpRead(key: SelectionKey, data: ByteArray) {
+//			logd(data.strUTF8)
+//		}
+//
+//		override fun onTcpConnected(key: SelectionKey) {
+//			logd("Connected")
+//			key.writeFrame("Yang")
+//		}
+//
+//		override fun onTcpConnectFailed(key: SelectionKey) {
+//			logd("Connect Failed")
+//		}
+//
+//		override fun onTcpLoopEnd() {
+//			logd("Finished")
+//		}
+//	}
+//
+//	val a = TcpClient(LineFrame(), callback)
+//	a.start("localhost", 9000)
+//	logd("client Started")
+//	Thread.sleep(30.SEC)
+//	a.stop()
+//	logd("client END")
+//}
+//
+//fun main() {
+//
+//	val n = Runtime.getRuntime().availableProcessors()
+//	println(n)
+//}

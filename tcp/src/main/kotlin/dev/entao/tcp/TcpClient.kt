@@ -7,39 +7,36 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.SocketChannel
 
 interface TcpClientCallback {
-	fun onClientConnected(key: SelectionKey) {}
-	fun onClientConnectFailed(key: SelectionKey) {}
-	fun onClientReadIdle(key: SelectionKey) {}
-	fun onClientReadFrame(key: SelectionKey, data: ByteArray) {}
-	fun onClientFinish() {}
+	fun onTcpConnected(key: SelectionKey) {}
+	fun onTcpConnectFailed(key: SelectionKey) {}
+	fun onTcpReadIdle(key: SelectionKey) {}
+	fun onTcpRead(key: SelectionKey, data: ByteArray) {}
+	fun onTcpLoopEnd() {}
 }
 
-class TcpClient(val callback: TcpClientCallback) : TcpCallback {
-	private val serviceLoop = TcpLoop(LineFrame())
-	val selectionKey: SelectionKey? get() = serviceLoop.channels.firstOrNull()
+class TcpClient(bufferFrame: BufferFrame, val callback: TcpClientCallback) : TcpLoopCallback {
+	private val clientLoop = TcpLoop(bufferFrame, this)
+	val selectionKey: SelectionKey? get() = clientLoop.channels.firstOrNull()
 
-	init {
-		serviceLoop.callback = this
-	}
 
 	override fun onKeyConnectFailed(key: SelectionKey) {
-		callback.onClientConnectFailed(key)
+		callback.onTcpConnectFailed(key)
 	}
 
 	override fun onKeyConnected(key: SelectionKey) {
-		callback.onClientConnected(key)
+		callback.onTcpConnected(key)
 	}
 
 	override fun onKeyReadIdle(key: SelectionKey) {
-		callback.onClientReadIdle(key)
+		callback.onTcpReadIdle(key)
 	}
 
 	override fun onReadFrame(key: SelectionKey, data: ByteArray) {
-		callback.onClientReadFrame(key, data)
+		callback.onTcpRead(key, data)
 	}
 
 	override fun onLoopFinish() {
-		callback.onClientFinish()
+		callback.onTcpLoopEnd()
 	}
 
 	override fun onKeyRemoved(key: SelectionKey) {
@@ -49,27 +46,28 @@ class TcpClient(val callback: TcpClientCallback) : TcpCallback {
 		}
 	}
 
-	val isOpen: Boolean
-		get() = this.serviceLoop.isOpen
 
 	@Synchronized
 	fun start(host: String, port: Int) {
 		if (isOpen) {
 			throw IllegalStateException("已存在是start状态")
 		}
-		serviceLoop.startLoop()
+		clientLoop.startLoop()
 
 		val inet = InetSocketAddress(host, port)
 		val ch = SocketChannel.open()
 		ch.configureBlocking(false)
 		ch.connect(inet)
-		serviceLoop.add(ch, SelectionKey.OP_CONNECT)
+		clientLoop.add(ch, SelectionKey.OP_CONNECT)
 	}
 
 	@Synchronized
 	fun stop() {
-		serviceLoop.stopLoop()
+		clientLoop.stopLoop()
 	}
+
+	val isOpen: Boolean
+		get() = this.clientLoop.isOpen
 
 	val isActive: Boolean
 		get() {

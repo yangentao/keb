@@ -3,16 +3,18 @@ package dev.entao.tcp
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
 import java.nio.channels.SocketChannel
+import java.nio.charset.Charset
 
 
 val ByteArray.strUTF8: String get() = String(this, Charsets.UTF_8)
 
-fun SelectionKey.write(encoder: FrameEncoder): Boolean {
-	return this.write(encoder.data)
+fun SelectionKey.writeFrame(text: String, charset: Charset = Charsets.UTF_8): Boolean {
+	return this.writeFrame(text.toByteArray(charset))
 }
 
-fun SelectionKey.writeLine(text: String): Boolean {
-	return this.write(LineEncoder(text))
+fun SelectionKey.writeFrame(data: ByteArray): Boolean {
+	val frame = this.framer ?: return false
+	return this.write(frame.makeFrame(data))
 }
 
 fun SelectionKey.write(data: ByteArray): Boolean {
@@ -79,6 +81,12 @@ var SelectionKey.readTime: Long
 	get() = this.attr("readTime") as? Long ?: 0L
 	set(value) {
 		this.attr("readTime", value)
+	}
+
+var SelectionKey.framer: BufferFrame?
+	get() = this.attr("framer") as? BufferFrame
+	set(value) {
+		this.attr("framer", value)
 	}
 
 fun SelectionKey.close() {

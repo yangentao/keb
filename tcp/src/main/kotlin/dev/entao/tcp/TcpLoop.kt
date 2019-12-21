@@ -12,9 +12,8 @@ import java.nio.channels.spi.AbstractSelectableChannel
 import java.util.*
 
 
-interface TcpCallback {
+interface TcpLoopCallback {
 	fun onKeyConnected(key: SelectionKey) {}
-
 	fun onKeyConnectFailed(key: SelectionKey) {}
 	fun onKeyAcceptable(key: SelectionKey) {}
 
@@ -26,7 +25,7 @@ interface TcpCallback {
 	fun onLoopFinish() {}
 }
 
-class TcpLoop(val bufferFrame: BufferFrame, val maxFrameLength: Int = 2048) {
+class TcpLoop(val bufferFrame: BufferFrame, val callback: TcpLoopCallback) {
 	private var thread: Thread? = null
 	private var selector: Selector? = null
 	private val channelList: LinkedList<SelectionKey> = LinkedList()
@@ -34,10 +33,12 @@ class TcpLoop(val bufferFrame: BufferFrame, val maxFrameLength: Int = 2048) {
 	private var preTime: Long = 0L
 	//读超时时间
 	var readIdleSeconds: Int = 90
-	var callback: TcpCallback? = null
+
 
 	val isOpen: Boolean get() = selector?.isOpen ?: false
 	val channels: ArrayList<SelectionKey> get() = ArrayList(channelList)
+
+	val size: Int get() = channelList.size
 
 	fun startLoop() {
 		assert(channelList.isEmpty())
@@ -73,23 +74,23 @@ class TcpLoop(val bufferFrame: BufferFrame, val maxFrameLength: Int = 2048) {
 			channel.configureBlocking(false)
 		}
 		val key = channel.register(sel, op)
+		key.framer = bufferFrame
 		synchronized(channelList) {
 			channelList.add(key)
 		}
-		callback?.onKeyAdded(key)
+		callback.onKeyAdded(key)
 		selector?.wakeup()
 	}
 
-	@Suppress("VARIABLE_WITH_REDUNDANT_INITIALIZER")
 	private fun closeChannel(key: SelectionKey) {
 		key.close()
-		var removed = false
+		var removed: Boolean
 		synchronized(channelList) {
 			removed = channelList.remove(key)
 		}
 		if (removed) {
 			try {
-				callback?.onKeyRemoved(key)
+				callback.onKeyRemoved(key)
 			} catch (ex: Exception) {
 				ex.printStackTrace()
 			}
@@ -107,7 +108,7 @@ class TcpLoop(val bufferFrame: BufferFrame, val maxFrameLength: Int = 2048) {
 		for (ch in channels) {
 			closeChannel(ch)
 		}
-		callback?.onLoopFinish()
+		callback.onLoopFinish()
 	}
 
 	private fun checkIdle() {
@@ -119,7 +120,7 @@ class TcpLoop(val bufferFrame: BufferFrame, val maxFrameLength: Int = 2048) {
 				val tm = this.readIdleSeconds * 1000L
 				val ls = channels.filter { t - it.readTime > tm }
 				for (k in ls) {
-					callback?.onKeyReadIdle(k)
+					callback.onKeyReadIdle(k)
 				}
 			} catch (ex: Exception) {
 				ex.printStackTrace()
@@ -153,13 +154,13 @@ class TcpLoop(val bufferFrame: BufferFrame, val maxFrameLength: Int = 2048) {
 						val ch = key.channel() as SocketChannel
 						if (ch.isConnectionPending && ch.finishConnect()) {
 							key.interestOps(SelectionKey.OP_READ)
-							callback?.onKeyConnected(key)
+							callback.onKeyConnected(key)
 						} else {
 							closeChannel(key)
-							callback?.onKeyConnectFailed(key)
+							callback.onKeyConnectFailed(key)
 						}
 					} else if (key.isAcceptable) {
-						callback?.onKeyAcceptable(key)
+						callback.onKeyAcceptable(key)
 					} else if (key.isReadable) {
 						key.readTime = System.currentTimeMillis()
 						if (-1 == readKey(key)) {
@@ -222,7 +223,8 @@ class TcpLoop(val bufferFrame: BufferFrame, val maxFrameLength: Int = 2048) {
 		if (newBuf.isEmpty()) {
 			return
 		}
-		val sz = bufferFrame.accept(newBuf)
+		val p = bufferFrame.accept(newBuf)
+		val sz = p.first
 		when {
 			sz > 0 -> {
 				if (sz < newBuf.size) {
@@ -230,10 +232,12 @@ class TcpLoop(val bufferFrame: BufferFrame, val maxFrameLength: Int = 2048) {
 				} else {
 					key.byteArray = null
 				}
-				callback?.onReadFrame(key, bufferFrame.data!!)
+				if (p.second != null) {
+					callback.onReadFrame(key, p.second!!)
+				}
 				callFrame(key)
 			}
-			newBuf.size > this.maxFrameLength -> {
+			newBuf.size > bufferFrame.maxFrameLength -> {
 				key.byteArray = null
 			}
 			else -> {
