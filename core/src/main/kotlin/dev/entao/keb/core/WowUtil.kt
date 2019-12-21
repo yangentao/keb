@@ -5,6 +5,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredMemberFunctions
+import kotlin.reflect.full.findAnnotation
 
 /**
  * Created by entaoyang@163.com on 2017/5/7.
@@ -42,14 +43,34 @@ val KFunction<*>.actionName: String
 		val fname = this.userName.substringBefore(HttpFilter.ACTION).toLowerCase()
 		return if (fname == HttpFilter.INDEX) "" else fname
 	}
+
 val KClass<*>.pageName: String
 	get() {
-		val gname = this.userName.substringBefore(HttpFilter.GROUP_SUFFIX).toLowerCase()
-		if (gname == HttpFilter.INDEX) {
-			return ""
+		return pageClassMap.getOrPut(this) {
+			makePageName(this)
 		}
-		return gname
 	}
+
+private fun makePageName(cls: KClass<*>): String {
+	val named = cls.findAnnotation<Name>()?.value
+	if (named != null) {
+		return named
+	}
+	val clsName = cls.simpleName!!
+	for (ps in HttpFilter.pageSuffixs) {
+		if (clsName != ps && clsName.endsWith(ps)) {
+			val gname = clsName.substr(0, clsName.length - ps.length)
+			if (gname == HttpFilter.INDEX) {
+				return ""
+			} else {
+				return gname
+			}
+		}
+	}
+	return clsName
+}
+
+private val pageClassMap = HashMap<KClass<*>, String>()
 
 val String.intList: List<Int>
 	get() {

@@ -239,7 +239,7 @@ abstract class HttpFilter : Filter {
 	}
 
 	companion object {
-		const val GROUP_SUFFIX = "Group"
+		val pageSuffixs: HashSet<String> = hashSetOf("Group", "Page")
 		const val ACTION = "Action"
 		const val INDEX = "index"
 
