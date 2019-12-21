@@ -102,7 +102,7 @@ class TokenSlice(val pwd: String) : HttpSlice {
 	}
 
 	override fun acceptRouter(context: HttpContext, router: Router): Boolean {
-		if (router.function.isNeedToken) {
+		if (router.needToken) {
 			val m = context.tokenModel
 			if (m == null) {
 				context.abort(401, "未登录")

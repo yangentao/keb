@@ -23,6 +23,9 @@ class Router(val uri: String, val cls: KClass<*>, val function: KFunction<*>, ob
 	private val inst: Any? = obj ?: function.ownerObject
 	private val paramList = function.parameters
 
+	val needToken: Boolean = cls.hasAnnotation<NeedToken>() || function.hasAnnotation<NeedToken>()
+	val needLogin: Boolean = cls.hasAnnotation<NeedLogin>() || function.hasAnnotation<NeedLogin>()
+
 	val methods: Set<String> by lazy {
 		val a = HashSet<String>()
 		val b = function.findAnnotation<HttpMethod>()?.value?.map { it.toUpperCase() }?.toSet()

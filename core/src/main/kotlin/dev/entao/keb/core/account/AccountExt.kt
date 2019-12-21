@@ -57,7 +57,7 @@ val HttpContext.isAccountLogined: Boolean
 object LoginCheckSlice : HttpSlice {
 
 	override fun acceptRouter(context: HttpContext, router: Router): Boolean {
-		if (router.function.hasAnnotation<NeedLogin>() || router.cls.hasAnnotation<NeedLogin>()) {
+		if (router.needLogin) {
 			if (!context.isAccountLogined) {
 				if (context.filter.loginUri.isNotEmpty()) {
 					if (context.acceptHtml) {
