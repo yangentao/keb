@@ -4,12 +4,16 @@ import dev.entao.kava.json.YsonObject
 import dev.entao.keb.core.*
 import dev.entao.keb.core.util.JWT
 
-var HttpContext.userIdToken: Long
+var HttpContext.tokenUserId: Long?
 	get() {
-		return (this.propMap["_userIdToken_"] as? Long) ?: 0L
+		return this.propMap["tokenUserId"] as? Long
 	}
 	set(value) {
-		this.propMap["_userIdToken_"] = value
+		if (value == null) {
+			this.propMap.remove("tokenUserId")
+		} else {
+			this.propMap["tokenUserId"] = value
+		}
 	}
 
 var HttpContext.tokenModel: TokenModel?
@@ -36,6 +40,7 @@ class TokenModel(val yo: YsonObject = YsonObject()) {
 	var userId: Long by yo
 	var userName: String by yo
 	var expireTime: Long by yo
+	var platform: String by yo
 
 	val expired: Boolean
 		get() {
@@ -52,15 +57,31 @@ class TokenModel(val yo: YsonObject = YsonObject()) {
 }
 
 //0 永不过期
-fun HttpContext.makeToken(userId: Long, userName: String, expireTime: Long): String {
+fun HttpContext.makeToken(userId: Long, userName: String, platform: String, expireTime: Long): String {
 	val ts = this.filter.sliceList.find { it is TokenSlice } as? TokenSlice
 			?: throw IllegalAccessError("没有找到TokenSlice")
 	val m = TokenModel()
 	m.userId = userId
 	m.userName = userName
 	m.expireTime = expireTime
+	m.platform = platform
 	return ts.makeToken(m.yo.toString())
 }
+
+val HttpContext.accessToken: String?
+	get() {
+		val a = this.request.header("Authorization")
+		val b = a?.substringAfter("Bearer ", "")?.trim() ?: ""
+		if (b.isNotEmpty()) {
+			return b
+		}
+		val tk = this.request.param("access_token") ?: this.request.param("token") ?: return null
+		return if (tk.isNotEmpty()) {
+			tk
+		} else {
+			null
+		}
+	}
 
 //override fun onInit() {
 //	addSlice(TokenSlice("99665588"))
@@ -68,22 +89,15 @@ fun HttpContext.makeToken(userId: Long, userName: String, expireTime: Long): Str
 class TokenSlice(val pwd: String) : HttpSlice {
 
 	override fun beforeRequest(context: HttpContext) {
-		val a = context.request.header("Authorization")
-		val b = a?.substringAfter("Bearer ", "")?.trim() ?: ""
-		val token = if (b.isEmpty()) {
-			context.request.param("access_token") ?: context.request.param("token") ?: return
-		} else {
-			b
-		}
-		if (token.isEmpty()) {
-			return
-		}
+		val token = context.accessToken ?: return
 		val j = JWT(pwd, token)
 		context.jwtValue = j
-		val m = TokenModel(YsonObject(j.body))
-		context.tokenModel = m
-		if (!m.expired) {
-			context.userIdToken = m.userId
+		if (j.OK) {
+			val m = TokenModel(YsonObject(j.body))
+			context.tokenModel = m
+			if (!m.expired) {
+				context.tokenUserId = m.userId
+			}
 		}
 	}
 

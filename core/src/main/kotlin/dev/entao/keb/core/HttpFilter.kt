@@ -64,9 +64,7 @@ abstract class HttpFilter : Filter {
 
 	abstract fun cleanThreadLocals()
 
-	open fun createTokenPassword(): String {
-		return System.currentTimeMillis().toString()
-	}
+	abstract fun createTokenPassword(): String
 
 	open fun createLogPrinter(): YogPrinter {
 		return YogDir(webDir.logDir, 15)
