@@ -32,8 +32,12 @@ open class Model(val model: ModelMap = ModelMap()) {
 
 	fun existByKey(): Boolean {
 		val w = this.whereByPrimaryKey ?: throw IllegalArgumentException("必须设置主键")
-		return conn.querySQL {
-			select("1").from(this::class).where(w).limit(1)
+		val cls = this::class
+		return conn.query {
+			select("1")
+			from(cls)
+			where(w)
+			limit(1)
 		}.existRow
 	}
 
@@ -59,7 +63,7 @@ open class Model(val model: ModelMap = ModelMap()) {
 			conn.updateByKey(this, ps)
 		} else {
 			conn.updateByKey(this)
-		}
+		} > 0
 	}
 
 	fun updateByKey(vararg ps: KMutableProperty<*>): Boolean {
@@ -67,7 +71,7 @@ open class Model(val model: ModelMap = ModelMap()) {
 			conn.updateByKey(this, ps.toList())
 		} else {
 			conn.updateByKey(this)
-		}
+		} > 0
 	}
 
 

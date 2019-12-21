@@ -1,5 +1,6 @@
 package dev.entao.kava.sql.ext
 
+import dev.entao.kava.json.YsonArray
 import dev.entao.kava.sql.*
 
 class Test : Model() {
@@ -13,6 +14,8 @@ class Test : Model() {
 
 	@Decimal(6, 3)
 	var fee: Double by model
+
+	var msgs: YsonArray by model
 
 	companion object : ModelClass<Test>()
 

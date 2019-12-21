@@ -23,7 +23,7 @@ dependencies {
     implementation 'dev.entao.kava:base:1.4.5'
     implementation 'dev.entao.kava:json:1.4.5'
 
-//    implementation 'org.postgresql:postgresql:42.2.8'
+    implementation 'org.postgresql:postgresql:42.2.8'
 //    implementation 'mysql:mysql-connector-java:8.0.18'
 }
 

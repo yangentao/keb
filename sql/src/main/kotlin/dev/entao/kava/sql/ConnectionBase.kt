@@ -1,10 +1,37 @@
 package dev.entao.kava.sql
 
+import dev.entao.kava.base.Name
+import dev.entao.kava.base.Prop
+import dev.entao.kava.base.ownerClass
 import dev.entao.kava.json.*
 import dev.entao.kava.log.logd
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import kotlin.reflect.KClass
+import kotlin.reflect.full.findAnnotation
+
+/**
+ * Created by entaoyang@163.com on 2017/6/10.
+ */
+
+val KClass<*>.sqlName: String
+	get() {
+		return this.findAnnotation<Name>()?.value ?: this.simpleName!!.toLowerCase()
+	}
+
+val Prop.sqlName: String
+	get() {
+		return this.findAnnotation<Name>()?.value ?: this.name.toLowerCase()
+	}
+val Prop.sqlFullName: String
+	get() {
+		return "${this.ownerClass!!.sqlName}.${this.sqlName}"
+	}
+
+
+
+typealias TabClass = KClass<*>
 
 val Connection.isMySQL: Boolean get() = "MySQL" == this.metaData.databaseProductName
 val Connection.isPostgres: Boolean get() = "PostgreSQL" == this.metaData.databaseProductName
@@ -21,6 +48,7 @@ val String.trimSQL: String
 		return this.trim('`', '\"')
 	}
 
+
 fun Connection.esc(name: String): String {
 	if (isMySQL && (name in mysqlKeySet)) {
 		return "`$name`"
@@ -32,6 +60,21 @@ fun Connection.esc(name: String): String {
 
 }
 
+
+infix fun String.AS(other: String): String {
+	return "$this AS $other"
+}
+
+fun Connection.valPos(value: Any?): String {
+	if (this.isPostgres) {
+		if (value is YsonObject || value is YsonArray) {
+			return "?::json"
+		}
+	}
+	return "?"
+}
+
+
 fun PreparedStatement.setParams(params: List<Any?>) {
 	for (i in params.indices) {
 		val v = params[i]
@@ -39,7 +82,7 @@ fun PreparedStatement.setParams(params: List<Any?>) {
 			is YsonNull -> null
 			is YsonObject -> v.toString()
 			is YsonArray -> v.toString()
-			is YsonString -> v.toString()
+			is YsonString -> v.data
 			is YsonNum -> v.data
 			is YsonBool -> v.data
 			is YsonBlob -> v.data
@@ -83,56 +126,6 @@ fun Connection.update(sql: String, args: List<Any?> = emptyList()): Int {
 	}
 }
 
-fun Connection.insertGenKey(sql: String, args: ArrayList<Any?>): Long {
-	val st = this.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
-	st.setParams(args)
-	if (ConnLook.logEnable) {
-		logd(sql)
-		logd(args)
-	}
-	st.use {
-		val n = it.executeUpdate()
-		return if (n <= 0) {
-			0L
-		} else {
-			it.generatedKeys.longValue ?: 0L
-		}
-	}
-}
-
-
-fun Connection.tableExists(tableName: String): Boolean {
-	val tname = tableName.trimSQL
-	val meta = this.metaData
-	val rs = meta.getTables(this.catalog, this.schema, tname, arrayOf("TABLE"))
-	val firstRow = rs.firstRow()
-	val s = firstRow?.get("TABLE_NAME")?.toString() ?: firstRow?.get("table_name")?.toString() ?: ""
-	return s.toLowerCase() == tname.toLowerCase()
-}
-
-fun Connection.tableDesc(tableName: String): List<ColumnInfo> {
-	val meta = this.metaData
-	val rs = meta.getColumns(this.catalog, this.schema, tableName.trimSQL, "%")
-	return rs.allRows().map {
-		val m = ColumnInfo()
-		m.model.putAll(it)
-		m
-	}
-}
-
-fun Connection.dumpIndex(tableName: String) {
-	val meta = this.metaData
-	val rs = meta.getIndexInfo(this.catalog, this.schema, tableName.trimSQL, false, false)
-	rs.dump()
-}
-
-fun Connection.tableIndexList(tableName: String): List<IndexInfo> {
-	val meta = this.metaData
-	val rs = meta.getIndexInfo(this.catalog, this.schema, tableName.trimSQL, false, false)
-	return rs.models {
-		IndexInfo()
-	}
-}
 
 inline fun Connection.trans(block: (Connection) -> Unit) {
 	try {
@@ -147,17 +140,4 @@ inline fun Connection.trans(block: (Connection) -> Unit) {
 	}
 }
 
-fun Connection.createTable(tableName: String, columns: List<String>): Int {
-	val sql = buildString {
-		append("CREATE TABLE IF NOT EXISTS $tableName (")
-		append(columns.joinToString(", "))
-		append(")")
-	}
-	return this.update(sql)
-}
-
-fun Connection.createIndex(tableName: String, columnName: String) {
-	val idxName = "${tableName.trimSQL}_${columnName.trimSQL}_INDEX"
-	exec("CREATE INDEX  $idxName ON $tableName(${columnName})")
-}
 

@@ -197,7 +197,7 @@ fun <V> defaultValueOfProperty(p: KProperty<*>): V {
 		return c.defaultValue as V
 	}
 
-	throw IllegalArgumentException("不支持的类型modelMap: ${p.fullName}")
+	throw IllegalArgumentException("不支持的类型modelMap: ${retType.classifier}, ${p.fullName}")
 }
 //
 //class Hello {

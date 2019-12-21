@@ -24,6 +24,7 @@ open class ModelClass<out T : Model> {
 		DefTable(tabCls)
 	}
 
+	val con: Connection get() = tabCls.namedConn
 
 	@Suppress("UNCHECKED_CAST")
 	open fun mapRow(map: Map<String, Any?>): T {
@@ -32,15 +33,13 @@ open class ModelClass<out T : Model> {
 		return m
 	}
 
-	val con: Connection get() = tabCls.namedConn
-
 
 	fun delete(w: Where, vararg ws: Where): Int {
 		return con.delete(tabCls, andW(w, *ws))
 	}
 
 	fun update(map: Map<Prop, Any?>, w: Where?): Int {
-		return con.update(tabCls, map, w)
+		return con.update(tabCls, map.map { it.key to it.value }, w)
 	}
 
 	fun update(p: Pair<Prop, Any?>, w: Where?): Int {

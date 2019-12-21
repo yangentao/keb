@@ -3,6 +3,7 @@ package dev.entao.kava.sql
 import dev.entao.kava.base.*
 import dev.entao.kava.json.YsonArray
 import dev.entao.kava.json.YsonObject
+import dev.entao.kava.json.YsonParser
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty
 
@@ -62,13 +63,17 @@ class ModelMap(capacity: Int = 32) : HashMap<String, Any?>(capacity) {
 				return when (v) {
 					is String -> YsonObject(v) as V
 					is YsonObject -> v as V
-					else -> throw IllegalArgumentException("类型不匹配: " + property.fullName)
+					else -> {
+						return YsonParser(v.toString()).parseObject() as V
+					}
 				}
 			} else if (retType.isClass(YsonArray::class)) {
 				return when (v) {
 					is String -> YsonArray(v) as V
 					is YsonArray -> v as V
-					else -> throw IllegalArgumentException("类型不匹配: " + property.fullName)
+					else -> {
+						return YsonParser(v.toString()).parseArray() as V
+					}
 				}
 			}
 			//TODO decimal, double, float, Long, Int

@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'dev.entao.keb'
-version '1.4.8'
+version '1.4.9'
 
 sourceCompatibility = 1.8
 
@@ -21,7 +21,7 @@ dependencies {
     compileOnly "javax.servlet:javax.servlet-api:3.1.0"
 
 
-    //    implementation 'org.postgresql:postgresql:42.2.8'
+    implementation 'org.postgresql:postgresql:42.2.8'
 //    implementation 'mysql:mysql-connector-java:8.0.18'
 
 }
@@ -43,6 +43,7 @@ sourceSets {
         kotlin.srcDirs += '../core/src/main/kotlin'
         kotlin.srcDirs += '../page/src/main/kotlin'
         kotlin.srcDirs += '../page/src/main/java'
+
 
 //        kotlin.srcDirs += '../base/main/kotlin'
     }

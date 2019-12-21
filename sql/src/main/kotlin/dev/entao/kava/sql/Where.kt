@@ -9,6 +9,8 @@ import java.util.*
  * Created by yangentao on 2016/12/14.
  */
 
+//where 不支持json格式参数, ?::json
+
 class Where(val value: String) {
 
 	val args = ArrayList<Any>()

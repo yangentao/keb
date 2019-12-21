@@ -1,10 +1,54 @@
-@file:Suppress("PropertyName", "MemberVisibilityCanBePrivate", "unused")
-
 package dev.entao.kava.sql
 
-/**
- * Created by entaoyang@163.com on 2017/6/10.
- */
+import java.sql.Connection
+
+fun Connection.countAll(cls: TabClass, w: Where?): Int {
+	return this.countAll(cls.sqlName, w)
+}
+
+fun Connection.countAll(tableName: String, w: Where?): Int {
+	return this.query {
+		select("COUNT(*)")
+		from(tableName)
+		where(w)
+	}.intValue ?: 0
+}
+
+
+fun Connection.tableExists(tableName: String): Boolean {
+	val tname = tableName.trimSQL
+	val meta = this.metaData
+	val rs = meta.getTables(this.catalog, this.schema, tname, arrayOf("TABLE"))
+	val firstRow = rs.firstRow()
+	val s = firstRow?.get("TABLE_NAME")?.toString() ?: firstRow?.get("table_name")?.toString() ?: ""
+	return s.toLowerCase() == tname.toLowerCase()
+}
+
+fun Connection.tableDesc(tableName: String): List<ColumnInfo> {
+	val meta = this.metaData
+	val rs = meta.getColumns(this.catalog, this.schema, tableName.trimSQL, "%")
+	return rs.allRows().map {
+		val m = ColumnInfo()
+		m.model.putAll(it)
+		m
+	}
+}
+
+fun Connection.tableIndexList(tableName: String): List<IndexInfo> {
+	val meta = this.metaData
+	val rs = meta.getIndexInfo(this.catalog, this.schema, tableName.trimSQL, false, false)
+	return rs.models {
+		IndexInfo()
+	}
+}
+
+fun Connection.dumpIndex(tableName: String) {
+	val meta = this.metaData
+	val rs = meta.getIndexInfo(this.catalog, this.schema, tableName.trimSQL, false, false)
+	rs.dump()
+}
+
+
 //TABLE_CAT=apps, TABLE_SCHEM=null, TABLE_NAME=person4, COLUMN_NAME=id, DATA_TYPE=4, TYPE_NAME=INT, COLUMN_SIZE=10, BUFFER_LENGTH=65535, DECIMAL_DIGITS=null, NUM_PREC_RADIX=10, NULLABLE=0, REMARKS=, COLUMN_DEF=null, SQL_DATA_TYPE=0, SQL_DATETIME_SUB=0, CHAR_OCTET_LENGTH=null, ORDINAL_POSITION=1, IS_NULLABLE=NO, SCOPE_CATALOG=null, SCOPE_SCHEMA=null, SCOPE_TABLE=null, SOURCE_DATA_TYPE=null, IS_AUTOINCREMENT=YES, IS_GENERATEDCOLUMN=NO,
 //TABLE_CAT=apps, TABLE_SCHEM=null, TABLE_NAME=person4, COLUMN_NAME=person, DATA_TYPE=-1, TYPE_NAME=JSON, COLUMN_SIZE=1073741824, BUFFER_LENGTH=65535, DECIMAL_DIGITS=null, NUM_PREC_RADIX=10, NULLABLE=0, REMARKS=, COLUMN_DEF=null, SQL_DATA_TYPE=0, SQL_DATETIME_SUB=0, CHAR_OCTET_LENGTH=null, ORDINAL_POSITION=2, IS_NULLABLE=NO, SCOPE_CATALOG=null, SCOPE_SCHEMA=null, SCOPE_TABLE=null, SOURCE_DATA_TYPE=null, IS_AUTOINCREMENT=NO, IS_GENERATEDCOLUMN=NO,
 class ColumnInfo : Model() {

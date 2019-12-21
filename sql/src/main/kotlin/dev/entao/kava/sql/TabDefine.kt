@@ -223,7 +223,7 @@ class DefColumn(private val prop: Prop, val dbType: Int) {
 				"double precision"
 			}
 		}
-		if (prop.isTypeClass(java.sql.Date::class)) {
+		if (prop.isTypeClass(java.sql.Date::class) || prop.isTypeClass(java.util.Date::class)) {
 			return "date"
 		}
 		if (prop.isTypeClass(java.sql.Time::class)) {
@@ -232,14 +232,17 @@ class DefColumn(private val prop: Prop, val dbType: Int) {
 		if (prop.isTypeClass(java.sql.Timestamp::class)) {
 			return "timestamp"
 		}
-		if (prop.isTypeClass(java.util.Date::class)) {
-			return "DATETIME"
-		}
 		if (prop.isTypeClass(YsonArray::class) || prop.isTypeClass(YsonObject::class)) {
-			return if (dbType == TypeMYSQL) {
-				"JSON"
-			} else {
-				"json" //jsonb
+			return when (dbType) {
+				TypeMYSQL -> {
+					"JSON"
+				}
+				TypePostgresql -> {
+					"json" //jsonb
+				}
+				else -> {
+					"text"
+				}
 			}
 		}
 		if (prop.isTypeClass(ByteArray::class)) {

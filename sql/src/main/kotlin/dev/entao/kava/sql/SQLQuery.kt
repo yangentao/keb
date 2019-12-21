@@ -3,6 +3,7 @@
 package dev.entao.kava.sql
 
 import dev.entao.kava.base.Prop
+import dev.entao.kava.base.Prop1
 import dev.entao.kava.base.plusAssign
 import java.sql.Connection
 import java.sql.ResultSet
@@ -35,7 +36,7 @@ class SQLQuery {
 	}
 
 	fun groupBy(p: Prop): SQLQuery {
-		return this.groupBy(p.s)
+		return this.groupBy(p.sqlName)
 	}
 
 	fun having(s: String): SQLQuery {
@@ -188,6 +189,20 @@ class SQLQuery {
 
 }
 
+class OnBuilder {
+
+	infix fun Prop.EQ(s: Prop1): String {
+		return "${this.sqlFullName} = ${s.sqlFullName}"
+	}
+
+	infix fun String.EQ(s: String): String {
+		return "$this = $s"
+	}
+
+	infix fun String.AND(s: String): String {
+		return "$this AND $s"
+	}
+}
 
 fun Connection.query(q: SQLQuery): ResultSet {
 	return this.query(q.toSQL(), q.args)
