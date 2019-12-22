@@ -21,6 +21,8 @@ val Int.DAY: Long get() = this * 24 * 3600_000L
 
 val Long.myDate: MyDate get() = MyDate(this)
 val Long.asTimestamp: java.sql.Timestamp get() = java.sql.Timestamp(this)
+val Long.asDateSQL: java.sql.Date get() = java.sql.Date(this)
+val Long.asTimeSQL: java.sql.Time get() = java.sql.Time(this)
 
 class MyDate(time: Long = System.currentTimeMillis(), locale: Locale = Locale.getDefault()) {
 
