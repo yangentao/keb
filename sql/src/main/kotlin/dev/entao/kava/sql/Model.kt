@@ -15,6 +15,8 @@ import kotlin.reflect.KProperty
 
 open class Model(val model: ModelMap = ModelMap()) {
 
+	private val conn: Connection get() = this::class.namedConn
+
 	fun hasProp(p: KProperty<*>): Boolean {
 		return hasProp(p)
 	}
@@ -26,9 +28,6 @@ open class Model(val model: ModelMap = ModelMap()) {
 	fun removeProperty(p: KProperty<*>) {
 		model.removeProperty(p)
 	}
-
-
-	private val conn: Connection get() = this::class.namedConn
 
 	fun existByKey(): Boolean {
 		val w = this.whereByPrimaryKey ?: throw IllegalArgumentException("必须设置主键")
@@ -75,90 +74,35 @@ open class Model(val model: ModelMap = ModelMap()) {
 	}
 
 
-	fun toJsonClient(vararg ps: KProperty<*>): YsonObject {
-		val jo = YsonObject()
-		if (ps.isEmpty()) {
-			for (p in this::class.modelProperties) {
-				if (!p.isHideClient) {
-					jo.any(p.userName, p.getter.call(this))
-				}
-			}
-		} else {
-			for (p in ps) {
-				jo.any(p.userName, p.getter.call(this))
-			}
-		}
-		return jo
-	}
-
-	fun toJson(vararg ps: KProperty<*>): YsonObject {
-		val jo = YsonObject()
-		if (ps.isEmpty()) {
-			for (p in this::class.modelProperties) {
-				jo.any(p.userName, p.getter.call(this))
-			}
-		} else {
-			for (p in ps) {
-				jo.any(p.userName, p.getter.call(this))
-			}
-		}
-		return jo
-	}
-
-	fun fillJsonClient(jo: YsonObject, vararg ps: KProperty<*>): YsonObject {
-		if (ps.isEmpty()) {
-			for (p in this::class.modelProperties) {
-				if (!p.isHideClient) {
-					val v = p.getter.call(this)
-					jo.any(p.userName, v)
-				}
-			}
-		} else {
-			for (p in ps) {
-				val v = p.getter.call(this)
-				jo.any(p.userName, v)
-			}
-		}
-		return jo
-	}
-
-	fun fillJson(jo: YsonObject, vararg ps: KProperty<*>): YsonObject {
-		if (ps.isEmpty()) {
-			for (p in this::class.modelProperties) {
-				val v = p.getter.call(this)
-				jo.any(p.userName, v)
-			}
-		} else {
-			for (p in ps) {
-				val v = p.getter.call(this)
-				jo.any(p.userName, v)
-			}
-		}
-		return jo
-	}
-
 	override fun toString(): String {
 		return Yson.toYson(model).toString()
 	}
 
-	//仅包含有值的列, modMap中出现
-	@Exclude
-	val modelPropertiesExists: List<KMutableProperty<*>>
-		get() {
-			return this::class.modelProperties.filter { model.hasProp(it) }
-		}
+//	//仅包含有值的列, modMap中出现
+//	@Exclude
+//	val modelPropertiesExists: List<KMutableProperty<*>>
+//		get() {
+//			return this::class.modelProperties.filter { model.hasProp(it) }
+//		}
 
-	@Exclude
-	val whereByPrimaryKey: Where?
-		get() {
-			var w: Where? = null
-			this::class.modelPrimaryKeys.forEach {
-				w = w AND (it EQ it.getValue(this))
-			}
-			return w
-		}
 
 }
+
+val <T : Model> T.whereByPrimaryKey: Where?
+	get() {
+		var w: Where? = null
+		this::class.modelPrimaryKeys.forEach {
+			w = w AND (it EQ it.getValue(this))
+		}
+		return w
+	}
+
+//仅包含有值的列, modMap中出现
+val <T : Model> T.modelPropertiesExists: List<KMutableProperty<*>>
+	get() {
+		return this::class.modelProperties.filter { model.hasProp(it) }
+	}
+
 
 fun <T : Model> T.update(block: (T) -> Unit): Boolean {
 	val ls = this.model.gather {
@@ -168,4 +112,82 @@ fun <T : Model> T.update(block: (T) -> Unit): Boolean {
 		return this.updateByKey(ls)
 	}
 	return false
+}
+
+
+fun <T : Model> T.json(block: (Prop) -> Boolean): YsonObject {
+	val jo = YsonObject()
+	for (p in this::class.modelProperties) {
+		if (block(p)) {
+			jo.any(p.userName, p.getter.call(this))
+		}
+	}
+	return jo
+}
+
+fun <T : Model> T.jsonTo(jo: YsonObject, block: (Prop) -> Boolean): YsonObject {
+	for (p in this::class.modelProperties) {
+		if (block(p)) {
+			jo.any(p.userName, p.getter.call(this))
+		}
+	}
+	return jo
+}
+
+fun <T : Model> T.jsonClient(): YsonObject {
+	val jo = YsonObject()
+	for (p in this::class.modelProperties) {
+		if (!p.isHideClient) {
+			jo.any(p.userName, p.getter.call(this))
+		}
+	}
+	return jo
+}
+
+fun <T : Model> T.jsonClientTo(jo: YsonObject): YsonObject {
+	for (p in this::class.modelProperties) {
+		if (!p.isHideClient) {
+			jo.any(p.userName, p.getter.call(this))
+		}
+	}
+	return jo
+}
+
+fun <T : Model> T.jsonExclude(vararg ps: Prop): YsonObject {
+	if (ps.isEmpty()) {
+		return this.jsonClient()
+	}
+	val keySet = ps.map { it.name }
+	return this.json { it.name !in keySet }
+}
+
+fun <T : Model> T.jsonExcludeTo(jo: YsonObject, vararg ps: Prop): YsonObject {
+	if (ps.isEmpty()) {
+		return this.jsonClientTo(jo)
+	}
+	val keySet = ps.map { it.name }
+	return jsonTo(jo) {
+		it.name !in keySet
+	}
+}
+
+fun <T : Model> T.jsonInclude(vararg ps: Prop): YsonObject {
+	if (ps.isEmpty()) {
+		return this.jsonClient()
+	}
+	val jo = YsonObject()
+	for (p in ps) {
+		jo.any(p.userName, p.getter.call(this))
+	}
+	return jo
+}
+
+fun <T : Model> T.jsonIncludeTo(jo: YsonObject, vararg ps: Prop): YsonObject {
+	if (ps.isEmpty()) {
+		return this.jsonClientTo(jo)
+	}
+	for (p in ps) {
+		jo.any(p.userName, p.getter.call(this))
+	}
+	return jo
 }

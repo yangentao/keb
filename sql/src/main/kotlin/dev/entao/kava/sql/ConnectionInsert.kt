@@ -84,9 +84,9 @@ fun Connection.insertOrUpdate(table: String, kvs: List<Pair<String, Any?>>, uniq
 		val us = updateCols.joinToString(", ") { "$it = VALUES($it) " }
 		buf.append(us)
 	} else if (this.isPostgres) {
-		val uc = updateCols.joinToString(",")
-		val uv = updateCols.joinToString(",") { "excluded.$it" }
-		buf.append(" ON CONFLICT DO UPDATE SET ($uc) = ($uv)")
+		val kcs = uniqColumns.joinToString(",")
+		val uv = updateCols.joinToString(",") { "$it = excluded.$it" }
+		buf.append(" ON CONFLICT ($kcs) DO UPDATE SET $uv")
 	}
 	return this.update(buf.toString(), kvs.map { it.second }) > 0
 }

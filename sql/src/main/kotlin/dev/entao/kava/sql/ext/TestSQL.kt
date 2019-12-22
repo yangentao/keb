@@ -27,17 +27,13 @@ fun main() {
 	TextConverts[YsonArray::class] = YsonArrayText
 	TextConverts[YsonObject::class] = YsonObjectText
 
-	val m = Test.oneKey(10) ?: return
-	m.update {
-		m.msgs = ysonArray(9, 8, 7)
-	}
+	val con = ConnLook.defaultConnection
+	con.dropTable("test")
 
-	val mm = Test.oneKey(10)
-	printX(mm?.id, mm?.msgs)
 
 	val t = Test()
 	t.name = "aaa"
-	t.msgs = ysonArray(999,88,77)
+	t.msgs = ysonArray(999, 88, 77)
 	t.insert()
 
 	Test.dumpTable()

@@ -38,22 +38,35 @@ open class ModelClass<out T : Model> {
 		return con.delete(tabCls, andW(w, *ws))
 	}
 
+	fun deleteByKey(keyValue: Any): Int {
+		return delete(keyWhere(keyValue))
+	}
+
+	fun updateByKey(keyValue: Any, vararg ps: Pair<Prop, Any?>): Int {
+		return con.update(tabCls, ps.toList(), keyWhere(keyValue))
+	}
+
 	fun update(map: Map<Prop, Any?>, w: Where?): Int {
 		return con.update(tabCls, map.map { it.key to it.value }, w)
 	}
 
 	fun update(p: Pair<Prop, Any?>, w: Where?): Int {
-		return update(mapOf(p), w)
+		return con.update(tabCls, listOf(p), w)
 	}
 
 	fun update(p: Pair<Prop, Any?>, p2: Pair<Prop, Any?>, w: Where?): Int {
-		return update(mapOf(p, p2), w)
+		return con.update(tabCls, listOf(p, p2), w)
 	}
 
 	fun update(vararg ps: Pair<Prop, Any?>, block: () -> Where?): Int {
-		return update(ps.toMap(), block())
+		return con.update(tabCls, ps.toList(), block())
 	}
 
+	fun keyWhere(pkValue: Any): Where {
+		val pks = tabCls.modelPrimaryKeys
+		assert(pks.size == 1)
+		return pks.first() EQ pkValue
+	}
 
 	fun dumpTable() {
 		con.dump { from(tabCls) }
@@ -68,9 +81,7 @@ open class ModelClass<out T : Model> {
 	}
 
 	fun oneKey(pkValue: Any): T? {
-		val pks = this.tabCls.modelPrimaryKeys
-		assert(pks.size == 1)
-		return this.one(pks[0] EQ pkValue)
+		return this.one(keyWhere(pkValue))
 	}
 
 	fun one(w: Where, vararg ws: Where): T? {

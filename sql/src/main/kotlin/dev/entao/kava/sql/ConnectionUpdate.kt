@@ -2,11 +2,17 @@ package dev.entao.kava.sql
 
 import dev.entao.kava.base.*
 import java.sql.Connection
+import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 
 /**
  * Created by entaoyang@163.com on 2017/4/5.
  */
+
+
+fun Connection.dropTable(tableName: String): Int {
+	return this.update("DROP TABLE IF EXISTS $tableName")
+}
 
 fun Connection.createTable(tableName: String, columns: List<String>): Int {
 	val sql = buildString {

@@ -12,6 +12,8 @@ class Test : Model() {
 
 	var user: String by model
 
+	var age: Int by model
+
 	@Decimal(6, 3)
 	var fee: Double by model
 

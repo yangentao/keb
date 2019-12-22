@@ -3,9 +3,17 @@ package dev.entao.kava.sql
 import dev.entao.kava.base.*
 import dev.entao.kava.json.YsonArray
 import dev.entao.kava.json.YsonObject
+import dev.entao.kava.sql.ext.printX
 import java.sql.Connection
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
+
+
+fun main() {
+	val a = true
+	val b = false
+	printX(a.compareTo(b))
+}
 
 const val TypeMYSQL: Int = 0
 const val TypePostgresql: Int = 1
@@ -15,7 +23,19 @@ class DefTable(private val cls: KClass<*>) {
 	val name: String = cls.sqlName
 	val dbType: Int = if (conn.isMySQL) TypeMYSQL else if (conn.isPostgres) TypePostgresql else throw java.lang.IllegalArgumentException("只支持MySQL或PostgreSQL")
 	private val autoCreate: Boolean = cls.findAnnotation<AutoCreateTable>()?.value ?: true
-	private val columns: List<DefColumn> = cls.modelProperties.map { DefColumn(it, dbType) }
+	private val columns: List<DefColumn> = cls.modelProperties.map { DefColumn(it, dbType) }.sortedWith(Comparator<DefColumn> { o1, o2 ->
+		var n = -o1.pk.compareTo(o2.pk)
+		if (n == 0) {
+			n = -(o1.unique ?: "").compareTo(o2.unique ?: "")
+			if (n == 0) {
+				n = -o1.index.compareTo(o2.index)
+			}
+			if (n == 0) {
+				n = o1.name.compareTo(o2.name)
+			}
+		}
+		n
+	})
 	val labelValue: String? = cls.findAnnotation<Label>()?.value
 
 	init {
