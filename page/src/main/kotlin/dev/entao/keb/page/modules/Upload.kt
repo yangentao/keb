@@ -1,13 +1,10 @@
 package dev.entao.keb.page.modules
 
-import dev.entao.kava.base.DefaultValue
-import dev.entao.kava.base.Name
-import dev.entao.kava.sql.AutoInc
-import dev.entao.kava.sql.Model
-import dev.entao.kava.sql.ModelClass
-import dev.entao.kava.sql.PrimaryKey
+import dev.entao.kava.base.*
+import dev.entao.kava.sql.*
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.account.account
+import dev.entao.keb.core.account.tokenUserId
 import java.io.File
 import java.util.*
 import javax.servlet.http.Part
@@ -30,16 +27,20 @@ class Upload : Model() {
 	var rawname: String by model
 	var size: Int by model
 	var contentType: String by model
+	@Index
 	var userId: String by model
+	@Index
 	var accountId: String by model
-	var uploadTime: Long by model
+	@Index
+	var uploadTime: TimestampSQL by model
+
 	var platform: String by model
 
 	fun localFile(context: HttpContext): File {
-		if (subdir.isEmpty()) {
-			return File(context.uploadDir, localFileName)
+		return if (subdir.isEmpty()) {
+			File(context.uploadDir, localFileName)
 		} else {
-			return File(File(context.uploadDir, subdir), localFileName)
+			File(File(context.uploadDir, subdir), localFileName)
 		}
 	}
 
@@ -75,7 +76,8 @@ class Upload : Model() {
 			m.rawname = part.submittedFileName
 			m.size = part.size.toInt()
 			m.accountId = context.account
-			m.uploadTime = System.currentTimeMillis()
+			m.userId = context.tokenUserId?.toString() ?: ""
+			m.uploadTime = TimeMill.asTimestamp
 			m.platform = context.httpParams.str(PLATFORM) ?: context.httpParams.str("os") ?: ""
 			m.subdir = checkSubDirParam(context.httpParams.str(SUBDIR)?.trim()
 					?: "")

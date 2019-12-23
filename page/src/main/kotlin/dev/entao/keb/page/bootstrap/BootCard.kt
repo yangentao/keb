@@ -1,5 +1,6 @@
 package dev.entao.keb.page.bootstrap
 
+import dev.entao.keb.core.ActionURL
 import dev.entao.keb.page.tag.*
 
 //<div class="card" style="width: 18rem;">
@@ -10,6 +11,19 @@ import dev.entao.keb.page.tag.*
 //		<a href="#" class="btn btn-primary">Go somewhere</a>
 //	</div>
 //</div>
+
+fun Tag.cardHeaderActions(title: String, vararg acList: ActionURL) {
+	cardHeader {
+		div(class_ to _d_flex) {
+			span(class_ to _h6.._mr_auto) { +title }
+			span {
+				for (ac in acList) {
+					linkButtonX(ac, class_ to _btn_outline_info.._btn_sm.._mr_1)
+				}
+			}
+		}
+	}
+}
 
 fun Tag.cardBodyTitle(titleText: String, block: TagCallback) {
 	this.card {

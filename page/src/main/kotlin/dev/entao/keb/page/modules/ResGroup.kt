@@ -23,10 +23,6 @@ import javax.servlet.http.Part
 class ResGroup(context: HttpContext) : HttpGroup(context) {
 
 
-	fun indexAction() {
-		context.abort(404)
-	}
-
 	//上传一个文件
 	@HttpMethod("POST")
 	fun uploadAction() {
@@ -66,16 +62,14 @@ class ResGroup(context: HttpContext) : HttpGroup(context) {
 	}
 
 	private fun sendFile(id: Int, isMedia: Boolean) {
-		val item = Upload.one(Upload::id EQ id)
+		val item = Upload.oneKey(id)
 		if (item == null) {
 			context.abort(404, "无效的标识")
-//			resultSender.failed(-1, "无效的标识")
 			return
 		}
 		val file = item.localFile(context)
 		if (!file.exists()) {
 			context.abort(404, "无效的标识")
-//			resultSender.failed(-1, "文件已不存在")
 			return
 		}
 		val fs = FileSender(context)
@@ -87,7 +81,7 @@ class ResGroup(context: HttpContext) : HttpGroup(context) {
 	}
 
 	fun imgAction(id: Int) {
-		val item = Upload.one(Upload::id EQ id)
+		val item = Upload.oneKey(id)
 		if (item == null) {
 			context.abort(404, "无效的标识")
 			return
@@ -110,7 +104,7 @@ class ResGroup(context: HttpContext) : HttpGroup(context) {
 	companion object {
 
 		fun deleteRes(context: HttpContext, id: Int) {
-			val item = Upload.one(Upload::id EQ id) ?: return
+			val item = Upload.oneKey(id) ?: return
 			val file = item.localFile(context)
 			file.delete()
 			item.deleteByKey()

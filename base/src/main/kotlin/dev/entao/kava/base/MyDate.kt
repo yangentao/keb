@@ -9,15 +9,17 @@ import java.util.*
  * Created by entaoyang@163.com on 2016/12/20.
  */
 
+typealias DateSQL = java.sql.Date
+
+typealias TimeSQL = java.sql.Time
+typealias TimestampSQL = java.sql.Timestamp
+
+val TimeMill: Long get() = System.currentTimeMillis()
 
 val Int.SEC: Long get() = this * 1000L
 val Int.MIN: Long get() = this * 60_000L
 val Int.HOR: Long get() = this * 3600_000L
 val Int.DAY: Long get() = this * 24 * 3600_000L
-
-//val Int.seconds: Long get() = this * 1000L
-//val Int.minutes: Long get() = this * 1000L * 60L
-//val Int.hours: Long get() = this * 1000L * 3600L
 
 val Long.myDate: MyDate get() = MyDate(this)
 val Long.asTimestamp: java.sql.Timestamp get() = java.sql.Timestamp(this)
