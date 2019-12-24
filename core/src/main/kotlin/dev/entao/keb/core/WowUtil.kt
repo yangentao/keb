@@ -54,20 +54,20 @@ val KClass<*>.pageName: String
 private fun makePageName(cls: KClass<*>): String {
 	val named = cls.findAnnotation<Name>()?.value
 	if (named != null) {
-		return named
+		return named.toLowerCase()
 	}
 	val clsName = cls.simpleName!!
 	for (ps in HttpFilter.pageSuffixs) {
 		if (clsName != ps && clsName.endsWith(ps)) {
-			val gname = clsName.substr(0, clsName.length - ps.length)
-			if (gname == HttpFilter.INDEX) {
+			val gname = clsName.substr(0, clsName.length - ps.length).toLowerCase()
+			if (gname == HttpFilter.INDEX.toLowerCase()) {
 				return ""
 			} else {
 				return gname
 			}
 		}
 	}
-	return clsName
+	return clsName.toLowerCase()
 }
 
 private val pageClassMap = HashMap<KClass<*>, String>()

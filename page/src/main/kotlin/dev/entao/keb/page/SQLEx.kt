@@ -58,8 +58,8 @@ private fun HttpScope.sqlParam(p: Prop1): Any? {
 	}
 	if (p.isTypeString) {
 		val s = context.httpParams.str(p) ?: return null
-		if (s.isEmpty()) {
-			return null
+		if (s.isNotEmpty()) {
+			return s
 		}
 	}
 	return null
