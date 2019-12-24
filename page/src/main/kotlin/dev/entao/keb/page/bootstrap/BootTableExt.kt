@@ -12,7 +12,7 @@ import dev.entao.keb.page.modules.Upload
 import dev.entao.keb.page.tag.*
 
 
-abstract class ColumnBuilder<T> {
+abstract class ColumnBuilder<T : Any> {
 	var sortName: String = ""
 	var textLimit = 100
 
@@ -26,7 +26,7 @@ abstract class ColumnBuilder<T> {
 	abstract fun onTd(tag: Tag, item: T)
 }
 
-open class CheckColumn<T>(val prop: Prop1) : ColumnBuilder<T>() {
+open class CheckColumn<T : Any>(val prop: Prop1) : ColumnBuilder<T>() {
 	override fun onTh(tag: Tag) {
 		tag["width"] = "4em"
 		tag.checkbox {
@@ -48,7 +48,7 @@ open class CheckColumn<T>(val prop: Prop1) : ColumnBuilder<T>() {
 	}
 }
 
-open class ActionColumn<T>(val prop: Prop1, vararg val actions: HttpAction) : ColumnBuilder<T>() {
+open class ActionColumn<T : Any>(val prop: Prop1, vararg val actions: HttpAction) : ColumnBuilder<T>() {
 	var label: String = "操作"
 
 	fun label(s: String): ActionColumn<T> {
@@ -78,7 +78,7 @@ open class ActionColumn<T>(val prop: Prop1, vararg val actions: HttpAction) : Co
 }
 
 
-open class ResColumn<T>(val prop: Prop1, val downAction: HttpAction, val label: String = prop.userLabel) : ColumnBuilder<T>() {
+open class ResColumn<T : Any>(val prop: Prop1, val downAction: HttpAction, val label: String = prop.userLabel) : ColumnBuilder<T>() {
 
 
 	override fun onTh(tag: Tag) {
@@ -103,7 +103,14 @@ private val Prop1.sortable: Boolean
 		return this.hasAnnotation<Index>() || this.hasAnnotation<Unique>() || this.hasAnnotation<PrimaryKey>()
 	}
 
-open class PropColumn<T>(val prop: Prop1, val label: String = prop.userLabel) : ColumnBuilder<T>() {
+
+
+
+open class PropColumn<T : Any>(val prop: Prop1, val label: String = prop.userLabel) : ColumnBuilder<T>() {
+
+	var onDisplayText: (T) -> String = {
+		prop.displayString(it as Any)
+	}
 
 	init {
 		if (prop.sortable) {
@@ -121,15 +128,15 @@ open class PropColumn<T>(val prop: Prop1, val label: String = prop.userLabel) : 
 	}
 
 	override fun onTd(tag: Tag, item: T) {
-		val disp = prop.displayString(item as Any)
+		val disp = onDisplayText(item)
 		tag.textEscaped(disp.head(textLimit))
 	}
 }
 
-open class LinkColumn<T>(prop: Prop1, val linkTo: HttpAction, val argProp: Prop1 = prop, label: String = prop.userLabel) : PropColumn<T>(prop, label) {
+open class LinkColumn<T : Any>(prop: Prop1, val linkTo: HttpAction, val argProp: Prop1 = prop, label: String = prop.userLabel) : PropColumn<T>(prop, label) {
 
 	override fun onTd(tag: Tag, item: T) {
-		val displayValue = prop.displayString(item as Any)
+		val displayValue = onDisplayText(item)
 		val argV: String = if (prop === argProp) {
 			displayValue
 		} else {
@@ -139,7 +146,7 @@ open class LinkColumn<T>(prop: Prop1, val linkTo: HttpAction, val argProp: Prop1
 	}
 }
 
-open class KeyColumn<T>(val key: String, val label: String = key) : ColumnBuilder<T>() {
+open class KeyColumn<T : Any>(val key: String, val label: String = key) : ColumnBuilder<T>() {
 
 	fun sortable(): KeyColumn<T> {
 		this.sortNamed(key)
@@ -157,7 +164,7 @@ open class KeyColumn<T>(val key: String, val label: String = key) : ColumnBuilde
 	}
 }
 
-open class IndexColumn<T>(val index: Int, val label: String) : ColumnBuilder<T>() {
+open class IndexColumn<T : Any>(val index: Int, val label: String) : ColumnBuilder<T>() {
 	override fun onTh(tag: Tag) {
 		tag.textEscaped(this.label)
 	}
