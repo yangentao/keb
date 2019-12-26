@@ -4,7 +4,11 @@ package dev.entao.kava.sql
 
 import dev.entao.kava.log.logd
 import dev.entao.kava.base.closeSafe
+import dev.entao.kava.json.YsonArray
+import dev.entao.kava.json.YsonObject
+import java.lang.IllegalArgumentException
 import java.sql.ResultSet
+import java.sql.ResultSetMetaData
 import java.sql.Types
 
 inline fun <R> ResultSet.closeAfter(block: (ResultSet) -> R): R {
@@ -163,16 +167,9 @@ val ResultSet.anyValue: Any?
 	}
 
 fun ResultSet.firstRow(): ModelMap? {
-	val meta = this.metaData
 	this.closeAfter {
 		if (this.next()) {
-			val map = ModelMap()
-			for (i in 1..meta.columnCount) {
-				val label = meta.getColumnLabel(i)
-				val value = this.getObject(i)
-				map[label] = value
-			}
-			return map
+			return resultModelMap(it, it.metaData)
 		}
 	}
 	return null
@@ -184,14 +181,91 @@ fun ResultSet.allRows(): ArrayList<ModelMap> {
 	val meta = this.metaData
 	this.closeAfter {
 		while (this.next()) {
-			val map = ModelMap()
-			for (i in 1..meta.columnCount) {
-				val label = meta.getColumnLabel(i)
-				val value = this.getObject(i)
-				map[label] = value
-			}
-			list.add(map)
+			list += resultModelMap(it, meta)
 		}
 	}
 	return list
+}
+
+private val jsonTypes: Set<String> = setOf("json", "JSON", "jsonb", "JSONB")
+fun ResultSet.ysonArray(): YsonArray {
+	val arr = YsonArray(256)
+	val meta = this.metaData
+	this.closeAfter {
+		while (this.next()) {
+			arr += resultObject(it, meta)
+		}
+	}
+	return arr
+}
+
+fun ResultSet.firstObject(): YsonObject? {
+	this.closeAfter {
+		if (this.next()) {
+			return resultObject(it, it.metaData)
+		}
+	}
+	return null
+}
+
+fun ResultSet.eachRow(block: (ResultSet) -> Unit) {
+	this.closeAfter {
+		while (this.next()) {
+			block(it)
+		}
+	}
+}
+
+fun ResultSet.eachObject(block: (YsonObject) -> Unit) {
+	val meta = this.metaData
+	this.closeAfter {
+		while (this.next()) {
+			val yo = resultObject(it, meta)
+			block(yo)
+		}
+	}
+}
+
+fun ResultSet.eachModelMap(block: (ModelMap) -> Unit) {
+	val meta = this.metaData
+	this.closeAfter {
+		while (this.next()) {
+			val m = resultModelMap(it, meta)
+			block(m)
+		}
+	}
+}
+
+private fun resultModelMap(rs: ResultSet, meta: ResultSetMetaData): ModelMap {
+	val map = ModelMap()
+	for (i in 1..meta.columnCount) {
+		val label = meta.getColumnLabel(i)
+		val value = rs.getObject(i)
+		map[label] = value
+	}
+	return map
+}
+
+private fun resultObject(rs: ResultSet, meta: ResultSetMetaData): YsonObject {
+	val yo = YsonObject(meta.columnCount + 2)
+	for (i in 1..meta.columnCount) {
+		val label = meta.getColumnLabel(i)
+		val typeName = meta.getColumnTypeName(i)
+		val value: Any? = if (typeName in jsonTypes) {
+			val js = rs.getString(i)?.trim()
+			if (js == null || js.isEmpty()) {
+				null
+			} else if (js.startsWith("{")) {
+				YsonObject(js)
+			} else if (js.startsWith("[")) {
+				YsonArray(js)
+			} else {
+				throw  IllegalArgumentException("json格式非法: $js ")
+			}
+		} else {
+			rs.getObject(i)
+		}
+		yo.any(label, value)
+	}
+	return yo
 }

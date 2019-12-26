@@ -6,13 +6,51 @@ import dev.entao.kava.base.*
 import dev.entao.kava.sql.*
 import dev.entao.keb.core.HttpContext
 import dev.entao.keb.core.HttpScope
+import dev.entao.keb.core.account.tokenUserId
 import dev.entao.keb.core.param
 import dev.entao.keb.core.paramNameSet
 import javax.servlet.http.HttpServletRequest
 
+
+
+
+
+fun <T : Model> ModelClass<T>.listPaged(context: HttpContext, w: Where?, sp: SortParam): List<T> {
+	return this.list {
+		where(w)
+		orderBy(sp)
+		limitPage(context)
+	}
+}
+
+fun TableQuery.limitPage(context: HttpContext) {
+	val n = context.httpParams.int(P.pageArg) ?: 0
+	this.limit(P.pageSize, n * P.pageSize)
+}
+
+fun TableQuery.orderBy(sp: SortParam) {
+	if (sp.sortBy.isNotEmpty()) {
+		if (sp.desc) {
+			desc(sp.sortBy)
+		} else {
+			asc(sp.sortBy)
+		}
+	}
+}
+
 fun SQLQuery.limitPage(context: HttpContext) {
 	val n = context.httpParams.int(P.pageArg) ?: 0
 	this.limit(P.pageSize, n * P.pageSize)
+}
+
+fun SQLQuery.orderBy(sp: SortParam) {
+	if (sp.sortBy.isNotEmpty()) {
+		if (sp.desc) {
+			desc(sp.sortBy)
+		} else {
+			asc(sp.sortBy)
+		}
+	}
 }
 
 class SortParam(context: HttpContext, sortByName: String, desc: Boolean = true) {
@@ -35,16 +73,6 @@ class SortParam(context: HttpContext, sortByName: String, desc: Boolean = true) 
 	constructor(context: HttpContext, p: Prop1, desc: Boolean) : this(context, p.userName, desc)
 }
 
-
-fun SQLQuery.orderBy(sp: SortParam) {
-	if (sp.sortBy.isNotEmpty()) {
-		if (sp.desc) {
-			desc(sp.sortBy)
-		} else {
-			asc(sp.sortBy)
-		}
-	}
-}
 
 private fun HttpScope.sqlParam(p: Prop1): Any? {
 	if (p.isTypeInt) {

@@ -4,6 +4,16 @@ import dev.entao.kava.json.YsonObject
 import dev.entao.keb.core.*
 import dev.entao.keb.core.util.JWT
 
+
+val HttpContext.userID: Long?
+	get() {
+		val userId = this.tokenUserId ?: return null
+		if (userId == 0L) {
+			return null
+		}
+		return userId
+	}
+
 var HttpContext.tokenUserId: Long?
 	get() {
 		return this.propMap["tokenUserId"] as? Long

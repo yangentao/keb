@@ -86,38 +86,29 @@ open class ModelClass<out T : Model> {
 	}
 
 	fun one(w: Where, vararg ws: Where): T? {
-		return list {
-			where(andW(w, *ws))
+		return filter(w, *ws) {
 			limit(1)
 		}.firstOrNull()
 	}
 
-	fun asc(prop: Prop, w: Where, vararg ws: Where): List<T> {
+
+	fun filter(w: Where, vararg ws: Where, block: TableQuery.() -> Unit): List<T> {
 		return list {
 			where(andW(w, *ws))
-			asc(prop)
-		}
-	}
-
-	fun desc(prop: Prop, w: Where, vararg ws: Where): List<T> {
-		return list {
-			where(andW(w, *ws))
-			desc(prop)
-		}
-	}
-
-	fun filter(w: Where, vararg ws: Where): List<T> {
-		return list {
-			where(andW(w, *ws))
-		}
-	}
-
-	fun list(block: SQLQuery.() -> Unit): List<T> {
-		val ls = con.query {
-			from(tabCls)
 			this.block()
-		}.allRows()
+		}
+	}
+
+	fun list(block: TableQuery.() -> Unit): List<T> {
+		val ls = tableQuery(block).allRows()
 		return ls.map { mapRow(it) }
+	}
+
+	//单表
+	fun tableQuery(block: TableQuery.() -> Unit): ResultSet {
+		val q = TableQuery(tabCls.sqlName)
+		q.block()
+		return con.query(q.toSQL(), q.args)
 	}
 
 	fun query(block: SQLQuery.() -> Unit): ResultSet {
@@ -164,3 +155,5 @@ private fun findModelProperties(cls: KClass<*>): List<KMutableProperty<*>> {
 		} else !it.isExcluded
 	}.map { it as KMutableProperty<*> }
 }
+
+

@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'dev.entao.keb'
-version '1.4.17'
+version '1.4.18'
 
 sourceCompatibility = 1.8
 

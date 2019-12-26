@@ -104,8 +104,6 @@ private val Prop1.sortable: Boolean
 	}
 
 
-
-
 open class PropColumn<T : Any>(val prop: Prop1, val label: String = prop.userLabel) : ColumnBuilder<T>() {
 
 	var onDisplayText: (T) -> String = {
@@ -175,6 +173,15 @@ open class IndexColumn<T : Any>(val index: Int, val label: String) : ColumnBuild
 		} else if (item is Array<*>) {
 			tag.textEscaped(item[index]?.toString()?.head(textLimit))
 		}
+	}
+}
+
+fun <T : Any> Tag.tableHover(tid: String, items: List<T>, cbList: List<ColumnBuilder<T>>, sortParam: SortParam, callback: TagCallback = {}): Tag {
+	return tableT(items, cbList, sortParam) {
+		this.id = tid
+		this += _table_hover.._table_bordered
+		first(tagname_ to "thead") += _thead_light
+		this.callback()
 	}
 }
 

@@ -1,6 +1,7 @@
 package dev.entao.kava.sql.ext
 
 import dev.entao.kava.base.TextConverts
+import dev.entao.kava.base.TimeMill
 import dev.entao.kava.json.*
 import dev.entao.kava.log.*
 import dev.entao.kava.sql.*
@@ -27,16 +28,31 @@ fun main() {
 	TextConverts[YsonArray::class] = YsonArrayText
 	TextConverts[YsonObject::class] = YsonObjectText
 
-	val con = ConnLook.defaultConnection
-	con.dropTable("test")
+	val m = Test()
+	m.name = "Name $TimeMill"
+	m.fee = 990.9
+	m.age = 88
+	m.msgs = ysonArray("a", "b", "c")
+	m.insert()
 
 
-	val t = Test()
-	t.name = "aaa"
-	t.msgs = ysonArray(999, 88, 77)
-	t.insert()
+	val jarr = Test.tableQuery { desc(Test::id) }.ysonArray()
+	logd(jarr.toString())
 
-	Test.dumpTable()
+	val yo = Test.tableQuery { }.firstObject()
+	logd(yo)
+
+//	rs.closeAfter {
+//		if (rs.next()) {
+//			for (i in 1..meta.columnCount) {
+//				val label = meta.getColumnLabel(i)
+//				val value: Any? = rs.getObject(i)
+//				val tname = meta.getColumnTypeName(i)
+//				val t = meta.getColumnType(i)
+//				printX(t, tname, label, value)
+//			}
+//		}
+//	}
 
 
 }

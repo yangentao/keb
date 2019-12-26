@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'dev.entao.kava'
-version '2.1.5'
+version '2.1.6'
 
 sourceCompatibility = 1.8
 
@@ -20,7 +20,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect"
 
     implementation 'dev.entao.kava:log:1.4.5'
-    implementation 'dev.entao.kava:base:1.4.5'
+    implementation 'dev.entao.kava:base:1.4.6'
     implementation 'dev.entao.kava:json:1.4.5'
 
     implementation 'org.postgresql:postgresql:42.2.8'

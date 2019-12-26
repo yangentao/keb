@@ -72,7 +72,12 @@ class SQLQuery {
 	}
 
 	fun from(vararg clses: TabClass): SQLQuery {
-		clses.mapTo(fromArr) { it.sqlName }
+		val ts = clses.map { it.sqlName }
+		for (a in ts) {
+			if (a !in fromArr) {
+				fromArr.add(a)
+			}
+		}
 		return this
 	}
 
@@ -90,12 +95,12 @@ class SQLQuery {
 	}
 
 	fun join(tables: List<String>, joinType: String = "LEFT"): SQLQuery {
-		joinClause = "$joinType JOIN ( ${tables.joinToString(", ")} ) "
+		joinClause = "$joinType JOIN  ${tables.joinToString(", ")}  "
 		return this
 	}
 
 	fun on(s: String): SQLQuery {
-		onClause = " ON ($s) "
+		onClause = " ON $s  "
 		return this
 	}
 
