@@ -11,6 +11,7 @@ import dev.entao.keb.core.render.ResultRender
 open class HttpGroup(final override val context: HttpContext) : HttpScope {
 
 	val resultSender: ResultRender get() = context.resultSender
+	val timeNow: Long = System.currentTimeMillis()
 
 //	open fun indexAction() {
 //		context.abort(404)
