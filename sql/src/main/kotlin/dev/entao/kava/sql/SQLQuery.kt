@@ -7,82 +7,182 @@ import dev.entao.kava.base.Prop1
 import dev.entao.kava.base.plusAssign
 import java.sql.Connection
 import java.sql.ResultSet
-import kotlin.reflect.KClass
-import kotlin.reflect.KProperty
 
 /**
  * Created by yangentao on 2016/12/14.
  */
 
-class SQLQuery {
 
-	//from允许多次调用 from("a").from("b").where....
-	private var distinct = false
-	private val selectArr = arrayListOf<String>()
-	private val fromArr = arrayListOf<String>()
-	private var whereClause: String = ""
-	private var limitClause: String = ""
-	private var joinClause = ""
-	private var onClause = ""
-	private var orderClause = ""
-	private var groupByClause: String = ""
-	private var havingClause: String = ""
+//Single Table Query
+open class BaseQuery {
+	var _distinctClause: String = ""
+	val _selectClause = arrayListOf<String>()
+	var _whereClause: String = ""
+	var _limitClause: String = ""
+	var _orderClause = ""
+	var _groupByClause: String = ""
+	var _havingClause: String = ""
 
 	val args: ArrayList<Any> = ArrayList()
+}
 
-	fun groupBy(s: String): SQLQuery {
-		groupByClause = "GROUP BY $s"
-		return this
+fun <T : BaseQuery> T.groupBy(s: String): T {
+	_groupByClause = "GROUP BY $s"
+	return this
+}
+
+fun <T : BaseQuery> T.groupBy(p: Prop): T {
+	return this.groupBy(p.sqlName)
+}
+
+fun <T : BaseQuery> T.having(s: String): T {
+	_havingClause = "HAVING $s"
+	return this
+}
+
+fun <T : BaseQuery> T.having(w: Where): T {
+	this.having(w.value)
+	this.args.addAll(w.args)
+	return this
+}
+
+fun <T : BaseQuery> T.distinct(): T {
+	this._distinctClause = "DISTINCT"
+	return this
+}
+
+fun <T : BaseQuery> T.distinctOn(col: String): T {
+	this._distinctClause = "DISTINCT ON($col)"
+	return this
+}
+
+fun <T : BaseQuery> T.distinctOn(p: Prop): T {
+	this._distinctClause = "DISTINCT ON(${p.sqlFullName})"
+	return this
+}
+
+fun <T : BaseQuery> T.selectAll(): T {
+	_selectClause.add("*")
+	return this
+}
+
+fun <T : BaseQuery> T.select(vararg cols: Prop): T {
+	cols.mapTo(_selectClause) { it.sqlFullName }
+	return this
+}
+
+fun <T : BaseQuery> T.select(vararg cols: String): T {
+	_selectClause.addAll(cols)
+	return this
+}
+
+
+fun <T : BaseQuery> T.where(block: () -> Where): T {
+	val w = block.invoke()
+	return where(w)
+}
+
+fun <T : BaseQuery> T.where(w: Where?): T {
+	if (w != null && w.value.isNotEmpty()) {
+		_whereClause = "WHERE ${w.value}"
+		args.addAll(w.args)
 	}
+	return this
+}
 
-	fun groupBy(p: Prop): SQLQuery {
-		return this.groupBy(p.sqlName)
+fun <T : BaseQuery> T.where(w: String, vararg params: Any): T {
+	_whereClause = "WHERE $w"
+	args.addAll(params)
+	return this
+}
+
+fun <T : BaseQuery> T.asc(col: String): T {
+	if (_orderClause.isEmpty()) {
+		_orderClause = "ORDER BY $col ASC"
+	} else {
+		_orderClause += ", $col ASC"
 	}
+	return this
+}
 
-	fun having(s: String): SQLQuery {
-		havingClause = "HAVING $s"
-		return this
+fun <T : BaseQuery> T.desc(col: String): T {
+	if (_orderClause.isEmpty()) {
+		_orderClause = "ORDER BY $col DESC"
+	} else {
+		_orderClause += ", $col DESC"
 	}
+	return this
+}
 
-	fun having(w: Where): SQLQuery {
-		this.having(w.value)
-		this.args.addAll(w.args)
-		return this
+fun <T : BaseQuery> T.asc(p: Prop): T {
+	return asc(p.sqlFullName)
+}
+
+fun <T : BaseQuery> T.desc(p: Prop): T {
+	return desc(p.sqlFullName)
+}
+
+fun <T : BaseQuery> T.limit(size: Int): T {
+	return this.limit(size, 0)
+}
+
+fun <T : BaseQuery> T.limit(size: Int, offset: Int): T {
+	if (size > 0 && offset >= 0) {
+		_limitClause = "LIMIT $size OFFSET $offset "
 	}
+	return this
+}
 
-	val DISTINCT: SQLQuery
-		get() {
-			this.distinct = true
-			return this
+class TableQuery(val tableName: String) : BaseQuery() {
+	//SELECT owner, COUNT(*) FROM pet GROUP BY owner
+	fun toSQL(): String {
+		val sb = StringBuilder(256)
+		sb += "SELECT "
+		if (_distinctClause.isNotEmpty()) {
+			sb += _distinctClause
+			sb += " "
 		}
 
-	fun selectAll(): SQLQuery {
-		selectArr.add("*")
-		return this
+		sb += if (_selectClause.isEmpty()) {
+			"*"
+		} else {
+			_selectClause.joinToString(", ")
+		}
+		sb.append(" FROM ").append(tableName)
+		sb += " "
+		if (_groupByClause.isEmpty()) {
+			_havingClause = ""
+		}
+		val ls = listOf(_whereClause, _groupByClause, _havingClause, _orderClause, _limitClause)
+		sb += ls.map { it.trim() }.filter { it.isNotEmpty() }.joinToString(" ")
+		return sb.toString()
 	}
+}
 
-	fun select(vararg cols: Prop): SQLQuery {
-		cols.mapTo(selectArr) { it.sqlFullName }
-		return this
-	}
 
-	fun select(vararg cols: String): SQLQuery {
-		selectArr.addAll(cols)
-		return this
-	}
+class SQLQuery : BaseQuery() {
+
+	//from允许多次调用 from("a").from("b").where....
+	val _fromClause = arrayListOf<String>()
+	var _joinClause = ""
+	var _onClause = ""
 
 	fun from(vararg clses: TabClass): SQLQuery {
 		val ts = clses.map { it.sqlName }
 		for (a in ts) {
-			if (a !in fromArr) {
-				fromArr.add(a)
+			if (a !in _fromClause) {
+				_fromClause.add(a)
 			}
 		}
 		return this
 	}
 
 	fun from(vararg tables: String): SQLQuery {
-		fromArr.addAll(tables)
+		for (a in tables) {
+			if (a !in _fromClause) {
+				_fromClause.add(a)
+			}
+		}
 		return this
 	}
 
@@ -95,12 +195,12 @@ class SQLQuery {
 	}
 
 	fun join(tables: List<String>, joinType: String = "LEFT"): SQLQuery {
-		joinClause = "$joinType JOIN  ${tables.joinToString(", ")}  "
+		_joinClause = "$joinType JOIN  ${tables.joinToString(", ")}  "
 		return this
 	}
 
 	fun on(s: String): SQLQuery {
-		onClause = " ON $s  "
+		_onClause = " ON $s  "
 		return this
 	}
 
@@ -110,84 +210,30 @@ class SQLQuery {
 		return on(s)
 	}
 
-	fun where(block: () -> Where): SQLQuery {
-		val w = block.invoke()
-		return where(w)
-	}
-
-	fun where(w: Where?): SQLQuery {
-		if (w != null && w.value.isNotEmpty()) {
-			whereClause = "WHERE ${w.value}"
-			args.addAll(w.args)
-		}
-		return this
-	}
-
-	fun where(w: String, vararg params: Any): SQLQuery {
-		whereClause = "WHERE $w"
-		args.addAll(params)
-		return this
-	}
-
-	fun asc(col: String): SQLQuery {
-		if (orderClause.isEmpty()) {
-			orderClause = "ORDER BY $col ASC"
-		} else {
-			orderClause += ", $col ASC"
-		}
-		return this
-	}
-
-	fun desc(col: String): SQLQuery {
-		if (orderClause.isEmpty()) {
-			orderClause = "ORDER BY $col DESC"
-		} else {
-			orderClause += ", $col DESC"
-		}
-		return this
-	}
-
-	fun asc(p: Prop): SQLQuery {
-		return asc(p.sqlFullName)
-	}
-
-	fun desc(p: Prop): SQLQuery {
-		return desc(p.sqlFullName)
-	}
-
-	fun limit(size: Int): SQLQuery {
-		return this.limit(size, 0)
-	}
-
-	fun limit(size: Int, offset: Int): SQLQuery {
-		if (size > 0 && offset >= 0) {
-			limitClause = "LIMIT $size OFFSET $offset "
-		}
-		return this
-	}
 
 	//SELECT owner, COUNT(*) FROM pet GROUP BY owner
 	fun toSQL(): String {
 		val sb = StringBuilder(256)
 		sb += "SELECT "
-		if (distinct) {
-			sb += "DISTINCT "
+		if (_distinctClause.isNotEmpty()) {
+			sb += _distinctClause
+			sb += " "
 		}
 
-		sb += if (selectArr.isEmpty()) {
+		sb += if (_selectClause.isEmpty()) {
 			"*"
 		} else {
-			selectArr.joinToString(", ")
+			_selectClause.joinToString(", ")
 		}
-		sb.append(" FROM ").append(fromArr.joinToString(","))
+		sb.append(" FROM ").append(_fromClause.joinToString(","))
 		sb += " "
-		if (joinClause.isEmpty()) {
-			onClause = ""
+		if (_joinClause.isEmpty()) {
+			_onClause = ""
 		}
-		if (groupByClause.isEmpty()) {
-			havingClause = ""
+		if (_groupByClause.isEmpty()) {
+			_havingClause = ""
 		}
-		val ls = listOf(joinClause, onClause, whereClause, groupByClause, havingClause, orderClause, limitClause)
+		val ls = listOf(_joinClause, _onClause, _whereClause, _groupByClause, _havingClause, _orderClause, _limitClause)
 		sb += ls.map { it.trim() }.filter { it.isNotEmpty() }.joinToString(" ")
 		return sb.toString()
 	}

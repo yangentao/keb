@@ -46,7 +46,7 @@ val KProperty<*>.formOptionsMap: Map<String, String>
 private fun keyValueMapByTable(tableName: String, keyCol: String, labelCol: String, w: Where? = null): Map<String, String> {
 	val map = LinkedHashMap<String, String>()
 	if (keyCol == labelCol) {
-		val q = SQLQuery().from(tableName).select(keyCol).asc(keyCol).DISTINCT.where(w)
+		val q = SQLQuery().from(tableName).select(keyCol).distinct().asc(keyCol).where(w)
 		val ls = ConnLook.defaultConnection.query(q).allRows()
 		ls.forEach {
 			val k = it[keyCol]
@@ -55,7 +55,7 @@ private fun keyValueMapByTable(tableName: String, keyCol: String, labelCol: Stri
 			}
 		}
 	} else {
-		val q = SQLQuery().from(tableName).select(keyCol, labelCol).asc(labelCol).DISTINCT.where(w)
+		val q = SQLQuery().from(tableName).select(keyCol, labelCol).asc(labelCol).distinct().where(w)
 		val ls = ConnLook.defaultConnection.query(q).allRows()
 		ls.forEach {
 			val k = it[keyCol]
