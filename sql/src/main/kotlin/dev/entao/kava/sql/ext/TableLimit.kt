@@ -43,10 +43,10 @@ class TableLimit(private val cls: KClass<out Model>, limitValue: Int = 0) {
 			}
 
 			if (pk.isTypeInt) {
-				val n = r.intValue ?: return
+				val n = r.firstRow { it.getInt(1) } ?: return
 				c.delete(cls, pk LT n)
 			} else if (pk.isTypeLong) {
-				val n = r.longValue ?: return
+				val n = r.firstRow { it.getLong(1) } ?: return
 				c.delete(cls, pk LT n)
 			} else {
 				r.closeSafe()

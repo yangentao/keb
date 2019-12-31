@@ -11,7 +11,9 @@ fun Connection.countAll(tableName: String, w: Where?): Int {
 		select("COUNT(*)")
 		from(tableName)
 		where(w)
-	}.intValue ?: 0
+	}.firstRow {
+		it.getInt(1)
+	} ?: 0
 }
 
 
@@ -19,7 +21,7 @@ fun Connection.tableExists(tableName: String): Boolean {
 	val tname = tableName.trimSQL
 	val meta = this.metaData
 	val rs = meta.getTables(this.catalog, this.schema, tname, arrayOf("TABLE"))
-	val firstRow = rs.firstRow()
+	val firstRow = rs.firstMap
 	val s = firstRow?.get("TABLE_NAME")?.toString() ?: firstRow?.get("table_name")?.toString() ?: ""
 	return s.toLowerCase() == tname.toLowerCase()
 }
@@ -27,7 +29,7 @@ fun Connection.tableExists(tableName: String): Boolean {
 fun Connection.tableDesc(tableName: String): List<ColumnInfo> {
 	val meta = this.metaData
 	val rs = meta.getColumns(this.catalog, this.schema, tableName.trimSQL, "%")
-	return rs.allRows().map {
+	return rs.allMaps.map {
 		val m = ColumnInfo()
 		m.model.putAll(it)
 		m
@@ -37,7 +39,7 @@ fun Connection.tableDesc(tableName: String): List<ColumnInfo> {
 fun Connection.tableIndexList(tableName: String): List<IndexInfo> {
 	val meta = this.metaData
 	val rs = meta.getIndexInfo(this.catalog, this.schema, tableName.trimSQL, false, false)
-	return rs.models {
+	return rs.allModels {
 		IndexInfo()
 	}
 }

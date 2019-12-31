@@ -79,7 +79,7 @@ class MapTable(val tableName: String, val connName: String = "") {
 	}
 
 	fun get(key: String): String? {
-		return mapCon.query("SELECT value_ FROM $tableName WHERE key_ = ?", listOf(key)).strValue
+		return mapCon.query("SELECT value_ FROM $tableName WHERE key_ = ?", listOf(key)).firstRow { it.getString(1) }
 	}
 
 	val mapValue: HashMap<String, String>

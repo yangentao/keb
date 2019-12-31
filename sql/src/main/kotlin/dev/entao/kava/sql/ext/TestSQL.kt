@@ -36,10 +36,10 @@ fun main() {
 	m.insert()
 
 
-	val jarr = Test.tableQuery { desc(Test::id) }.ysonArray()
+	val jarr = Test.tableQuery { desc(Test::id) }.allJson
 	logd(jarr.toString())
 
-	val yo = Test.tableQuery { }.firstObject()
+	val yo = Test.tableQuery { }.firstObject
 	logd(yo)
 
 //	rs.closeAfter {

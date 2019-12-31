@@ -60,7 +60,7 @@ fun Connection.insertGen(sql: String, args: List<Any?>): Long {
 		return if (n <= 0) {
 			0L
 		} else {
-			it.generatedKeys.longValue ?: 0L
+			it.generatedKeys.firstRow { r -> r.getLong(1) } ?: 0L
 		}
 	}
 }

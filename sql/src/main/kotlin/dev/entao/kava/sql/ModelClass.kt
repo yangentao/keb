@@ -101,7 +101,7 @@ open class ModelClass<T : Model> {
 	}
 
 	fun list(block: TableQuery.() -> Unit): List<T> {
-		val ls = tableQuery(block).allRows()
+		val ls = tableQuery(block).allMaps
 		return ls.map { mapRow(it) }
 	}
 
@@ -133,7 +133,7 @@ open class ModelClass<T : Model> {
 			join(otherColumnOn.ownerClass!!)
 			on { thisColumnOn EQ otherColumnOn }
 			where(where)
-		}.allRows().map {
+		}.allMaps.map {
 			this.mapRow(it)
 		}
 	}

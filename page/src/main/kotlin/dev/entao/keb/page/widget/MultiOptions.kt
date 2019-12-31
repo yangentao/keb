@@ -47,7 +47,7 @@ private fun keyValueMapByTable(tableName: String, keyCol: String, labelCol: Stri
 	val map = LinkedHashMap<String, String>()
 	if (keyCol == labelCol) {
 		val q = SQLQuery().from(tableName).select(keyCol).distinct().asc(keyCol).where(w)
-		val ls = ConnLook.defaultConnection.query(q).allRows()
+		val ls = ConnLook.defaultConnection.query(q).allMaps
 		ls.forEach {
 			val k = it[keyCol]
 			if (k != null) {
@@ -56,7 +56,7 @@ private fun keyValueMapByTable(tableName: String, keyCol: String, labelCol: Stri
 		}
 	} else {
 		val q = SQLQuery().from(tableName).select(keyCol, labelCol).asc(labelCol).distinct().where(w)
-		val ls = ConnLook.defaultConnection.query(q).allRows()
+		val ls = ConnLook.defaultConnection.query(q).allMaps
 		ls.forEach {
 			val k = it[keyCol]
 			val v = it[labelCol]
@@ -108,7 +108,7 @@ fun KProperty<*>.singleSelectDisplay(v: Any): String? {
 
 private fun findLableOfKey(tableName: String, keyCol: String, labelCol: String, keyValue: Any): String? {
 	val q = SQLQuery().from(tableName).select(labelCol).limit(1).where(keyCol EQ keyValue)
-	val a: Any? = ConnLook.defaultConnection.query(q).anyValue
+	val a: Any? = ConnLook.defaultConnection.query(q).firstRow { it.getObject(1) }
 	return a?.toString() ?: ""
 }
 
