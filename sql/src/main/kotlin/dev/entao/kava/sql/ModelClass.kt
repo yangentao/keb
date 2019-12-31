@@ -82,13 +82,14 @@ open class ModelClass<T : Model> {
 		}.existRow
 	}
 
-	fun oneKey(pkValue: Any): T? {
-		return this.one(keyWhere(pkValue))
+	fun oneKey(pkValue: Any, block: TableQuery.() -> Unit = {}): T? {
+		return this.one(keyWhere(pkValue), block = block)
 	}
 
-	fun one(w: Where, vararg ws: Where): T? {
+	fun one(w: Where, vararg ws: Where, block: TableQuery.() -> Unit = {}): T? {
 		return filter(w, *ws) {
 			limit(1)
+			this.block()
 		}.firstOrNull()
 	}
 
