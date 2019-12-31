@@ -3,12 +3,13 @@
 package dev.entao.kava.sql
 
 import dev.entao.kava.base.Prop
+import dev.entao.kava.base.Prop1
 import dev.entao.kava.base.isPublic
+import dev.entao.kava.base.ownerClass
 import java.sql.Connection
 import java.sql.ResultSet
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
-import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.memberProperties
 
@@ -16,27 +17,27 @@ import kotlin.reflect.full.memberProperties
  * Created by entaoyang@163.com on 2017/4/5.
  */
 
-open class ModelClass<out T : Model> {
+open class ModelClass<T : Model> {
 
 	@Suppress("UNCHECKED_CAST")
-	private val tabCls: KClass<T> = javaClass.enclosingClass.kotlin as KClass<T>
+	val tableClass: KClass<T> = javaClass.enclosingClass.kotlin as KClass<T>
+	val con: Connection get() = tableClass.namedConn
 
 	init {
-		DefTable(tabCls)
+		DefTable(tableClass)
 	}
 
-	val con: Connection get() = tabCls.namedConn
 
 	@Suppress("UNCHECKED_CAST")
 	open fun mapRow(map: Map<String, Any?>): T {
-		val m = tabCls.createInstance()
+		val m = tableClass.createInstance()
 		m.model.putAll(map)
 		return m
 	}
 
 
 	fun delete(w: Where, vararg ws: Where): Int {
-		return con.delete(tabCls, andW(w, *ws))
+		return con.delete(tableClass, andW(w, *ws))
 	}
 
 	fun deleteByKey(keyValue: Any): Int {
@@ -44,33 +45,33 @@ open class ModelClass<out T : Model> {
 	}
 
 	fun updateByKey(keyValue: Any, vararg ps: Pair<Prop, Any?>): Int {
-		return con.update(tabCls, ps.toList(), keyWhere(keyValue))
+		return con.update(tableClass, ps.toList(), keyWhere(keyValue))
 	}
 
 	fun update(map: Map<Prop, Any?>, w: Where?): Int {
-		return con.update(tabCls, map.map { it.key to it.value }, w)
+		return con.update(tableClass, map.map { it.key to it.value }, w)
 	}
 
 	fun update(p: Pair<Prop, Any?>, w: Where?): Int {
-		return con.update(tabCls, listOf(p), w)
+		return con.update(tableClass, listOf(p), w)
 	}
 
 	fun update(p: Pair<Prop, Any?>, p2: Pair<Prop, Any?>, w: Where?): Int {
-		return con.update(tabCls, listOf(p, p2), w)
+		return con.update(tableClass, listOf(p, p2), w)
 	}
 
 	fun update(vararg ps: Pair<Prop, Any?>, block: () -> Where?): Int {
-		return con.update(tabCls, ps.toList(), block())
+		return con.update(tableClass, ps.toList(), block())
 	}
 
 	fun keyWhere(pkValue: Any): Where {
-		val pks = tabCls.modelPrimaryKeys
+		val pks = tableClass.modelPrimaryKeys
 		assert(pks.size == 1)
 		return pks.first() EQ pkValue
 	}
 
 	fun dumpTable() {
-		con.dump { from(tabCls) }
+		con.dump { from(tableClass) }
 	}
 
 	fun exits(w: Where, vararg ws: Where): Boolean {
@@ -106,14 +107,14 @@ open class ModelClass<out T : Model> {
 
 	//单表
 	fun tableQuery(block: TableQuery.() -> Unit): ResultSet {
-		val q = TableQuery(tabCls.sqlName)
+		val q = TableQuery(tableClass.sqlName)
 		q.block()
 		return con.query(q.toSQL(), q.args)
 	}
 
 	fun query(block: SQLQuery.() -> Unit): ResultSet {
 		return con.query {
-			from(tabCls)
+			from(tableClass)
 			this.block()
 		}
 	}
@@ -123,7 +124,18 @@ open class ModelClass<out T : Model> {
 		for (a in ws) {
 			ww = ww AND a
 		}
-		return con.countAll(tabCls, ww)
+		return con.countAll(tableClass, ww)
+	}
+
+	fun joinOn(thisColumnOn: Prop1, otherColumnOn: Prop1, where: Where): List<T> {
+		return this.query {
+			select("${tableClass.sqlName}.*")
+			join(otherColumnOn.ownerClass!!)
+			on { thisColumnOn EQ otherColumnOn }
+			where(where)
+		}.allRows().map {
+			this.mapRow(it)
+		}
 	}
 }
 
