@@ -120,6 +120,11 @@ open class ModelClass<T : Model> {
 		}
 	}
 
+	fun query(sa: SQLArgs): ResultSet {
+		return con.query(sa)
+	}
+
+
 	fun count(w: Where?, vararg ws: Where): Int {
 		var ww = w
 		for (a in ws) {

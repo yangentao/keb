@@ -60,6 +60,7 @@ fun Connection.esc(name: String): String {
 
 }
 
+class SQLArgs(val sql: String, val args: List<Any?> = emptyList())
 
 infix fun String.AS(other: String): String {
 	return "$this AS $other"
@@ -93,7 +94,11 @@ fun PreparedStatement.setParams(params: List<Any?>) {
 	}
 }
 
-fun Connection.exec(sql: String, args: List<Any> = emptyList()): Boolean {
+fun Connection.exec(sa: SQLArgs): Boolean {
+	return this.exec(sa.sql, sa.args)
+}
+
+fun Connection.exec(sql: String, args: List<Any?> = emptyList()): Boolean {
 	if (ConnLook.logEnable) {
 		logd(sql)
 	}
@@ -104,6 +109,10 @@ fun Connection.exec(sql: String, args: List<Any> = emptyList()): Boolean {
 	}
 }
 
+fun Connection.query(sa: SQLArgs): ResultSet {
+	return query(sa.sql, sa.args)
+}
+
 fun Connection.query(sql: String, args: List<Any?>): ResultSet {
 	if (ConnLook.logEnable) {
 		logd(sql)
@@ -112,6 +121,10 @@ fun Connection.query(sql: String, args: List<Any?>): ResultSet {
 	val st = this.prepareStatement(sql)
 	st.setParams(args)
 	return st.executeQuery()
+}
+
+fun Connection.update(sa: SQLArgs): Int {
+	return this.update(sa.sql, sa.args)
 }
 
 fun Connection.update(sql: String, args: List<Any?> = emptyList()): Int {

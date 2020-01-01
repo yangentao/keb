@@ -1,4 +1,4 @@
-@file:Suppress("unused", "MemberVisibilityCanBePrivate", "PropertyName")
+@file:Suppress("unused", "MemberVisibilityCanBePrivate", "PropertyName", "FunctionName")
 
 package dev.entao.kava.sql
 
@@ -12,18 +12,313 @@ import java.sql.ResultSet
  * Created by yangentao on 2016/12/14.
  */
 
+@DslMarker
+annotation class SQLMarker
 
-//Single Table Query
-open class BaseQuery {
-	var _distinctClause: String = ""
-	val _selectClause = arrayListOf<String>()
+@SQLMarker
+class OrderByClause(val _colList: ArrayList<String> = ArrayList()) {
+
+	val isEmpty: Boolean get() = _colList.isEmpty()
+
+	fun asc(col: String) {
+		_colList += "$col ASC"
+	}
+
+	fun desc(col: String) {
+		_colList += "$col DESC"
+	}
+
+	fun asc(p: Prop) {
+		asc(p.sqlFullName)
+	}
+
+	fun desc(p: Prop) {
+		desc(p.sqlFullName)
+	}
+
+	override fun toString(): String {
+		if (isEmpty) {
+			return ""
+		}
+		return "ORDER BY " + _colList.joinToString(",")
+	}
+}
+
+@SQLMarker
+class SelectClause {
+	var _distinct: String = ""
+	val columns = ArrayList<String>()
+
+
+	operator fun String.unaryPlus() {
+		columns += this
+	}
+
+	operator fun Prop.unaryPlus() {
+		columns += this.sqlFullName
+	}
+
+	fun cols(vararg cs: String) {
+		columns += cs
+	}
+
+	fun cols(vararg cs: Prop) {
+		columns += cs.map { it.sqlFullName }
+	}
+
+	val distinct: SelectClause
+		get() {
+			_distinct = "DISTINCT"
+			return this
+		}
+
+	fun distinctOn(prop: Prop) = distinctOn(prop.sqlFullName)
+	fun distinctOn(col: String) {
+		_distinct = "DISTINCT ON($col)"
+	}
+
+
+	fun call(funName: String, arg: String) {
+		columns += "$funName($arg)"
+	}
+
+	fun count(col: String) = call("COUNT", col)
+	fun count(p: Prop) = call("COUNT", p.sqlFullName)
+
+	fun countDistinct(col: String) = call("COUNT", "DISTINCT $col")
+	fun countDistinct(p: Prop) = call("COUNT", "DISTINCT ${p.sqlFullName}")
+	fun sum(col: String) = call("SUM", col)
+	fun sum(p: Prop) = call("SUM", p.sqlFullName)
+	fun max(col: String) = call("MAX", col)
+	fun max(p: Prop) = call("MAX", p.sqlFullName)
+	fun min(col: String) = call("MIN", col)
+	fun min(p: Prop) = call("MIN", p.sqlFullName)
+	fun avg(col: String) = call("AVG", col)
+	fun avg(p: Prop) = call("AVG", p.sqlFullName)
+
+
+	fun lead(p: Prop, offset: Int = 1, default: String? = null) {
+		lead(p.sqlFullName, offset, default)
+	}
+
+	fun lead(col: String, offset: Int = 1, default: String? = null) {
+		columns += when {
+			default != null -> {
+				"LEAD($col, $offset, $default)"
+			}
+			offset > 1 -> {
+				"LEAD($col, $offset)"
+			}
+			else -> {
+				"LEAD($col)"
+			}
+		}
+	}
+
+	fun lag(p: Prop, offset: Int = 1, default: String? = null) {
+		lag(p.sqlFullName, offset, default)
+	}
+
+	fun lag(col: String, offset: Int = 1, default: String? = null) {
+		columns += when {
+			default != null -> {
+				"LAG($col, $offset, $default)"
+			}
+			offset > 1 -> {
+				"LAG($col, $offset)"
+			}
+			else -> {
+				"LAG($col)"
+			}
+		}
+	}
+
+
+	fun row_number() {
+		columns += "ROW_NUMBER()"
+	}
+
+	fun rank() {
+		columns += "RANK()"
+	}
+
+	fun dense_rank() {
+		columns += "DENSE_RANK()"
+	}
+
+	fun percent_rank() {
+		columns += "PERCENT_RANK()"
+	}
+
+
+	fun first_value(p: Prop, ignoreNulls: Boolean = false) {
+		first_value(p.sqlFullName, ignoreNulls)
+	}
+
+	fun first_value(col: String, ignoreNulls: Boolean = false) {
+		columns += if (ignoreNulls) {
+			"FIRST_VALUE($col ignore nulls)"
+		} else {
+			"FIRST_VALUE($col)"
+		}
+	}
+
+	fun last_value(p: Prop, ignoreNulls: Boolean = false) {
+		last_value(p.sqlFullName, ignoreNulls)
+	}
+
+	fun last_value(col: String, ignoreNulls: Boolean = false) {
+		columns += if (ignoreNulls) {
+			"LAST_VALUE($col ignore nulls)"
+		} else {
+			"LAST_VALUE($col)"
+		}
+	}
+
+	fun over(block: OverClause.() -> Unit) {
+		val ov = OverClause()
+		ov.block()
+		columns[columns.lastIndex] = columns.last() + ov.toString()
+	}
+
+	override fun toString(): String {
+		val buf = StringBuilder(columns.size * 12 + 16)
+		buf += "SELECT "
+		if (_distinct.isNotEmpty()) {
+			buf += _distinct
+			buf += " "
+		}
+		val cs = columns.joinToString(", ")
+		if (cs.isEmpty()) {
+			buf += "* "
+		} else {
+			buf += cs
+		}
+		return buf.toString()
+	}
+}
+
+
+@SQLMarker
+class OverClause {
+	var _alias: String = ""
+	var _partitionby: String = ""
+	val _orderClause = OrderByClause()
+	var _range: String = ""
+
+	fun alias(alias: String) {
+		this._alias = alias
+	}
+
+	fun partitionBy(p: Prop) {
+		partitionBy(p.sqlFullName)
+	}
+
+	fun partitionBy(col: String) {
+		_partitionby = "PARTITION BY $col"
+	}
+
+	fun asc(col: String) {
+		_orderClause.asc(col)
+	}
+
+	fun desc(col: String) {
+		_orderClause.desc(col)
+	}
+
+	fun asc(p: Prop) {
+		asc(p.sqlFullName)
+	}
+
+	fun desc(p: Prop) {
+		desc(p.sqlFullName)
+	}
+
+	fun orderBy(block: OrderByClause.() -> Unit) {
+		_orderClause.block()
+	}
+
+	fun rangeBetween(preceding: Int, following: Int) {
+		val a = if (preceding >= 0) {
+			preceding.toString()
+		} else {
+			"unbounded"
+		}
+		val b = if (following >= 0) {
+			following.toString()
+		} else {
+			"unbounded"
+		}
+		_range = "range between $a preceding and $b following"
+	}
+
+	fun rowsBetween(preceding: Int, following: Int) {
+		val a = if (preceding >= 0) {
+			preceding.toString()
+		} else {
+			"unbounded"
+		}
+		val b = if (following >= 0) {
+			following.toString()
+		} else {
+			"unbounded"
+		}
+		_range = "rows between $a preceding and $b following"
+	}
+
+	override fun toString(): String {
+		return " OVER($_partitionby $_orderClause  $_range) $_alias"
+	}
+}
+
+@SQLMarker
+abstract class BaseQuery {
+	var _seleectClause = SelectClause()
 	var _whereClause: String = ""
 	var _limitClause: String = ""
-	var _orderClause = ""
+	val _orderByClause = OrderByClause()
 	var _groupByClause: String = ""
 	var _havingClause: String = ""
 
-	val args: ArrayList<Any> = ArrayList()
+
+	val args: ArrayList<Any?> = ArrayList()
+
+	abstract fun toSQL(): String
+}
+
+fun <T : BaseQuery> T.select(block: SelectClause.() -> Unit): T {
+	_seleectClause.block()
+	return this
+}
+
+fun <T : BaseQuery> T.distinct(): T {
+	_seleectClause.distinct
+	return this
+}
+
+fun <T : BaseQuery> T.distinctOn(col: String): T {
+	_seleectClause.distinctOn(col)
+	return this
+}
+
+fun <T : BaseQuery> T.distinctOn(p: Prop): T {
+	_seleectClause.distinctOn(p)
+	return this
+}
+
+fun <T : BaseQuery> T.selectAll(): T {
+	_seleectClause.cols("*")
+	return this
+}
+
+fun <T : BaseQuery> T.select(vararg cols: Prop): T {
+	_seleectClause.cols(*cols)
+	return this
+}
+
+fun <T : BaseQuery> T.select(vararg cols: String): T {
+	_seleectClause.cols(*cols)
+	return this
 }
 
 fun <T : BaseQuery> T.groupBy(s: String): T {
@@ -43,36 +338,6 @@ fun <T : BaseQuery> T.having(s: String): T {
 fun <T : BaseQuery> T.having(w: Where): T {
 	this.having(w.value)
 	this.args.addAll(w.args)
-	return this
-}
-
-fun <T : BaseQuery> T.distinct(): T {
-	this._distinctClause = "DISTINCT"
-	return this
-}
-
-fun <T : BaseQuery> T.distinctOn(col: String): T {
-	this._distinctClause = "DISTINCT ON($col)"
-	return this
-}
-
-fun <T : BaseQuery> T.distinctOn(p: Prop): T {
-	this._distinctClause = "DISTINCT ON(${p.sqlFullName})"
-	return this
-}
-
-fun <T : BaseQuery> T.selectAll(): T {
-	_selectClause.add("*")
-	return this
-}
-
-fun <T : BaseQuery> T.select(vararg cols: Prop): T {
-	cols.mapTo(_selectClause) { it.sqlFullName }
-	return this
-}
-
-fun <T : BaseQuery> T.select(vararg cols: String): T {
-	_selectClause.addAll(cols)
 	return this
 }
 
@@ -97,20 +362,12 @@ fun <T : BaseQuery> T.where(w: String, vararg params: Any): T {
 }
 
 fun <T : BaseQuery> T.asc(col: String): T {
-	if (_orderClause.isEmpty()) {
-		_orderClause = "ORDER BY $col ASC"
-	} else {
-		_orderClause += ", $col ASC"
-	}
+	_orderByClause.asc(col)
 	return this
 }
 
 fun <T : BaseQuery> T.desc(col: String): T {
-	if (_orderClause.isEmpty()) {
-		_orderClause = "ORDER BY $col DESC"
-	} else {
-		_orderClause += ", $col DESC"
-	}
+	_orderByClause.desc(col)
 	return this
 }
 
@@ -134,32 +391,27 @@ fun <T : BaseQuery> T.limit(size: Int, offset: Int): T {
 }
 
 class TableQuery(val tableName: String) : BaseQuery() {
-	//SELECT owner, COUNT(*) FROM pet GROUP BY owner
-	fun toSQL(): String {
-		val sb = StringBuilder(256)
-		sb += "SELECT "
-		if (_distinctClause.isNotEmpty()) {
-			sb += _distinctClause
-			sb += " "
-		}
 
-		sb += if (_selectClause.isEmpty()) {
-			"*"
-		} else {
-			_selectClause.joinToString(", ")
-		}
+	constructor(cls: TabClass) : this(cls.sqlName) {
+
+	}
+
+	//SELECT owner, COUNT(*) FROM pet GROUP BY owner
+	override fun toSQL(): String {
+		val sb = StringBuilder(256)
+		sb += _seleectClause.toString()
 		sb.append(" FROM ").append(tableName)
 		sb += " "
 		if (_groupByClause.isEmpty()) {
 			_havingClause = ""
 		}
-		val ls = listOf(_whereClause, _groupByClause, _havingClause, _orderClause, _limitClause)
+		val ls = listOf(_whereClause, _groupByClause, _havingClause, _orderByClause.toString(), _limitClause)
 		sb += ls.map { it.trim() }.filter { it.isNotEmpty() }.joinToString(" ")
 		return sb.toString()
 	}
 }
 
-
+@SQLMarker
 class SQLQuery : BaseQuery() {
 
 	//from允许多次调用 from("a").from("b").where....
@@ -210,21 +462,17 @@ class SQLQuery : BaseQuery() {
 		return on(s)
 	}
 
+	fun joinOn(table: String, block: OnBuilder.() -> String): SQLQuery {
+		join(table)
+		on(block)
+		return this
+	}
+
 
 	//SELECT owner, COUNT(*) FROM pet GROUP BY owner
-	fun toSQL(): String {
+	override fun toSQL(): String {
 		val sb = StringBuilder(256)
-		sb += "SELECT "
-		if (_distinctClause.isNotEmpty()) {
-			sb += _distinctClause
-			sb += " "
-		}
-
-		sb += if (_selectClause.isEmpty()) {
-			"*"
-		} else {
-			_selectClause.joinToString(", ")
-		}
+		sb += _seleectClause.toString()
 		sb.append(" FROM ").append(_fromClause.joinToString(","))
 		sb += " "
 		if (_joinClause.isEmpty()) {
@@ -233,7 +481,7 @@ class SQLQuery : BaseQuery() {
 		if (_groupByClause.isEmpty()) {
 			_havingClause = ""
 		}
-		val ls = listOf(_joinClause, _onClause, _whereClause, _groupByClause, _havingClause, _orderClause, _limitClause)
+		val ls = listOf(_joinClause, _onClause, _whereClause, _groupByClause, _havingClause, _orderByClause.toString(), _limitClause)
 		sb += ls.map { it.trim() }.filter { it.isNotEmpty() }.joinToString(" ")
 		return sb.toString()
 	}
@@ -253,6 +501,24 @@ class OnBuilder {
 	infix fun String.AND(s: String): String {
 		return "$this AND $s"
 	}
+}
+
+fun UNION(vararg qs: BaseQuery): SQLArgs {
+	val sql = qs.joinToString(" UNION ") { it.toSQL() }
+	val ls = ArrayList<Any?>()
+	qs.forEach {
+		ls.addAll(it.args)
+	}
+	return SQLArgs(sql, ls)
+}
+
+fun UNION_ALL(vararg qs: BaseQuery): SQLArgs {
+	val sql = qs.joinToString(" UNION ALL ") { it.toSQL() }
+	val ls = ArrayList<Any?>()
+	qs.forEach {
+		ls.addAll(it.args)
+	}
+	return SQLArgs(sql, ls)
 }
 
 fun Connection.query(q: SQLQuery): ResultSet {

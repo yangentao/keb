@@ -41,6 +41,26 @@ fun main() {
 
 	val yo = Test.tableQuery { }.firstObject
 	logd(yo)
+	Test.tableQuery {
+		select {
+			+Test::id
+			+Test::name
+			sum(Test::age)
+			over {
+				partitionBy(Test::name)
+				desc(Test::id)
+				alias("sumAge")
+			}
+		}
+//		groupBy(Test::name)
+		desc(Test::name)
+	}.dump()
+
+
+	println("============")
+	val a = TableQuery(Test::class).select(Test::id, Test::name).where(Test::id EQ 1)
+	val b = TableQuery(Test::class).select(Test::id, Test::name).where(Test::id EQ 2)
+	Test.query(UNION(a, b)).dump()
 
 //	rs.closeAfter {
 //		if (rs.next()) {
