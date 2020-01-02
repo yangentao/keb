@@ -3,8 +3,8 @@
 package dev.entao.kava.http
 
 import dev.entao.kava.base.closeSafe
-import dev.entao.kava.json.YsonArray
-import dev.entao.kava.json.YsonObject
+import dev.entao.json.YsonArray
+import dev.entao.json.YsonObject
 import dev.entao.kava.log.logd
 import dev.entao.kava.log.loge
 import java.io.File

@@ -3,8 +3,8 @@
 package dev.entao.kava.sql
 
 import dev.entao.kava.base.*
-import dev.entao.kava.json.Yson
-import dev.entao.kava.json.YsonObject
+import dev.entao.json.Yson
+import dev.entao.json.YsonObject
 import java.sql.Connection
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty

@@ -1,8 +1,8 @@
 package dev.entao.keb.core
 
 import dev.entao.kava.base.*
-import dev.entao.kava.json.YsonArray
-import dev.entao.kava.json.YsonObject
+import dev.entao.json.YsonArray
+import dev.entao.json.YsonObject
 import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction

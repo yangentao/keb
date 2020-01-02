@@ -1,6 +1,6 @@
 package dev.entao.keb.core.account
 
-import dev.entao.kava.json.YsonObject
+import dev.entao.json.YsonObject
 import dev.entao.keb.core.*
 import dev.entao.keb.core.util.JWT
 

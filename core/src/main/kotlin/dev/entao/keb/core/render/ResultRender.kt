@@ -1,9 +1,9 @@
 package dev.entao.keb.core.render
 
 import dev.entao.kava.base.Mimes
-import dev.entao.kava.json.YsonArray
-import dev.entao.kava.json.YsonObject
-import dev.entao.kava.json.ysonArray
+import dev.entao.json.YsonArray
+import dev.entao.json.YsonObject
+import dev.entao.json.ysonArray
 import dev.entao.keb.core.HttpContext
 
 class Result {

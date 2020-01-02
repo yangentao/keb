@@ -1,9 +1,9 @@
 package dev.entao.kava.sql
 
 import dev.entao.kava.base.*
-import dev.entao.kava.json.YsonArray
-import dev.entao.kava.json.YsonObject
-import dev.entao.kava.json.YsonParser
+import dev.entao.json.YsonArray
+import dev.entao.json.YsonObject
+import dev.entao.json.YsonParser
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty
 

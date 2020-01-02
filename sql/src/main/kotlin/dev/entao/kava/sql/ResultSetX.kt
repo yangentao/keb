@@ -4,9 +4,9 @@ package dev.entao.kava.sql
 
 import dev.entao.kava.log.logd
 import dev.entao.kava.base.closeSafe
-import dev.entao.kava.json.YsonArray
-import dev.entao.kava.json.YsonObject
-import dev.entao.kava.json.YsonValue
+import dev.entao.json.YsonArray
+import dev.entao.json.YsonObject
+import dev.entao.json.YsonValue
 import java.sql.ResultSet
 import java.sql.ResultSetMetaData
 
@@ -116,7 +116,7 @@ val ResultSet.allJson: YsonArray
 		val meta = this.metaData
 		this.closeAfter {
 			while (this.next()) {
-				arr += it.rowToJsonObject(meta)
+				arr.data += it.rowToJsonObject(meta)
 			}
 		}
 		return arr

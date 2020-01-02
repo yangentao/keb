@@ -39,6 +39,11 @@ class MyDate(time: Long = System.currentTimeMillis(), locale: Locale = Locale.ge
 	val sqlTime: java.sql.Time get() = java.sql.Time(time)
 	val sqlTimestamp: java.sql.Timestamp get() = java.sql.Timestamp(time)
 
+	val toDate: java.util.Date get() = java.util.Date(time)
+	val toDateSQL: java.sql.Date get() = java.sql.Date(time)
+	val toTimeSQL: java.sql.Time get() = java.sql.Time(time)
+	val toTimestamp: java.sql.Timestamp get() = java.sql.Timestamp(time)
+
 	var time: Long
 		get() {
 			return calendar.timeInMillis

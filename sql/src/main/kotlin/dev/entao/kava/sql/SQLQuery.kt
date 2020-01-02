@@ -7,6 +7,7 @@ import dev.entao.kava.base.Prop1
 import dev.entao.kava.base.plusAssign
 import java.sql.Connection
 import java.sql.ResultSet
+import kotlin.reflect.KMutableProperty
 
 /**
  * Created by yangentao on 2016/12/14.
@@ -64,6 +65,10 @@ class SelectClause {
 
 	fun cols(vararg cs: Prop) {
 		columns += cs.map { it.sqlFullName }
+	}
+
+	fun cols(cols: List<Prop>) {
+		columns.addAll(cols.map { it.sqlFullName })
 	}
 
 	val distinct: SelectClause
@@ -286,6 +291,12 @@ abstract class BaseQuery {
 	abstract fun toSQL(): String
 }
 
+fun <T : BaseQuery> T.select(cols: List<Prop>): T {
+	_seleectClause.columns.addAll(cols.map { it.sqlFullName })
+	return this
+}
+
+
 fun <T : BaseQuery> T.select(block: SelectClause.() -> Unit): T {
 	_seleectClause.block()
 	return this
@@ -416,6 +427,7 @@ class SQLQuery : BaseQuery() {
 
 	//from允许多次调用 from("a").from("b").where....
 	val _fromClause = arrayListOf<String>()
+	var _joinType = ""
 	var _joinClause = ""
 	var _onClause = ""
 
@@ -438,6 +450,42 @@ class SQLQuery : BaseQuery() {
 		return this
 	}
 
+	val INNER: SQLQuery
+		get() {
+			_joinType = "INNER"
+			return this
+		}
+	val LEFT: SQLQuery
+		get() {
+			_joinType = "LEFT"
+			return this
+		}
+	val RIGHT: SQLQuery
+		get() {
+			_joinType = "RIGHT"
+			return this
+		}
+	val FULL: SQLQuery
+		get() {
+			_joinType = "FULL"
+			return this
+		}
+	val LEFT_OUTER: SQLQuery
+		get() {
+			_joinType = "LEFT OUTER"
+			return this
+		}
+	val RIGHT_OUTER: SQLQuery
+		get() {
+			_joinType = "RIGHT OUTER"
+			return this
+		}
+	val FULL_OUTER: SQLQuery
+		get() {
+			_joinType = "FULL OUTER"
+			return this
+		}
+
 	fun join(vararg tables: String): SQLQuery {
 		return this.join(tables.toList())
 	}
@@ -446,8 +494,8 @@ class SQLQuery : BaseQuery() {
 		return join(modelClasses.map { it.sqlName })
 	}
 
-	fun join(tables: List<String>, joinType: String = "LEFT"): SQLQuery {
-		_joinClause = "$joinType JOIN  ${tables.joinToString(", ")}  "
+	fun join(tables: List<String>): SQLQuery {
+		_joinClause = "JOIN  ${tables.joinToString(", ")}  "
 		return this
 	}
 
@@ -468,6 +516,12 @@ class SQLQuery : BaseQuery() {
 		return this
 	}
 
+	fun joinOn(cls: TabClass, block: OnBuilder.() -> String): SQLQuery {
+		join(cls.sqlName)
+		on(block)
+		return this
+	}
+
 
 	//SELECT owner, COUNT(*) FROM pet GROUP BY owner
 	override fun toSQL(): String {
@@ -477,11 +531,12 @@ class SQLQuery : BaseQuery() {
 		sb += " "
 		if (_joinClause.isEmpty()) {
 			_onClause = ""
+			_joinType = ""
 		}
 		if (_groupByClause.isEmpty()) {
 			_havingClause = ""
 		}
-		val ls = listOf(_joinClause, _onClause, _whereClause, _groupByClause, _havingClause, _orderByClause.toString(), _limitClause)
+		val ls = listOf(_joinType, _joinClause, _onClause, _whereClause, _groupByClause, _havingClause, _orderByClause.toString(), _limitClause)
 		sb += ls.map { it.trim() }.filter { it.isNotEmpty() }.joinToString(" ")
 		return sb.toString()
 	}

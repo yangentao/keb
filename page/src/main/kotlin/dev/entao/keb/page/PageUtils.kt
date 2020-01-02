@@ -1,15 +1,12 @@
 package dev.entao.keb.page
 
 import dev.entao.kava.base.*
-import dev.entao.kava.json.YsonValue
-import dev.entao.kava.log.logd
+import dev.entao.json.YsonValue
 import dev.entao.keb.core.Keb
 import dev.entao.keb.page.tag.Tag
 import dev.entao.keb.page.bootstrap.alertError
 import dev.entao.keb.page.bootstrap.alertSuccess
 import dev.entao.keb.page.widget.singleSelectDisplay
-import java.text.DecimalFormat
-import kotlin.math.pow
 import kotlin.reflect.full.findAnnotation
 
 /**

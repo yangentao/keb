@@ -1,13 +1,10 @@
 package dev.entao.kava.sql.ext
 
+import dev.entao.json.*
 import dev.entao.kava.base.TextConverts
 import dev.entao.kava.base.TimeMill
-import dev.entao.kava.json.*
 import dev.entao.kava.log.*
 import dev.entao.kava.sql.*
-import org.postgresql.util.PGobject
-import java.sql.Connection
-import java.sql.ResultSet
 
 //val mysqlUrl = "jdbc:mysql://localhost:3306/test?useSSL=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true"
 //val mysqlMaker: ConnMaker = MySQLConnMaker(mysqlUrl, "test", "test")
@@ -25,8 +22,8 @@ fun main() {
 	ConnLook.logEnable = true
 	ConnLook.maker = pgMaker
 
-	TextConverts[YsonArray::class] = YsonArrayText
-	TextConverts[YsonObject::class] = YsonObjectText
+	TextConverts[YsonArray::class] = YsonArrayTextConvert
+	TextConverts[YsonObject::class] = YsonObjectTextConvert
 
 	val m = Test()
 	m.name = "Name $TimeMill"

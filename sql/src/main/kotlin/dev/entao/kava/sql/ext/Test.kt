@@ -1,6 +1,6 @@
 package dev.entao.kava.sql.ext
 
-import dev.entao.kava.json.YsonArray
+import dev.entao.json.YsonArray
 import dev.entao.kava.sql.*
 
 class Test : Model() {

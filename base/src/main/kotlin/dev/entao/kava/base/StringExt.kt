@@ -270,3 +270,12 @@ fun String.escapeHtml(forView: Boolean): String {
 
 	return sb.toString()
 }
+
+val String.lowerCased: String
+	get() {
+		return this.toLowerCase(Locale.getDefault())
+	}
+val String.upperCased: String
+	get() {
+		return this.toUpperCase(Locale.getDefault())
+	}

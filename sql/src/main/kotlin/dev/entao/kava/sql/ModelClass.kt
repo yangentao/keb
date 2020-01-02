@@ -27,6 +27,10 @@ open class ModelClass<T : Model> {
 		DefTable(tableClass)
 	}
 
+	val allProps: List<KMutableProperty<*>>
+		get() {
+			return this.tableClass.modelProperties
+		}
 
 	@Suppress("UNCHECKED_CAST")
 	open fun mapRow(map: Map<String, Any?>): T {
