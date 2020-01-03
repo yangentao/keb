@@ -366,6 +366,17 @@ fun <T : BaseQuery> T.where(w: Where?): T {
 	return this
 }
 
+fun <T : BaseQuery> T.whereAnd(vararg ws: Where?): T {
+	var ww: Where? = null
+	for (w in ws) {
+		if (w != null) {
+			ww = ww AND w
+		}
+	}
+	where(ww)
+	return this
+}
+
 fun <T : BaseQuery> T.where(w: String, vararg params: Any): T {
 	_whereClause = "WHERE $w"
 	args.addAll(params)
