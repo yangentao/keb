@@ -86,7 +86,7 @@ open class ModelClass<T : Model> {
 		con.dump { from(tableClass) }
 	}
 
-	fun exits(w: Where, vararg ws: Where): Boolean {
+	fun exist(w: Where, vararg ws: Where): Boolean {
 		return query {
 			select("1")
 			where(andW(w, *ws))
