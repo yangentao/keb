@@ -39,6 +39,13 @@ open class ModelClass<T : Model> {
 		return m
 	}
 
+	fun insert(vararg ps: Pair<Prop, Any?>): Boolean {
+		return con.insert(tableClass, ps.toList())
+	}
+
+	fun insertGenKey(vararg ps: Pair<Prop, Any?>): Long {
+		return con.insertGenKey(tableClass, ps.toList())
+	}
 
 	fun delete(w: Where, vararg ws: Where): Int {
 		return con.delete(tableClass, andW(w, *ws))
@@ -67,6 +74,7 @@ open class ModelClass<T : Model> {
 	fun update(vararg ps: Pair<Prop, Any?>, block: () -> Where?): Int {
 		return con.update(tableClass, ps.toList(), block())
 	}
+
 
 	fun keyWhere(pkValue: Any): Where {
 		val pks = tableClass.modelPrimaryKeys
@@ -146,6 +154,36 @@ open class ModelClass<T : Model> {
 		}.allMaps.map {
 			this.mapRow(it)
 		}
+	}
+
+	fun <R> columnList(w: Where?, col: Prop1, block: (ResultSet) -> R?): List<R> {
+		return this.tableQuery {
+			select(col)
+			where(w)
+		}.allRows(block)
+	}
+
+	fun <R> columnListKey(keyVal: Any, col: Prop1, block: (ResultSet) -> R?): List<R> {
+		return this.tableQuery {
+			select(col)
+			where(keyWhere(keyVal))
+		}.allRows(block)
+	}
+
+	fun <R> columnOne(w: Where?, col: Prop1, block: (ResultSet) -> R?): R? {
+		return this.tableQuery {
+			select(col)
+			where(w)
+			limit(1)
+		}.firstRow(block)
+	}
+
+	fun <R> columnOneKey(keyVal: Any, col: Prop1, block: (ResultSet) -> R?): R? {
+		return this.tableQuery {
+			select(col)
+			where(keyWhere(keyVal))
+			limit(1)
+		}.firstRow(block)
 	}
 }
 
